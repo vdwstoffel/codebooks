@@ -1,22 +1,39 @@
 ---
-sidebar_label: "Docker"
-sidebar_position: 1
+sidebar_label: Images
+sidebar_position: 2
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Docker
+# Images
 
-<img
-  src="https://e7.pngegg.com/pngimages/219/411/png-clipart-docker-logo-kubernetes-microservices-cloud-computing-dockers-logo-text-logo-thumbnail.png"
-  alt="docker"
-  width="200"
-/>
 
-[Docker](https://www.docker.com/) is a platform for developing, shipping, and running applications using containerization. Containers allow a developer to package up an application with all parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+Docker Images are the building blocks of a Docker container. They are created with the build command, and they are used to create containers.
 
-## How to setup a dockerfile for a node application
+## How to create an image
+
+```dockerfile title="dockerfile"
+FROM node:latest
+
+WORKDIR /app
+
+COPY package*.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "start" ]
+```
+
+```bash
+docker build -t node-docker-demo:dev .
+```
+
+## How to create a image for a node application
 
 <Tabs>
 
@@ -91,3 +108,4 @@ app.listen(3000);
 </TabItem>
 
 </Tabs>
+
