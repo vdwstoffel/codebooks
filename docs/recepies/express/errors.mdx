@@ -1,0 +1,105 @@
+---
+sidebar_label: "Error Handeling"
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Error Handeling
+
+## Setup Error Handeling
+
+<Tabs>
+
+<TabItem  value="AppError.js">
+
+```js
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export default AppError;
+```
+
+</TabItem>
+
+<TabItem value="catchAsync.js">
+
+```js
+export default (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+};
+```
+
+</TabItem>
+
+<TabItem value="App.js">
+
+```js
+import express from "express";
+
+import AppError from "./AppError.js";
+import catchAsync from "./catchAsync.js";
+
+const app = express();
+
+// Use return to go directly to global error function
+app.get("/", (req, res, next) => {
+  if (1 != 2) {
+    console.log("error");
+    return next(new AppError("1 does not eqaul 2", 401));
+  }
+
+  return res.status(200).json({ message: "hello" });
+});
+
+// Async Error: wrap in catchAsync to offload errors
+app.get(
+  "/sw",
+  catchAsync(async (req, res, next) => {
+    const result = await fetch("https://swapi.dev/api/people/1/notexist");
+    const se = await result.json();
+
+    if (!se) {
+      return next(new AppError(`Some error`, 404));
+    }
+
+    res.status(200).json({ status: "success", data: se });
+  })
+);
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || "Unknown error";
+  res.status(err.statusCode).json({ status: err.status, message: err.message });
+});
+
+export default app;
+```
+
+</TabItem>
+
+</Tabs>
+
+## Universal error handler for unhandled rejections
+
+```js
+const server = app.listen(port);
+
+process.on("uncaughtException", (err) => {
+  console.error(err.name, err.message);
+  server.close().then(process.exit(1));
+});
+```

@@ -1,0 +1,139 @@
+---
+sidebar_label: "Maps"
+sidebar_position: 4
+---
+
+# Maps
+
+## Create a Map
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        Console.WriteLine(capitals["USA"]);
+    }
+}
+```
+
+## Check if a Key Exists
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        if (capitals.ContainsKey("USA"))
+        {
+            Console.WriteLine("USA is in the dictionary");
+        }
+    }
+}
+```
+
+## Iterate Over a Map
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        foreach (KeyValuePair<string, string> capital in capitals)
+        {
+            Console.WriteLine($"The capital of {capital.Key} is {capital.Value}");
+        }
+    }
+}
+```
+
+## Remove a Key-Value Pair
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        capitals.Remove("France");
+
+        foreach (KeyValuePair<string, string> capital in capitals)
+        {
+            Console.WriteLine($"The capital of {capital.Key} is {capital.Value}");
+        }
+    }
+}
+```
+
+## Clear a Map
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        capitals.Clear();
+
+        Console.WriteLine(capitals.Count);
+    }
+}
+```
+
+## Get Map Size
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, string> capitals = new Dictionary<string, string>();
+        capitals.Add("USA", "Washington D.C.");
+        capitals.Add("France", "Paris");
+        capitals.Add("Italy", "Rome");
+
+        Console.WriteLine(capitals.Count);
+    }
+}
+```

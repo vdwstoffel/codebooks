@@ -1,0 +1,896 @@
+---
+sidebar_label: "Hooks"
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import UseStateExample from "@site/src/components/reactExamples/UseStateExample";
+import UpdateFormInput from "@site/src/components/reactExamples/UpdateFormInput";
+import UpdaterFunction from "@site/src/components/reactExamples/UpdaterFunction";
+
+import UseEffectExample from "@site/src/components/reactExamples/UseEffectExample";
+import UpdateDomEvents from "@site/src/components/reactExamples/UpdateDomEvents";
+import UpdatingDependancyArray from "@site/src/components/reactExamples/UpdatingDependancyArray";
+
+import UseRefExample from "@site/src/components/reactExamples/UseRefExample";
+import UpdatingText from "@site/src/components/reactExamples/UpdatingText";
+import CheckIfElementWasClicked from "@site/src/components/reactExamples/CheckIfElementWasClicked";
+
+import UseReducerExample from "@site/src/components/reactExamples/UseReducerExample";
+import WithContextExample from "@site/src/components/reactExamples/WithContextExample";
+
+import UseContextExample from "@site/src/components/reactExamples/useContext/UseContextExample";
+import UseContextHookExample from "@site/src/components/reactExamples/useContext/UseContextHookExample";
+
+import UseMemoExmaple from "@site/src/components/reactExamples/UseMemoExample";
+
+# Hooks
+
+## useSate
+
+[useState](https://react.dev/reference/react/useState) is a React Hook that lets you add a state variable to your component.
+
+```jsx
+import { useState } from "react";
+
+...
+
+const [state, setState] = useState(initialState);
+```
+
+### Baisc useState Example
+
+Shows a basic example how a button click can update the state of an component.
+
+```jsx
+import { useState } from "react";
+
+export default function UseStateExample() {
+  const [count, setCount] = useState(0);
+
+  const increase = () => setCount((c) => c + 1);
+  const decrease = () => setCount((c) => c - 1);
+
+  return (
+    <>
+      <button onClick={decrease}>-</button>
+      <p>Count: {count}</p>
+      <button onClick={increase}>+</button>
+    </>
+  );
+}
+```
+
+<UseStateExample />
+
+### Update form input
+
+By adding a onChange to the field input we can see how the state is updated while we type
+
+```jsx
+import { useState } from "react";
+
+export default function UpdateFormInput() {
+  const [name, setName] = useState("");
+
+  function handleInput(e) {
+    setName(e.target.value);
+  }
+
+  return (
+    <>
+      <input onChange={handleInput} />
+      <p>You typed: {name}</p>
+    </>
+  );
+}
+```
+
+<UpdateFormInput />
+
+### useState Updater function
+
+When updating state the original state does not change if updated multiple time. Each update will modify the original value. To solve this problem, you may pass an updater function
+
+```jsx
+import { useState } from "react";
+
+export default function UpdaterFunction() {
+  const [countOne, setCountOne] = useState(0);
+  const [countTwo, setCountTwo] = useState(0);
+
+  function normalIncrease() {
+    // Notice that the count will only update by one since countOne still
+    // has the previous state since the component did not update
+    setCountOne(countOne + 1);
+    setCountOne(countOne + 1);
+  }
+
+  function updaterIncrease() {
+    // Here, a => a + 1 is your updater function.
+    // It takes the pending state and calculates the next state from it.
+    setCountTwo((a) => a + 1);
+    setCountTwo((a) => a + 1);
+  }
+
+  function increase() {
+    normalIncrease();
+    updaterIncrease();
+  }
+
+  return (
+    <>
+      <div>
+        <button onClick={increase}>+</button>
+        <p>Count w/o UpdaterFunctiopn: {countOne}</p>
+        <p>Count with UpdaterFunctiopn: {countTwo}</p>
+      </div>
+    </>
+  );
+}
+```
+
+<UpdaterFunction />
+
+### Creating a useState Custom hook
+
+<Tabs>
+
+<TabItem value="useCounter.js">
+
+```js
+import { useState } from "react";
+
+export function useCounter() {
+  const [count, setCount] = useState(0);
+
+  const increase = () => setCount((c) => c + 1);
+  const decrease = () => setCount((c) => c - 1);
+
+  return { count, increase, decrease };
+}
+```
+
+</TabItem>
+
+<TabItem value="CustomHook.js" >
+
+```jsx
+import { useCounter } from "./useCounter";
+
+export default function UseStateCustomHook() {
+  const { count, increase, decrease } = useCounter();
+
+  return (
+    <>
+      <button onClick={decrease}>-</button>
+      <p>{count}</p>
+      <button onClick={increase}>+</button>
+    </>
+  );
+}
+```
+
+</TabItem >
+
+</Tabs>
+
+## UseEffect
+
+[useEffect](https://react.dev/reference/react/useEffect) is a React Hook that lets you synchronize a component with an external system.
+
+```jsx
+import { useEffect } from "react";
+
+...
+
+useEffect(setup, dependencies?)
+```
+
+### Fetch Remote Data
+
+Fetching data from a remote server and display it when the component mounts
+
+```jsx
+import { useState, useEffect } from "react";
+
+import { getUsers } from "../../helpers/fakeServer";
+
+export default function UseEffectExample() {
+  const [users, setUsers] = useState([]);
+
+  async function fectUsers() {
+    const users = await getUsers();
+    setUsers(users);
+  }
+
+  useEffect(() => {
+    fectUsers();
+  }, []); // Dependancy array is empty, so it will only run once
+
+  return (
+    <>
+      {users.map((user, idx) => (
+        <p key={idx}>
+          {user.name} - {user.age}
+        </p>
+      ))}
+    </>
+  );
+}
+```
+
+<UseEffectExample />
+
+### Updating Dom Events
+
+useEffect can also be used to update Dom events
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function UpdateDomEvents() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  function trackeMove(e) {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }
+
+  useEffect(() => {
+    window.addEventListener("pointermove", trackeMove);
+    return () => window.removeEventListener("pointermove", trackeMove);
+  }, []);
+
+  return (
+    <div>
+      <h1>Mouse Position:</h1>
+      <p>x: {mousePosition.x}</p>
+      <p>y: {mousePosition.y}</p>
+    </div>
+  );
+}
+```
+
+<UpdateDomEvents />
+
+### Update component when a state changes
+
+```jsx
+import { useState, useEffect } from "react";
+
+import { getUsers, addUser } from "../../helpers/fakeServer";
+
+export default function UpdatingDependancyArray() {
+  const [users, setUsers] = useState([]);
+  const [lastAction, setLastAction] = useState(new Date().toISOString());
+
+  async function fetchUsers() {
+    const users = await getUsers();
+    setUsers(users);
+  }
+
+  async function addNewUser() {
+    await addUser({ name: "Doe", age: 30 });
+    setLastAction(new Date().toISOString());
+  }
+
+  useEffect(() => {
+    fetchUsers();
+    console.log("Run");
+  }, [lastAction]);
+
+  return (
+    <>
+      <h1>Last action at: {lastAction}</h1>
+      <button onClick={addNewUser}>Add</button>
+      {users.map((user, idx) => (
+        <p key={idx}>
+          {user.name} - {user.age}
+        </p>
+      ))}
+    </>
+  );
+}
+```
+
+<UpdatingDependancyArray />
+
+### Aborting an Async Function
+
+```jsx
+import { useEffect, useState } from "react";
+
+import { getUsers } from "../../helpers/fakeServer";
+
+export default function AbortEffect() {
+  const [apiStatus, setApiStatus] = useState("Not Set");
+
+  useEffect(() => {
+    const apiController = new AbortController();
+
+    async function getDetails() {
+      const users = await getUsers(apiController);
+      setApiStatus(users[0].name);
+    }
+
+    getDetails();
+    return () => apiController.abort();
+  }, []);
+
+  return <h1>API Status: {apiStatus}</h1>;
+}
+```
+
+```js
+export async function getUsers(apiController = undefined) {
+  const users = await axios.get("/users", { signal: apiController?.signal });
+  return users.data.users;
+}
+```
+
+## useRef
+
+[useRef](https://react.dev/reference/react/useRef) is a React Hook that lets you reference a value that’s not needed for rendering. useRef places an reference to any html element. Any normal dom manipulation can be done using useRef.
+
+```jsx
+import { useRef } from "react";
+
+...
+
+const ref = useRef(initialValue)
+```
+
+### Adding styles to a box
+
+<Tabs>
+
+<TabItem value="UseRefExample.jsx">
+
+```jsx
+import { useRef } from "react";
+
+import styles from "./ref.module.css";
+
+export default function RefExample() {
+  const redBox = useRef();
+
+  function handleClick() {
+    redBox.current.className = redBox.current.className + " " + styles.spin;
+    redBox.current.textContent = "Spinning";
+
+    setTimeout(() => {
+      redBox.current.textContent = "Stable";
+      redBox.current.className = `${styles.box} ${styles.red}`;
+    }, 5500);
+  }
+
+  return (
+    <>
+      <div>
+        <button onClick={handleClick}>Red</button>
+      </div>
+      <div>
+        <div ref={redBox} className={`${styles.box} ${styles.red}`}>
+          Stable
+        </div>
+      </div>
+    </>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="ref.module.css">
+
+```css
+.box {
+  width: 250px;
+  height: 250px;
+  border: 1px black solid;
+  margin: auto;
+  margin-top: 4em;
+}
+
+.red {
+  background-color: darkred;
+}
+
+.spin {
+  transform: rotate(360deg);
+  transition: all 5s;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<UseRefExample />
+
+### Updating element Text
+
+```jsx
+import { useRef } from "react";
+
+export default function UpdatingText() {
+  const para = useRef();
+  const inp = useRef();
+
+  function updateParagraph() {
+    para.current.textContent = "Button click updated Paragraph";
+  }
+
+  function updateInput() {
+    inp.current.value = "Updated";
+  }
+
+  return (
+    <div>
+      <button onClick={updateParagraph}>Update Paragraph</button>
+      <button onClick={updateInput}>Update Input</button>
+      <p ref={para}>Paragraph</p>
+      <input ref={inp} placeholder="Type Something" />
+    </div>
+  );
+}
+```
+
+<UpdatingText />
+
+### How to check if an element was clicked
+
+```jsx
+import { useEffect, useRef, useState } from "react";
+
+export default function CheckIfElementWasClicked() {
+  const ref = useRef();
+  const [lastClick, setLastClick] = useState();
+
+  function handleClick(e) {
+    if (ref.current && ref.current.contains(e.target)) {
+      setLastClick("Clicked inside div");
+    } else {
+      setLastClick("Clicked outside div");
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  });
+
+  return (
+    <>
+      <h1>Area Clicked: {lastClick}</h1>
+      <div
+        style={{ width: "600px", height: "600px", backgroundColor: "darkred" }}
+      >
+        <div
+          style={{ width: "300px", height: "300px", backgroundColor: "orange" }}
+          ref={ref}
+        >
+          Inner Div
+        </div>
+      </div>
+    </>
+  );
+}
+```
+
+<CheckIfElementWasClicked />
+
+## useReduer
+
+[useReducer](https://react.dev/reference/react/useReducer) is a React Hook that lets you add a reducer to your component.
+
+### Basic Usage
+
+```jsx
+import { useReducer } from "react";
+
+const initialState = {
+  balance: 0,
+  loan: 0,
+};
+
+function reducerFn(state, action) {
+  switch (action.type) {
+    case "deposit":
+      return { ...state, balance: state.balance + action.payload };
+
+    case "withdraw":
+      return { ...state, balance: state.balance - action.payload };
+
+    case "takeLoan": {
+      const loanAmount = action.payload;
+      return {
+        ...state,
+        balance: state.balance + loanAmount,
+        loan: state.loan + loanAmount,
+      };
+    }
+
+    case "payLoan":
+      return { ...state, loan: 0, balance: state.balance - state.loan };
+
+    default:
+      throw new Error("'Unknown action: " + action.type);
+  }
+}
+
+export default function UserReducerExample() {
+  const [state, dispatch] = useReducer(reducerFn, initialState);
+  const { balance, loan } = state;
+
+  const makeDeposit = () => dispatch({ type: "deposit", payload: 50 });
+  const withdraw = () => dispatch({ type: "withdraw", payload: 30 });
+  const takeLoan = () => dispatch({ type: "takeLoan", payload: 100 });
+  const payLoan = () => dispatch({ type: "payLoan" });
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: "3em" }}>
+        <span>Balance: $ {balance}</span>
+        <span>Outstanding loan: $ {loan}</span>
+      </div>
+      <div style={{ display: "flex", gap: "3em" }}>
+        <button onClick={makeDeposit}>Deposit $50</button>
+        <button onClick={withdraw}>Withdraw $30</button>
+        <button onClick={takeLoan}>Take $100 loan</button>
+        <button onClick={payLoan}>Repay loan</button>
+      </div>
+    </div>
+  );
+}
+```
+
+<UseReducerExample />
+
+### Adding useReducer to a context for global management
+
+<Tabs>
+
+<TabItem value="UserReducer.js">
+
+- Create and export the reducer function and initial state. This will be used by the context provider to allow all components to access the state and dispatch function.
+
+```js
+const initialState = {
+  name: "",
+  age: 0,
+};
+
+function userReducerFn(state, action) {
+  switch (action.type) {
+    case "updateName":
+      return { ...state, name: action.payload };
+
+    case "updateAge":
+      return { ...state, age: state.age + 1 };
+
+    default:
+      throw new Error("Unknow action: ", action.type);
+  }
+}
+
+// Create the initial state and function and export
+export { initialState, userReducerFn };
+```
+
+</TabItem>
+
+<TabItem value="UserContextProvider.jsx">
+
+- Create the context provider, that has the reducer variables and functrion, it will take child components as prop and give them global acess
+
+```jsx
+import { createContext, useReducer } from "react";
+
+import { initialState, userReducerFn } from "./userReducer";
+
+// Export the userContext, this will be used in the custom hook
+export const userContext = createContext({});
+
+export default function UserContextProvider({ children }) {
+  const [{ name, age }, dispatch] = useReducer(userReducerFn, initialState);
+
+  const updateName = (name) => dispatch({ type: "updateName", payload: name });
+  const updateAge = () => dispatch({ type: "updateAge" });
+
+  // Give all children access to the values
+  return (
+    <userContext.Provider value={{ name, age, updateName, updateAge }}>
+      {children}
+    </userContext.Provider>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="useUser.js">
+
+- Create a custom hook
+
+```js
+import { useContext } from "react";
+
+import { userContext } from "./UserContextProvider";
+
+export function useUser() {
+  const context = useContext(userContext);
+
+  if (context === undefined) {
+    throw new Error("userReducer used outside Provider");
+  }
+
+  return context;
+}
+```
+
+</TabItem>
+
+<TabItem value="WithContextExample.jsx">
+
+```jsx
+import UserContextProvider from "./UserContextProvider";
+import { useUser } from "./useUser";
+
+export default function WithContextExample() {
+  return (
+    <UserContextProvider>
+      <UserDetails />
+      <UserEdits />
+    </UserContextProvider>
+  );
+}
+
+function UserDetails() {
+  const { name, age } = useUser();
+
+  return (
+    <div>
+      <span>Name: {name}</span>
+      <span>Age: {age}</span>
+    </div>
+  );
+}
+
+function UserEdits() {
+  const { updateName, updateAge } = useUser();
+
+  const updateNameHandler = (e) => updateName(e.target.value);
+
+  return (
+    <div>
+      <input onChange={updateNameHandler} />
+      <button onClick={updateAge}>increment</button>
+    </div>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<WithContextExample />
+
+## useContext
+
+[useContext](https://react.dev/reference/react/useContext) is a React Hook that lets you read and subscribe to context from your component. useContext can be used for global state management.
+
+```jsx
+import { useContext, createContext } from 'react';
+
+const SomeContext = createContext('default value');
+...
+
+const value = useContext(SomeContext)
+```
+
+### Basic Example
+
+<Tabs>
+
+<TabItem value="UserContextProvider.jsx">
+
+create a context Component that accepts children. The Provider exposes the values to all child components.
+
+```jsx
+import { createContext, useState } from "react";
+
+export const UserContext = createContext();
+
+export default function UserContextProvider({ children }) {
+  const [userName, setUsername] = useState("");
+
+  const updateName = (name) => setUsername(name);
+
+  return (
+    <UserContext.Provider value={{ userName, updateName }}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="UseContextExample.jsx">
+
+By Wrapping ComponentOne and ComponentTwo with UserContextProvider, they can access the context values.
+
+```jsx
+import { useContext } from "react";
+
+import UserContextProvider, { UserContext } from "./UserContextProvider";
+
+export default function UseContextExample() {
+  return (
+    <UserContextProvider>
+      <ComponentOne />
+      <ComponentTwo />
+    </UserContextProvider>
+  );
+}
+
+function ComponentOne() {
+  const { updateName } = useContext(UserContext);
+
+  function updateHandler(e) {
+    updateName(e.target.value);
+  }
+
+  return (
+    <div>
+      <p>Create User</p>
+      <input onChange={updateHandler} />
+    </div>
+  );
+}
+
+function ComponentTwo() {
+  const { userName } = useContext(UserContext);
+
+  return (
+    <div>
+      <p>UserName: {userName}</p>
+    </div>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<UseContextExample />
+
+### Creating a useContext Custom Hook
+
+<Tabs>
+
+<TabItem value="UserContextProvider.js">
+
+```js
+import { createContext, useState } from "react";
+
+export const UserContext = createContext();
+
+export default function UserContextProvider({ children }) {
+  const [userName, setUsername] = useState("");
+
+  const updateName = (name) => setUsername(name);
+
+  return (
+    <UserContext.Provider value={{ userName, updateName }}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="useUser.js">
+
+```js
+import { useContext } from "react";
+
+import { UserContext } from "./UserContextProvider";
+
+export function useUser() {
+  const context = useContext(UserContext);
+
+  if (context === undefined) {
+    throw new Error("UseUser is used outside the provider");
+  }
+
+  return context;
+}
+```
+
+</TabItem>
+
+<TabItem value="UseContextExample.jsx">
+
+```jsx
+import UserContextProvider from "./UserContextProvider";
+import { useUser } from "./useUser";
+
+export default function UseContextExample() {
+  return (
+    <UserContextProvider>
+      <ComponentOne />
+      <ComponentTwo />
+    </UserContextProvider>
+  );
+}
+
+function ComponentOne() {
+  const { updateName } = useUser();
+
+  function updateHandler(e) {
+    updateName(e.target.value);
+  }
+
+  return (
+    <div>
+      <p>Create User</p>
+      <input onChange={updateHandler} />
+    </div>
+  );
+}
+
+function ComponentTwo() {
+  const { userName } = useUser();
+
+  return (
+    <div>
+      <p>UserName: {userName}</p>
+    </div>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<UseContextHookExample />
+
+## useMemo
+
+[useMemo](https://react.dev/reference/react/useMemo) is a React Hook that lets you cache the result of a calculation between re-renders.
+
+### Basic Example
+
+```jsx
+import { useState, useMemo } from "react";
+
+export default function UseMEmoExmaple() {
+  const [times, setTimes] = useState(0);
+  const [force, setForce] = useState(false);
+
+  const date = useMemo(() => {
+    return new Date().toLocaleTimeString();
+  }, [force]);
+
+  return (
+    <>
+      <p>Times Clicked: {times}</p>
+      <button onClick={() => setTimes((t) => t + 1)}>Increase</button>
+      <p>Without Memo update: {new Date().toLocaleTimeString()}</p>
+      <p>With Memo Update: {date}</p>
+      <button onClick={() => setForce((f) => !f)}>Force Rerender</button>
+    </>
+  );
+}
+```
+
+<UseMemoExmaple />
+

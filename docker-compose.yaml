@@ -1,0 +1,17 @@
+services:
+  codebook_server:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: codebook
+    ports:
+      - "9080:9080"
+    volumes:
+      - ./src:/app/src
+      - ./docs:/app/docs
+      - ./blog:/app/blog
+      - ./static:/app/static
+      - /app/node_modules/
+      - ./docusaurus.config.js:/app/docusaurus.config.js
+      - ./sidebars.js:/app/sidebars.js

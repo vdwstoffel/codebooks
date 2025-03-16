@@ -1,0 +1,91 @@
+---
+sidebar_label: "Error Handeling"
+sidebar_position: 203
+---
+
+# Error Handeling
+
+## Try/Catch/Finallly
+
+```java
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class ErrorHandling {
+
+    public static void main(String[] args) {
+
+        try {
+            FileInputStream myFile = new FileInputStream("./greeting.txt");
+            Scanner scanner = new Scanner(myFile);
+            System.out.println(scanner.nextLine());
+            scanner.close();
+
+        } catch (FileNotFoundException exception) {
+            System.out.println(exception.getMessage());
+            System.out.println("File not found");
+
+        } finally {
+            System.out.println("Finally block ran");
+        }
+    }
+}
+```
+
+## Using throws in function declaration
+
+In certain situations, you might want to handle an exception outside the function where the error-prone code resides, rather than within the function itself. This is where the 'throws' keyword becomes particularly useful.
+
+```java
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class FunctionThrows {
+
+    public static void main(String[] args) {
+
+        try {
+            readFile("./greeting.txt");
+        } catch (FileNotFoundException error) {
+            System.out.println(error);
+        }
+    }
+
+    public static void readFile(String filename) throws FileNotFoundException {
+        FileInputStream myFile = new FileInputStream(filename);
+        Scanner scanner = new Scanner(myFile);
+        System.out.println(scanner.nextLine());
+        scanner.close();
+    }
+}
+```
+
+## Argument validation
+
+```java
+public class ArgumentValidation {
+
+    public static void main(String[] args) {
+        showAge(-1);
+        showName("");
+    }
+
+    public static void showAge(int age) {
+        if (age < 1) {
+            throw new IllegalArgumentException("Age cannot be less than one");
+        }
+
+        System.out.println(age);
+    }
+
+    public static void showName(String Name) {
+        if (title.isBlank() || title == null) {
+            throw new IllegalArgumentException("Name is mandatory");
+        }
+
+        System.out.println(name);
+    }
+}
+```

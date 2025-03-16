@@ -1,0 +1,89 @@
+# Functions
+
+## Function with no return a
+
+```java
+public static void noReturn() {
+    System.out.println("This function has no return");
+}
+
+noReturn();
+```
+
+## Function with string return
+
+```java
+public static String stringReturn() {
+    return "This function returns a string";
+}
+
+String returnedStr = stringReturn();
+```
+
+## Function with int return
+
+```java
+public static int intReturn() {
+    return 10;
+}
+
+int returnedInt = intReturn();
+```
+
+## Function with double return
+
+```java
+public static double doubleReturn() {
+    return 10.5;
+}
+
+double returnedDouble = doubleReturn();
+```
+
+## Function with boolean return
+
+```java
+public static boolean booleanReturn() {
+    return true;
+}
+
+boolean returnedBoolean = booleanReturn();
+```
+
+## Function with parameters
+
+```java
+public static void withParameters(int a, int b) {
+    System.out.println(a + b);
+}
+
+withParameters(10, 20);
+```
+
+## Function with default parameters
+
+```java
+public static void withDefaultParameters(int a, int b = 10) {
+    System.out.println(a + b);
+}
+
+withDefaultParameters(10); // 20
+```
+
+## Add documentation to a function
+
+```java
+/**
+ * This function adds two numbers
+ * @param a
+ * @param b
+ * @return sum of a and b
+ */
+
+public static int add(int a, int b) {
+    return a + b;
+
+}
+
+int sum = add(10, 20);
+```

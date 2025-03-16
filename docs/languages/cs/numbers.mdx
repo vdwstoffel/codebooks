@@ -1,0 +1,82 @@
+---
+sidebar_label: "Numbers"
+sidebar_position: 3
+---
+
+# Numbers
+
+## Integer
+
+```csharp
+int age = 23;
+Console.WriteLine(age);
+```
+
+## Double
+
+```csharp
+double pi = 3.14159;
+Console.WriteLine(pi);
+```
+
+## Float
+
+```csharp
+float pi = 3.14159f;
+Console.WriteLine(pi);
+```
+
+## Decimal
+
+```csharp
+decimal pi = 3.14159m;
+Console.WriteLine(pi);
+```
+
+## Long
+
+```csharp
+long population = 7_794_798_739;
+Console.WriteLine(population);
+```
+
+## Generating a random number
+
+To generate a random number between 0 and 1, you can use the `random` function from the `math` module.
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Random random = new Random();
+        double randomNumber = random.NextDouble();
+        Console.WriteLine(randomNumber);
+    }
+}
+```
+
+- Generate a random number between 1 and 100:
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Random random = new Random();
+        int randomNumber = random.Next(1, 101);
+        Console.WriteLine(randomNumber);
+    }
+}
+```
+
+## Convert string to number
+
+```csharp
+string textAge = "23";
+int converted = Convert.ToInt32(textAge);
+```

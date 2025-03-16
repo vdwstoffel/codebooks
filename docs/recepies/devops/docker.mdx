@@ -1,0 +1,93 @@
+---
+sidebar_label: "Docker"
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Docker
+
+<img
+  src="https://e7.pngegg.com/pngimages/219/411/png-clipart-docker-logo-kubernetes-microservices-cloud-computing-dockers-logo-text-logo-thumbnail.png"
+  alt="docker"
+  width="200"
+/>
+
+[Docker](https://www.docker.com/) is a platform for developing, shipping, and running applications using containerization. Containers allow a developer to package up an application with all parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+
+## How to setup a dockerfile for a node application
+
+<Tabs>
+
+<TabItem value="Dockerfile">
+
+```Dockerfile
+FROM node:latest
+
+WORKDIR /app
+
+COPY package*.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "start" ]
+```
+
+</TabItem>
+
+<TabItem value="Commands">
+
+- Build Image
+
+```bash
+docker build -t node-docker-demo:dev .
+```
+- Run Container
+
+```bash
+docker run -d -p 9999:3000 --name node-demo node-docker-demo:dev
+curl -X GET http://localhost:9999
+```
+
+- Stop Container
+
+```bash
+docker stop node-demo
+```
+
+- Check container logs
+
+```bash
+docker logs node-demo
+```
+
+- Remove Container
+
+```bash
+docker rm node-demo
+```
+
+</TabItem>
+
+<TabItem value="app.js">
+
+```js
+import express from "express";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Hello from docker" });
+});
+
+app.listen(3000);
+```
+
+</TabItem>
+
+</Tabs>

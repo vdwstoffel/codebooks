@@ -1,0 +1,59 @@
+---
+sidebar_label: "Numbers"
+sidebar_position: 3
+---
+
+# Numbers
+
+```java
+int a = 10;
+long b = 1000000000L;
+double c = 10.5;
+```
+
+## Converting Number to a string
+
+```java
+int a = 10;
+String str = Integer.toString(a);
+```
+
+## Convert string to number
+
+```java
+String str = "10";
+int a = Integer.parseInt(str);
+```
+
+## Getting the remainder of a division
+
+```java
+int a = 10;
+int b = 4;
+int remainder = a % b; // 2
+```
+
+## Generating a random number
+
+```java
+import java.util.Random;
+
+Random rand = new Random();
+int randNumber = rand.nextInt(3); // 0 - 2
+```
+
+```java
+double randomNumber = Math.random();
+System.out.println(randomNumber);   // 0.2412344874800766
+
+// Get random number between 1 - 6
+int numberInt =  (int) (randomNumber * 6) + 1;
+System.out.println(numberInt);  // 5
+```
+
+## Convert double to int
+
+```java
+double a = 10.5;
+int b = (int) a; // 10
+```

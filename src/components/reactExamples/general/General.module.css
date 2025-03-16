@@ -1,0 +1,15 @@
+.modalContainer {
+  width: 500px;
+  height: 200px;
+  position: relative;
+  text-align: center;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: beige;
+  padding: 1em;
+}

@@ -1,0 +1,54 @@
+---
+sidebar_label: "IO"
+sidebar_position: 5
+---
+
+# Input and Output
+
+## How to take string user input
+
+```csharp title="Program.cs"
+Console.WriteLine("Enter name: ");
+string name = Console.ReadLine();
+Console.WriteLine("Hello " + name);
+```
+
+## Take integer input from user
+
+```csharp title="Program.cs"
+Console.WriteLine("Enter age: ");
+int age = Convert.ToInt32(Console.ReadLine());
+Console.WriteLine("You are " + age + " years old");
+```
+
+## Writing to a file
+
+```csharp title="Program.cs"
+using System.IO;
+
+string path = "./file.txt";
+string text = "Hello World";
+
+File.WriteAllText(path, text);
+```
+
+## Appending to a file
+
+```csharp title="Program.cs"
+using System.IO;
+
+string path = "./file.txt";
+string text = "Hello World";
+
+File.AppendAllText(path, text);
+```
+
+## Reading from a file
+
+```csharp title="Program.cs"
+using System.IO;
+
+string path = "./file.txt";
+string text = File.ReadAllText(path);
+Console.WriteLine(text);
+```

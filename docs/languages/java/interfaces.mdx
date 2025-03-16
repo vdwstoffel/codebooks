@@ -1,0 +1,69 @@
+---
+sidebar_label: "Interfaces"
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Interfaces
+
+A Java interface is a reference type that defines a set of abstract methods that a class can implement, allowing for a form of multiple inheritance and enabling different classes to be used interchangeably if they implement the same interface.
+
+## Declaring an Interface
+
+<Tabs>
+
+<TabItem value="Animal">
+
+```java title="Animal.java"
+public interface Animal {
+    void makeSound();
+}
+```
+
+</TabItem>
+<TabItem value="Cat">
+
+```java title="Cat.java"
+public class Cat implements Animal {
+
+    @Override
+    public void makeSound() {
+        System.out.println("Meow");
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Dog">
+
+```java title="Dog.java"
+public class Dog implements Animal {
+
+    @Override
+    public void makeSound() {
+        System.out.println("Woof");
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Main">
+
+```java title="Main.java"
+public class Main {
+
+    public static void main(String[] args) {
+        
+        Animal cat = new Cat();
+        Animal dog = new Dog();
+        
+        cat.makeSound();
+        dog.makeSound();
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>

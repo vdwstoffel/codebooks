@@ -1,0 +1,93 @@
+---
+sidebar_label: "Strings"
+sidebar_position: 2
+---
+
+# Strings
+
+## String Variable
+
+```csharp
+string greeting = "Hello World";
+Console.WriteLine(greeting);
+```
+
+## Char Variable
+
+```csharp
+char letter = 'A';
+Console.WriteLine(letter);
+```
+
+## Get String Length
+
+```csharp
+string code = "Hello C#";
+Console.WriteLine(code.Length);
+```
+
+## String Interpolation
+
+```csharp
+string name = "John";
+string surname = "Doe";
+string fullname = $"My name is {name} {surname}";
+Console.WriteLine(fullname);
+```
+
+## Change casing
+
+```csharp
+string city = "New York";
+string upper = city.ToUpper();
+string lower = city.ToLower();
+Console.WriteLine(upper); // NEW YORK
+Console.WriteLine(lower); // new york
+```
+
+## Convert int to string
+
+```csharp
+int number = 42;
+string text = number.ToString();
+Console.WriteLine(text);
+```
+
+## Check if two strings are equal
+
+```csharp
+string first = "Hello";
+string second = "Hello";
+bool equal = str1.Equals(str2);
+Console.WriteLine(areEqual);
+```
+
+## Check if string contains substring
+
+```csharp
+string text = "Hello World";
+bool contains = text.Contains("World");
+Console.WriteLine(contains);
+```
+
+## Replace a character in a string
+
+```csharp
+string text = "Hello World";
+string replaced = text.Replace("World", "C#");
+Console.WriteLine(replaced); // Hello C#
+```
+
+```csharp
+string demo = "aa and ee in one sentance";
+string modified = demo.Replace("a", "b");
+Console.WriteLine(modified); // bb bnd ee in one sentbnce
+```
+
+## Get index of a substring
+
+```csharp
+string text = "Hello World";
+int index = text.IndexOf("W");
+Console.WriteLine(index); // 6
+```

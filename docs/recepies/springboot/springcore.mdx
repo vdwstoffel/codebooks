@@ -1,0 +1,559 @@
+---
+sidebar_label: "Spring Core"
+title: "Spring Core"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Spring Core
+
+
+## Component Scanning
+
+When scanning for packages outside the main package, you can spicify the package name as an argument to the @SpringBootApplication annotation.
+
+```bash
+.
+├── coreDemo
+│   ├── common
+│   ├── CoreDemoApplication.java
+│   └── rest
+│       └── DemoController.java
+└── util
+    ├── Coach.java
+    └── CricketCoach.java
+```
+
+```java title="CoreDemoApplication.java"
+package com.coreDemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication(
+	scanBasePackages = {"com.coreDemo, com.util"} // Set explicit paths of packages
+)
+public class CoreDemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CoreDemoApplication.class, args);
+	}
+
+}
+```
+
+## Constructor Injection
+
+Constructor injection is a dependency injection technique where the dependencies of a class are provided through its constructor. This approach ensures that the class is always in a valid state with all its dependencies properly initialized. It promotes immutability and makes the dependencies explicit, which improves code readability and maintainability.
+
+<Tabs>
+
+<TabItem value="Create Interface">
+
+The interface defines the contract that the implementation class must adhere to. It declares the methods that the implementation class must provide.
+
+```java title="Coach.java"
+package com.coreDemo;
+
+public interface Coach {
+    String getDailyWorkout();
+}
+```
+
+</TabItem>
+<TabItem value="Create class">
+
+- `@Component` annotation registers the class as a Spring bean.
+- `@Override` annotation overrides the method from the interface.
+
+```java title="CricketCoach.java"
+package com.coreDemo;
+
+// highlight-next-line
+import org.springframework.stereotype.Component;
+
+// highlight-next-line
+@Component
+public class CricketCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice fast bowling for 15 minutes";
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Controller">
+
+- `@RestController` annotation register the class as a Spring MVC controller
+- `@Autowired` annotation tells Spring to scan for a component that implements the `Coach` interface.
+- `@GetMapping` annotation defines the endpoint.
+
+```java title="CoachController.java"
+package com.coreDemo;
+// highlight-next-line
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DemoController {
+
+    // define a private field for the dependency
+    private Coach myCoach;
+
+    // define a constructor for dependency injection
+    //highlight-start
+    @Autowired
+    public DemoController(Coach theCoach) {
+        myCoach = theCoach;
+    }
+
+    //highlight-end
+    @GetMapping("/dailyWorkout")
+    public String getDailyWorkout() {
+        return myCoach.getDailyWorkout();
+    }
+
+}
+```
+
+</TabItem>
+<TabItem value="Main">
+
+```java title="CoreDemoApplication.java"
+package com.coreDemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CoreDemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CoreDemoApplication.class, args);
+	}
+
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Setter Injection
+
+Setter injection is a dependency injection technique where the dependencies of a class are provided through setter methods. This approach allows for optional dependencies and makes the class mutable.
+
+<Tabs>
+
+<TabItem value="Create Interface">
+
+The interface defines the contract that the implementation class must adhere to. It declares the methods that the implementation class must provide.
+
+```java title="Coach.java"
+package com.coreDemo;
+
+public interface Coach {
+    String getDailyWorkout();
+}
+```
+
+</TabItem>
+<TabItem value="Create class">
+
+- `@Component` annotation registers the class as a Spring bean.
+- `@Override` annotation overrides the method from the interface.
+
+```java title="CricketCoach.java"
+package com.coreDemo;
+
+//highlight-next-line
+import org.springframework.stereotype.Component;
+
+// highlight-next-line
+@Component
+public class CricketCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice fast bowling for 15 minutes";
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Controller">
+
+- `@RestController` annotation register the class as a Spring MVC controller
+- `@Autowired` annotation tells Spring to scan for a component that implements the `Coach` interface.
+- `@GetMapping` annotation defines the endpoint.
+
+```java title="CoachController.java"
+package com.coreDemo;
+
+// highlight-next-line
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DemoController {
+
+    // define a private field for the dependency
+    private Coach myCoach;
+
+    //highlight-start
+    @Autowired
+    public void setCoach(Coach theCoach) {
+        myCoach = theCoach;
+    }
+
+    //highlight-end
+    @GetMapping("/dailyWorkout") // define the endpoint
+    public String getDailyWorkout() {
+        return myCoach.getDailyWorkout();
+    }
+
+}
+```
+
+</TabItem>
+<TabItem value="Main">
+
+```java title="CoreDemoApplication.java"
+package com.coreDemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CoreDemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CoreDemoApplication.class, args);
+	}
+
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Specify Class with Qualifier
+
+When you have multiple implementations of an interface, you can use the `@Qualifier` annotation to specify which implementation to use.
+
+<Tabs>
+
+<TabItem value="Cricket Class">
+
+- `@Qualifier` annotation specifies the name of the bean.
+
+```java title="CricketCoach.java"
+package com.coreDemo;
+// highlight-next-line
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
+//highlight-next-line
+@Qualifier("cricketCoach")
+public class CricketCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice fast bowling for 15 minutes";
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Football Class">
+
+- `@Qualifier` annotation specifies the name of the bean.
+
+```java title="FootballCoach.java"
+package com.coreDemo;
+
+//  highlight-next-line
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
+//highlight-next-line
+@Qualifier("footballCoach")
+public class FootballCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice dribbling for 30 minutes";
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Controller">
+
+```java title="DemoController.java"
+package com.coreDemo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+//highlight-next-line
+import org.springframework.beans.factory.annotation.Qualifier;
+
+@RestController
+public class DemoController {
+
+    private Coach myCoach;
+
+    @Autowired
+    //highlight-next-line
+    public void setCoach(@Qualifier("footballCoach") Coach theCoach) {
+        myCoach = theCoach;
+    }
+
+    @GetMapping("/dailyWorkout")
+    public String getDailyWorkout() {
+        return myCoach.getDailyWorkout();
+    }
+
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+
+## Add Default class using @Primary
+
+When you have multiple implementations of an interface and you want to specify a default implementation, you can use the `@Primary` annotation. In the following example, the `CricketCoach` class is the default implementation.
+
+<Tabs>
+
+<TabItem value="Cricket Class">
+
+- `@Primary` annotation specifies the default bean.
+
+```java title="CricketCoach.java"
+package com.coreDemo;
+
+// highlight-next-line
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+@Component
+// highlight-next-line
+@Primary
+public class CricketCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice fast bowling for 15 minutes";
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Football Class">
+
+```java title="FootballCoach.java"
+package com.coreDemo;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class FootballCoach implements Coach {
+
+    @Override
+    public String getDailyWorkout() {
+        return "Practice dribbling for 30 minutes";
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Controller">
+
+```java title="DemoController.java"
+package com.coreDemo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@RestController
+public class DemoController {
+
+    private Coach myCoach;
+
+    @Autowired
+    public void setCoach(Coach theCoach) {
+        myCoach = theCoach;
+    }
+
+    @GetMapping("/dailyWorkout")
+    public String getDailyWorkout() {
+        return myCoach.getDailyWorkout();
+    }
+
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Lazy Initialization
+
+By default all beans are initialized. This can be cusomitized by using the `@Lazy` annotation. This will delay the initialization of the bean until it is needed. There are two ways to set lazy initialization:
+
+- On the bean definition
+
+- `@Lazy` annotation tells Spring to lazily initialize the bean.
+
+```java title="TrackCoach.java"
+package com.coreDemo.common;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+// highlight-next-line
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+@Component
+@Qualifier("trackCoach")
+// highlight-next-line
+@Lazy
+public class TrackCoach implements Coach {
+
+    public TrackCoach() {
+        System.out.println("In constructor: " + getClass().getSimpleName());
+    }
+
+    @Override
+    public String getDailyWorkout() {
+        return "Run 5k";
+    }
+
+}
+```
+
+- Or globally in the `application.properties` file
+
+```properties title="application.properties"
+spring.main.lazy-initialization=true
+```
+
+**Note** Global lazy should only be used as a last resort as it can have a negative impact on the performance of the application.
+
+## Bean Lifecycle
+
+The Spring container manages the lifecycle of a bean. The lifecycle consists of several phases, such as initialization and destruction. The `@PostConstruct` and `@PreDestroy` annotations can be used to define methods that should run after the bean is constructed and before it is destroyed, respectively.
+
+- `@PostConstruct` annotation is used to define a method that should run after the bean is constructed.
+- `@PreDestroy` annotation is used to define a method that should run before the bean is destroyed.
+
+```java title="CricketCoach.java"
+package com.coreDemo.common;
+
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+// highlight-next-line
+import jakarta.annotation.PostConstruct;
+// highlight-next-line
+import jakarta.annotation.PreDestroy;
+
+@Component
+@Qualifier("cricketCoach")
+public class CricketCoach implements Coach {
+
+    public CricketCoach() {
+        System.out.println("In constructor: " + getClass().getSimpleName());
+    }
+
+  // highlight-next-line
+    @PostConstruct
+    public void startupStuff(){
+        System.out.println("Doing Startup stuff for " + getClass().getSimpleName());
+    }
+
+  // highlight-next-line
+    @PreDestroy
+    public void destroyStuff() {
+        System.out.println("Do my cleanup stuff " + getClass().getCanonicalName());
+    }
+
+    
+    @Override
+    public String getDailyWorkout() {
+        return "Practice fast bowling for 15 minutes";
+    }
+}  
+```
+
+## Config Bean using Java
+
+You can define beans using Java configuration classes. This is done by annotating a class with `@Configuration` and defining bean methods annotated with `@Bean`. This is useful when you need to configure beans that are not under your control, such as third-party libraries.
+
+<Tabs>
+
+<TabItem value="Config Class">
+
+ - `@Configuration` annotation indicates that the class contains bean definitions.
+ - `@Bean` annotation defines a bean with the specified name.
+
+```java title="SportConfig.java"
+package com.coreDemo.config;
+
+// highlight-next-line
+import org.springframework.context.annotation.Bean;
+// highlight-next-line
+import org.springframework.context.annotation.Configuration;
+
+import com.coreDemo.common.SwimCoach;
+import com.coreDemo.common.Coach;
+
+// highlight-next-line
+@Configuration
+public class SportConfig {
+    
+    // highlight-next-line
+    @Bean("swimCoach")
+    public Coach swimCoach() {
+        return new SwimCoach();
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Bean Class">
+
+```java title="SwimCoach.java"
+package com.coreDemo.common;
+
+public class SwimCoach implements Coach {
+
+    public SwimCoach() {
+        System.out.println("In constructor: " + getClass().getSimpleName());
+    }
+    
+    @Override
+    public String getDailyWorkout() {
+        return "Go swimming";
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+

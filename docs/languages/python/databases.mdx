@@ -1,0 +1,149 @@
+---
+sidebar_label: Databases
+---
+
+# Databases
+
+### Sqlite3
+
+```python
+import sqlite3
+
+def connect_to_database():
+
+    con = sqlite3.connect("demo.db")
+    if con:
+        cur = con.cursor()
+        return con, cur
+    else:
+        raise Exception("Error connecting to database")
+
+def create_table():
+    query = """
+            CREATE TABLE IF NOT EXISTS users (
+                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR(30),
+                age INTEGER
+            );
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query)
+
+def create_record(name: str, age: int):
+
+    query = f"""
+            INSERT INTO users (name, age)
+            VALUES (?, ?);
+            """
+
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (name, age))
+        con.commit()
+
+def update_name(user_id: int, new_name: str):
+    query = """
+            UPDATE users
+            SET name = ?
+            WHERE user_id = ?;
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (new_name, user_id))
+        con.commit()
+
+def get_users():
+    query = "SELECT * FROM users;"
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query)
+        data = cur.fetchall()
+
+    return data     # [(1, 'John Smith', 23), (2, 'Strong', 33)]
+
+def get_user_by_id(user_id: int):
+    query = """
+            SELECT * FROM users
+            WHERE user_id = ?;
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
+        data = cur.fetchone()
+    return data     # (1, 'John Smith', 23)
+```
+
+### Psycopg2 (PostgreSQL)
+
+```bash
+pip install psycopg2-binary
+```
+
+```python
+import psycopg2
+
+def connect_to_database():
+
+    con = psycopg2.connect("postgresql://demo_user:demo_password@192.168.129.11:5432/demo_db")
+    if con:
+        cur = con.cursor()
+        return con, cur
+    else:
+        raise Exception("Error connecting to database")
+
+def create_table():
+    query = """
+            CREATE TABLE IF NOT EXISTS users (
+                user_id SERIAL PRIMARY KEY,
+                name VARCHAR(30),
+                age INTEGER
+            );
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query)
+
+def create_record(name: str, age: int):
+
+    query = f"""
+            INSERT INTO users (name, age)
+            VALUES (%s, %s);
+            """
+
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (name, age))
+        con.commit()
+
+def update_name(user_id: int, new_name: str):
+    query = """
+            UPDATE users
+            SET name = %s
+            WHERE user_id = %s;
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (new_name, user_id))
+        con.commit()
+
+def get_users():
+    query = "SELECT * FROM users;"
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query)
+        data = cur.fetchall()
+
+    return data     # [(1, 'John Smith', 23), (2, 'Strong', 33)]
+
+def get_user_by_id(user_id: int):
+    query = """
+            SELECT * FROM users
+            WHERE user_id = %s;
+            """
+    con, cur = connect_to_database()
+    with con:
+        cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
+        data = cur.fetchone()
+    return data     # (1, 'John Smith', 23)
+```

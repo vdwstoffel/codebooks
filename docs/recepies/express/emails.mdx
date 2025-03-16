@@ -1,0 +1,67 @@
+---
+sidebar_label: "Emails"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Emails
+
+## Sending emails
+
+```bash
+npm i nodemailer
+```
+
+<Tabs>
+
+<TabItem value="mailer.js">
+
+```js
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "0ab28d4be596ec",
+    pass: "********c54c",
+  },
+});
+
+export async function mailer() {
+  const info = await transporter.sendMail({
+    from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
+    to: "bar@example.com, baz@example.com", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+}
+```
+
+</TabItem>
+<TabItem value = "app.js">
+
+```js
+import express from "express";
+
+import { mailer } from "./mailer.js";
+
+const app = express();
+
+app.get("/send", async (req, res) => {
+  await mailer();
+  res.status(200).json({ status: "succes", message: "Mail sent" });
+});
+
+export default app;
+```
+
+</TabItem>
+
+</Tabs>

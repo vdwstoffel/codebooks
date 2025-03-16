@@ -1,0 +1,34 @@
+---
+sidebar_label: "DELETE"
+sidebar_position: 5
+---
+
+# DELETE
+
+## Delete a record
+
+```sql
+DELETE FROM "users"
+WHERE "name" = 'Mike Meyers';
+```
+
+## Delete record with multiple conditions
+
+```sql
+DELETE FROM "users"
+WHERE "age" > 30
+AND "subscribed" = 'false';
+```
+
+## Delete records within a range
+
+```sql
+DELETE FROM "users"
+WHERE "age" BETWEEN 20 AND 30;
+```
+
+## Delete all records
+
+```sql
+SELECT * FROM "users";
+```

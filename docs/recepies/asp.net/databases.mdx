@@ -1,0 +1,186 @@
+---
+sidebar_label: "Databases"
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Databases
+
+## PostgreSQL
+
+```bash
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add package Microsoft.EntityFrameworkCore
+```
+
+<Tabs>
+
+<TabItem value="Configure">
+
+Add your PostgreSQL connection string to the `appsettings.json` file
+
+```json title="appsettings.json"
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=my_host;Database=my_db;Username=my_user;Password=my_pw"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}
+```
+
+</TabItem>
+
+<TabItem value="Create DB Context">
+
+Define a DbContext that represents a session with your PostgreSQL database.
+
+```csharp title="AppDbContext.cs"
+using Microsoft.EntityFrameworkCore;
+using MyApp.Models;
+
+namespace MyApp.Data
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<Product> Products { get; set; }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Define Model">
+
+Create a model that represents the data structure you want to store in PostgreSQL.
+
+```csharp title="Product.cs"
+namespace MyApp.Models
+{
+    public class Product
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Configure Service Model">
+
+Register the DbContext with the dependency injection container in your Program.cs file.
+
+```csharp title="Program.cs"
+using Microsoft.EntityFrameworkCore;
+using MyApp.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Register the DbContext with PostgreSQL provider.
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+```
+
+</TabItem>
+
+<TabItem value="Use DbContext">
+
+Register the DbContext with the dependency injection container in your Program.cs file.
+
+```csharp title="ProductsController.cs"
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyApp.Data;
+using MyApp.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace MyApp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public ProductsController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/products
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        {
+            return await _context.Products.ToListAsync();
+        }
+
+        // POST: api/products
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
+        }
+    }
+}
+
+```
+
+</TabItem>
+
+</Tabs>
+ 
+**Create and Apply Migrations**
+
+1. Add the EF Core Tools (if not already installed):
+
+```bash
+dotnet tool install --global dotnet-ef
+dotnet add package Microsoft.EntityFrameworkCore.Design
+```
+
+2. Add an Initial Migration:
+
+```bash
+dotnet ef migrations add InitialCreate
+```
+
+3. Apply the Migration:
+
+```bash
+dotnet ef database update
+```
+
+## Performing a migration
+
+```bash
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```

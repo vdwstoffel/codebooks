@@ -1,0 +1,279 @@
+---
+sidebar_label: "Authentication"
+sidebar_position: 8
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Authentication
+
+## Authentication with redux
+
+```bash
+npm i axios
+npm install @reduxjs/toolkit react-redux
+```
+
+```terminal
+.
+├── api
+│   └── userApi.js
+├── App.jsx
+├── main.jsx
+├── store.js
+└── users
+    ├── authSlice.js
+    ├── AuthWrapper.jsx
+    ├── Home.jsx
+    ├── LoginPage.jsx
+    └── SecretPage.jsx
+```
+
+<Tabs>
+
+<TabItem value="userApi.jsx">
+
+```js
+import axios from "axios";
+
+export async function loginUser() {
+  await axios.post("/login");
+  localStorage.setItem("userDemoToken", "userHasedToken");
+}
+
+export async function getUserDetails() {
+  const token = localStorage.getItem("userDemoToken");
+  if (!token) return;
+
+  const res = await axios.get("/me", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log(res.data);
+  return res.data;
+}
+```
+
+</TabItem>
+
+<TabItem value="authSlice.js">
+
+```js
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
+import { getUserDetails } from "../api/userApi";
+
+const initialState = {
+  isLoggedIn: false,
+  userDetails: {},
+  isLoading: false,
+  error: "",
+};
+
+export const authSlice = createSlice({
+  name: "auth",
+  initialState: initialState,
+  reducers: {
+    logout: (state) => {
+      state.isLoggedIn = false;
+      state.userDetails = {};
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(authenticateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = "";
+      })
+      .addCase(authenticateUser.fulfilled, (state, action) => {
+        console.log(action);
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.userDetails.username = action.payload.username;
+        state.error = "";
+      })
+      .addCase(authenticateUser.rejected, (state) => {
+        state.isLoading = false;
+        state.error = "Error Logging in";
+      });
+  },
+});
+
+export const authenticateUser = createAsyncThunk(
+  "auth/authenticateUser",
+  async () => {
+    const response = await getUserDetails();
+    console.log("Auth res", response);
+    return response;
+  }
+);
+
+export const { logout } = authSlice.actions;
+export default authSlice.reducer;
+```
+
+</TabItem>
+
+<TabItem value="store.js">
+
+```js
+import { configureStore } from "@reduxjs/toolkit";
+
+import authSlice from "./users/authSlice";
+
+export default configureStore({
+  reducer: {
+    auth: authSlice,
+  },
+});
+```
+
+</TabItem>
+
+<TabItem value="AuthWrapper.jsx">
+
+```jsx
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { authenticateUser } from "./authSlice";
+
+export default function AuthWrapper({ children }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("userDemoToken");
+    if (token) {
+      dispatch(authenticateUser()).finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      navigate("/login");
+    }
+  }, [loading, isLoggedIn, navigate]);
+
+  return <>{children}</>;
+}
+```
+
+</TabItem>
+
+<TabItem value="Home.jsx">
+
+```jsx
+import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+
+import { authenticateUser, logout } from "./authSlice";
+
+export default function Home() {
+  const dispatch = useDispatch();
+  const { isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(authenticateUser());
+  }, [dispatch, isLoggedIn]);
+
+  function logOutHandler() {
+    localStorage.removeItem("userDemoToken");
+    dispatch(logout());
+  }
+
+  return (
+    <>
+      <h1>Home Page</h1>
+      <p>Logged In: {`${isLoggedIn}`}</p>
+      <NavLink to="/login">Login</NavLink>
+      <NavLink to="/secret">Secret</NavLink>
+      <button onClick={logOutHandler}>LogOut</button>
+    </>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="LoginPage.jsx">
+
+```jsx
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/userApi";
+
+export default function LoginPage() {
+  const navigate = useNavigate();
+
+  function loginHandler() {
+    loginUser();
+    navigate("/");
+  }
+
+  return (
+    <>
+      <h1>Hello</h1>
+      <button onClick={loginHandler}>Login</button>
+    </>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="SecretPage.jsx">
+
+```jsx
+export default function SecretPage() {
+  return <h1>Secret Page that required auth</h1>;
+}
+```
+
+</TabItem>
+
+<TabItem value="App.jsx">
+
+```jsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import LoginPage from "./users/LoginPage";
+import SecretPage from "./users/SecretPage";
+import AuthWrapper from "./users/AuthWrapper";
+import Home from "./users/Home";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/secret",
+    element: (
+      <AuthWrapper>
+        <SecretPage />
+      </AuthWrapper>
+    ),
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+</TabItem>
+
+</Tabs>

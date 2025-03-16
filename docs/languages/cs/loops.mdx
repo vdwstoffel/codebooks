@@ -1,0 +1,145 @@
+---
+sidebar_label: Loops
+sidebar_position: 5
+---
+
+# Loops
+
+## For Loop
+
+```csharp
+for (int i = 0; i < 5; i++)
+{
+    Console.WriteLine(i);
+}
+```
+
+## While Loop
+
+```csharp
+int i = 0;
+
+while (i < 5)
+{
+    Console.WriteLine(i);
+    i++;
+}
+```
+
+## Do While Loop
+
+```csharp
+int i = 0;
+
+do
+{
+    Console.WriteLine(i);
+    i++;
+} while (i < 5);
+```
+
+## Break Statement
+
+```csharp
+for (int i = 0; i < 5; i++)
+{
+    if (i == 3)
+    {
+        break;
+    }
+    Console.WriteLine(i);
+}
+```
+
+## Continue Statement
+
+```csharp
+for (int i = 0; i < 5; i++)
+{
+    if (i == 3)
+    {
+        continue;
+    }
+    Console.WriteLine(i);
+}
+```
+
+## Nested Loops
+
+```csharp
+for (int i = 0; i < 3; i++)
+{
+    for (int j = 0; j < 3; j++)
+    {
+        Console.WriteLine($"i: {i}, j: {j}");
+    }
+}
+```
+
+## Loop Through Array
+
+```csharp
+int[] numbers = { 1, 2, 3, 4, 5 };
+
+for (int i = 0; i < numbers.Length; i++)
+{
+    Console.WriteLine(numbers[i]);
+}
+```
+
+## Loop Through List
+
+```csharp
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+foreach (int number in numbers)
+{
+    Console.WriteLine(number);
+}
+```
+
+## Loop Through Dictionary
+
+```csharp
+Dictionary<string, string> capitals = new Dictionary<string, string>();
+
+capitals.Add("USA", "Washington D.C.");
+capitals.Add("France", "Paris");
+capitals.Add("Italy", "Rome");
+
+foreach (KeyValuePair<string, string> capital in capitals)
+{
+    Console.WriteLine($"The capital of {capital.Key} is {capital.Value}");
+}
+```
+
+## Loop Through String
+
+```csharp
+string text = "Hello";
+
+foreach (char letter in text)
+{
+    Console.WriteLine(letter);
+}
+```
+
+## Loop Through Range
+
+```csharp
+foreach (int i in Enumerable.Range(0, 5))
+{
+    Console.WriteLine(i);
+}
+```
+
+## Loop Through File
+
+```csharp
+string[] lines = File.ReadAllLines("file.txt");
+
+foreach (string line in lines)
+{
+    Console.WriteLine(line);
+}
+```

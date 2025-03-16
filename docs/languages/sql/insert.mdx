@@ -1,0 +1,23 @@
+---
+sidebar_label: "INSERT"
+sidebar_position: 4
+---
+
+# INSERT
+
+## Insert a new record
+
+```sql
+INSERT INTO "users" ("name", "email", "age", "password", "subscribed")
+VALUES ("John Doe", "email@email.com", "31", "12345678", "false");
+```
+
+## Insert Multiple records
+
+```sql
+INSERT INTO "users" ("name", "email", "age", "password", "subscribed")
+VALUES ("Mike Meyers", "mike@gmail.com", "29", "123123123", "true"),
+       ("Jane Thyme", "thyme@gmail.com", "47", "111111", "true"),
+       ("Sally Smith", "sally@hotmail.com", "22", "222222", "false"),
+       ("Tom Jones", "jones@email.com", "33", "333333", "true");
+```

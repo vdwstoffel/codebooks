@@ -1,0 +1,46 @@
+---
+sidebar_label: "React"
+sidebar_position: 1
+---
+
+# React
+
+[React](https://react.dev/) lets you build user interfaces out of individual pieces called components. Create your own React components like Thumbnail, LikeButton, and Video. Then combine them into entire screens, pages, and apps.
+
+## Create a React App
+
+```bash
+npm create vite@latest
+cd my-app
+npm run dev
+```
+
+## Change default port (Vite)
+
+```js title="vite.config.js"
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  server: {
+    port: 8000,
+    host: true, // needed for docker
+  },
+});
+```
+
+## How to connect external api to React
+
+```js title="vite.config.js"
+server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:<express-port>", // Your Express backend URL
+        changeOrigin: true,
+      },
+    },
+  },
+```
+
+```js title="App.js"
+const res = await axios.get("api/backend-route");
+```

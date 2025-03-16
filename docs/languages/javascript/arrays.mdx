@@ -1,0 +1,62 @@
+---
+sidebar_label: Arrays
+---
+
+# Arrays
+
+## Getting the length of an array
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+console.log(languages.length); // 4
+```
+
+## Sorting an array
+
+Sorting happens in place, so the original array is modified.
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+languages.sort();
+console.log(languages); // ["C++", "Java", "JavaScript", "Python"]
+```
+
+## Mapping
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+const capitals = languages.map((lang) => lang.toLocaleUpperCase());
+console.log(capitals); // ["PYTHON", "JAVASCRIPT", "JAVA", "C++"]
+```
+
+## Filter
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+const filtered = languages.filter((lang) => lang.startsWith("J"));
+console.log(filtered); // ["JavaScript", "Java"]
+```
+
+## Reducer
+
+```js
+const numbers = [1, 2, 3, 4, 5];
+const sum = numbers.reduce((acc, curr) => acc + curr, 0);
+console.log(sum); // 15
+```
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+const reduced = languages.reduce((acc, lan) => acc + lan.length, 0);
+console.log(reduced); // 23
+```
+
+## ForEach
+
+```js
+const languages = ["Python", "JavaScript", "Java", "C++"];
+
+languages.forEach((lan) => {
+  console.log(lan.toLocaleLowerCase());
+});
+```

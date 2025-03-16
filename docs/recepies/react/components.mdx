@@ -1,0 +1,226 @@
+---
+sidebar_label: "Components"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import BasicComponent from "@site/src/components/reactExamples/components/BasicComponent";
+import PassingProps from "@site/src/components/reactExamples/components/PassingProps";
+import ChildComponents from "@site/src/components/reactExamples/components/ChildComponents";
+import LiftingState from "@site/src/components/reactExamples/components/LiftingState";
+import CounterApp from "@site/src/components/reactExamples/components/CounterApp";
+import Counter from "@site/src/components/reactExamples/components/Counter";
+
+# Components
+
+## Basic Component Example
+
+```jsx
+import BrowserWindow from "../../BrowserWindow/BrowserWindow";
+
+export default function BasicComponent() {
+  return;
+
+  <BrowserWindow>
+    <h1>This is a basic component</h1>;
+  </BrowserWindow>;
+}
+```
+
+<BasicComponent />
+
+## Passing Props
+
+```jsx
+export default function PassingProps() {
+  return (
+    <>
+      <User name="John" age={42} />
+      <User name="Strong" age={31} />
+    </>
+  );
+}
+
+function User({ name, age }) {
+  return (
+    <p>
+      This is {name}, who is {age}
+    </p>
+  );
+}
+```
+
+{" "}
+
+<PassingProps />
+
+## Child Components
+
+```jsx
+export default function ChildComponents() {
+  return (
+    <Container>
+      <button>Click Me!</button>
+    </Container>
+  );
+}
+
+function Container({ children }) {
+  return (
+    <div style={{ backgroundColor: "darkred", padding: "3em" }}>{children}</div>
+  );
+}
+```
+
+{" "}
+
+<ChildComponents />
+
+## React Composition
+
+instead of prop drilling, you can use composition to pass props to child components
+
+```jsx
+import React from "react";
+
+function ParentComponent({ children }) {
+  return <div className="parent-component">{children}</div>;
+}
+
+function ChildComponent({ message }) {
+  return <div className="child-component">{message}</div>;
+}
+
+function App() {
+  return (
+    <ParentComponent>
+      <ChildComponent message="Hello" />
+    </ParentComponent>
+  );
+}
+```
+
+## Lifting state up
+
+Lifting state up in React refers to the process of moving state from child components up to a common ancestor component. This allows multiple components to share and manipulate the same state, which is often necessary when those components need to stay in sync.
+
+```jsx
+import { useState } from "react";
+
+export default function LiftingState() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <>
+      <ChildA count={count} />
+      <ChildB setCount={setCount} />
+    </>
+  );
+}
+
+function ChildA({ count }) {
+  return <div>Count: {count}</div>;
+}
+
+function ChildB({ setCount }) {
+  return (
+    <button onClick={() => setCount((count) => count + 1)}>Increment</button>
+  );
+}
+```
+
+{" "}
+
+<LiftingState />
+
+## Group children with React Fragments
+
+```jsx
+export default function Example() {
+  return (
+    <>
+      <ChildA />
+      <ChildB />
+    </>
+  );
+}
+```
+
+## Compound Component Pattern
+
+<Tabs>
+
+<TabItem value="Counter.jsx">
+
+```jsx
+import { createContext, useContext, useState } from "react";
+
+// 1. Create Context
+const CounterContext = createContext();
+
+// 2. Create Parent component
+export default function Counter({ children }) {
+  const [count, setCount] = useState(0);
+  const increment = () => setCount((c) => c + 1);
+  const decrement = () => setCount((c) => c - 1);
+
+  return (
+    <CounterContext.Provider value={{ count, increment, decrement }}>
+      {children}
+    </CounterContext.Provider>
+  );
+}
+
+// 3. Create helper child components
+function Label({ label }) {
+  return <h1>{label}</h1>;
+}
+
+function Count() {
+  const { count } = useContext(CounterContext);
+  return <span>{count}</span>;
+}
+
+function Increase({ icon = "+" }) {
+  const { increment } = useContext(CounterContext);
+  return <button onClick={increment}>{icon}</button>;
+}
+
+function Decrement({ icon = "-" }) {
+  const { decrement } = useContext(CounterContext);
+  return <button onClick={decrement}>{icon}</button>;
+}
+
+// 4. Add child compoents as properties
+Counter.Label = Label;
+Counter.Count = Count;
+Counter.Increase = Increase;
+Counter.Decrement = Decrement;
+```
+
+</TabItem>
+
+<TabItem value="App.jsx">
+
+```jsx
+import Counter from "./Counter";
+
+export default function CounterApp() {
+  return (
+    <Counter>
+      <Counter.Label label="Counter Example" />
+      <Counter.Increase icon="-" />
+      <Counter.Count />
+      <Counter.Increase icon="+" />
+    </Counter>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<CounterApp />

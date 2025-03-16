@@ -1,0 +1,89 @@
+---
+sidebar_label: Maps
+---
+
+# Maps
+
+Both HashMap and TreeMap use the same methods
+
+## Hash Map
+
+HashMap is an implementation of Map that stores an unordered collection of key-value entries.
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+Map<String, Double> inventory = new HashMap<>();
+```
+
+
+## TreeMap
+
+TreeMap is an ordered collection of key-value pairs, and it sorts the entries in ascending order of the keys
+
+```java
+import java.util.TreeMap;
+import java.util.Map;
+
+Map<Integer, Integer> tree = new TreeMap<>();
+```
+
+## Add an item
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+inventory.put("Oranges", 5.99);
+System.out.println(inventory); // {Oranges=5.99}
+```
+
+## Get an item
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+// Add an entry to the map
+inventory.put("Oranges", 5.99);
+
+// Get the item
+double orangePrice = inventory.get("Oranges");
+System.out.println(orangePrice); // 5.99
+```
+
+## Check if a key exists
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+inventory.put("Oranges", 5.99);
+
+// Check if key exists
+boolean orangeExists = inventory.containsKey("Oranges");
+System.out.println(orangeExists); // true
+
+boolean mangoExists = inventory.containsKey("Mango");
+System.out.println(mangoExists); //false
+```
+
+## Update an entry
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+inventory.put("Oranges", 5.99);
+
+// Update an item in a hashmap
+inventory.put("Oranges", 3.99);
+double updatedPrice = inventory.get("Oranges");
+System.out.println(updatedPrice); // 3.99
+```
+
+## Remove an entry
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+
+inventory.put("Oranges", 5.99);
+inventory.put("Apples", 2.99);
+
+// Remove an entry
+inventory.remove("Oranges");
+System.out.println(inventory); // {Apples=2.99}
+```

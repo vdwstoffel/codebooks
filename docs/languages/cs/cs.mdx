@@ -1,0 +1,38 @@
+---
+sidebar_label: "C#"
+sidebar_position: 1
+---
+
+# C#
+
+<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: "200px"}}>
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/C_Sharp_Logo_2023.svg/800px-C_Sharp_Logo_2023.svg.png"
+    alt="c#-logo"
+  />
+</div>
+
+## Compile and run app
+
+```bash
+dotnet new console -n MyCSharpApp
+```
+
+```csharp title="Program.cs"
+using System;
+
+namespace HelloWorld
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      Console.WriteLine("Hello World!");
+    }
+  }
+}
+```
+
+```bash
+dotnet run
+```

@@ -1,0 +1,89 @@
+---
+sidebar_label: "Dates"
+---
+
+# Dates
+
+## Get Current Date
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        DateTime currentDate = DateTime.Now;
+        Console.WriteLine(currentDate); // 2021-09-01 12:00:00 AM
+    }
+}
+```
+
+## Get the current Yearm mont and day
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        DateTime currentDate = DateTime.Now;
+        int year = currentDate.Year;
+        int month = currentDate.Month;
+        int day = currentDate.Day;
+        Console.WriteLine($"Year: {year}, Month: {month}, Day: {day}"); // Year: 2021, Month: 9, Day: 1
+    }
+}
+```
+
+## Get the current hour, minute and second
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        DateTime currentDate = DateTime.Now;
+        int hour = currentDate.Hour;
+        int minute = currentDate.Minute;
+        int second = currentDate.Second;
+        Console.WriteLine($"Hour: {hour}, Minute: {minute}, Second: {second}"); // Hour: 12, Minute: 0, Second: 0
+    }
+}
+```
+
+## Get difference between two time objects
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        DateTime startDate = new DateTime(2021, 9, 1, 12, 0, 0);
+        DateTime endDate = new DateTime(2021, 9, 1, 13, 0, 0);
+        TimeSpan difference = endDate - startDate;
+        Console.WriteLine(difference); // 01:00:00
+    }
+}
+```
+
+## Format String date to Datetime
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        string dateString = "2021-09-01";
+        DateTime date = DateTime.Parse(dateString);
+        Console.WriteLine(date); // 2021-09-01 12:00:00 AM
+    }
+}
+```

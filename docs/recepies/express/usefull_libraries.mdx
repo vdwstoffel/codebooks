@@ -1,0 +1,153 @@
+---
+sidebar_label: "Usefull Libraries"
+sidebar_position: 9
+---
+
+# Usefull Libraries
+
+## Secure http headers
+
+Help secure Express apps by setting HTTP response headers.
+
+```bash
+npm i helmt
+```
+
+```js
+import express from "express";
+import helmet from "helmet";
+
+const app = express();
+
+app.use(helmet());
+
+app.get("/", (req, res) => {
+  res.statusCode(200).json({ status: "success", message: "Hello" });
+});
+
+export default app;
+```
+
+## Limit Api requets
+
+Basic rate-limiting middleware for Express. Use to limit repeated requests to public APIs and/or endpoints such as password reset.
+
+```bash
+npm i express-rate-limit
+```
+
+```js
+import express from "express";
+import rateLimit from "express-rate-limit";
+
+const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: "draft-8", // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Redis, Memcached, etc. See below.
+});
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter);
+
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "success", message: "hello" });
+});
+
+export default app;
+```
+
+## How to sanitize input
+
+```bash
+npm install xss-clean --save
+```
+
+```js
+import express from "express";
+import xss from "xss-clean";
+
+const app = express();
+app.use(xss());
+
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "success", message: "hello" });
+});
+
+export default app;
+```
+
+## Prevent HTTP Parameter Pollution
+
+Express middleware to protect against HTTP Parameter Pollution attacks
+
+```bash
+npm i hpp
+```
+
+```js
+import express from "express";
+// highlight-next-line
+import hpp from "hpp";
+
+const app = express();
+
+// highlight-next-line
+app.use(hpp());
+
+app.get("/", (req, res) => {
+  console.log(req.query);
+  res.status(200).json({ message: "hello" });
+});
+
+export default app;
+```
+
+- Without hpp middleware
+
+```bash
+curl -X GET http://192.168.129.11:3000\?name\="John"\&name\="John"
+# { name: [ 'John', 'John' ] }
+```
+
+- With hpp middleware
+
+```bash
+curl -X GET http://192.168.129.11:3000\?name\="John"\&name\="John"
+# { name: 'John' }
+```
+
+### Adding a filter for allowed duplicates
+
+By adding a whitelist, you can allow duplicates for specific parameters.
+
+```js
+import express from "express";
+import hpp from "hpp";
+
+const app = express();
+
+app.use(hpp());
+// highlight-next-line
+app.use("/whitelist", hpp({ whitelist: ["filter"] }));
+
+app.get("/", (req, res) => {
+  console.log(req.query);
+  res.status(200).json({ message: "hello" });
+});
+
+app.get("/whitelist", (req, res) => {
+  console.log(req.query);
+  res.status(200).json({ message: "hello" });
+});
+
+export default app;
+```
+
+```bash
+curl -X GET http://192.168.129.11:3000/whitelist\?filter\="colour"\&filter\="type"
+# { filter: [ 'colour', 'type' ] }
+```

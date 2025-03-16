@@ -1,0 +1,75 @@
+---
+sidebar_label: "OOP"
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Object-Oriented Programming
+
+## Creating a class
+
+```bash
+├── oop
+│   └── OopExample.cs
+└── Program.cs
+```
+
+<Tabs>
+
+<TabItem value="OopExample.cs">
+
+```csharp title="OopExample.cs"
+namespace oop.Oop
+{
+    class OopExample
+    {
+        private string name;
+
+        public OopExample(string name)
+        {
+            this.name = name;
+        }
+
+        public string getName()
+        {
+            return this.name;
+        }
+
+        public void setName(string name)
+        {
+            this.name = name;
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Program.cs">
+
+```csharp title="Program.cs"
+using oop.Oop; // import Oop name space from oop folder
+
+namespace App
+{
+    class App
+    {
+        static void Main(string[] args)
+        {
+            oopExample();
+        }
+
+        static void oopExample()
+        {
+            OopExample oop = new OopExample("John");
+            string name = oop.getName();
+            Console.WriteLine(name);
+        }
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>

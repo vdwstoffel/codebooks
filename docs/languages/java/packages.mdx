@@ -1,0 +1,64 @@
+---
+sidebar_label: "Packages"
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Packages
+
+- `Package` create a namespace for the classes, based in the directory structure. Each subfolder should be included
+- `import` keyword is used to include the classes from the package. Each subfolder should be included, followed by the class name
+
+```sh
+.
+├── Main.java
+└── model
+    └── User.java
+```
+
+<Tabs>
+
+<TabItem value="User.java">
+
+```java
+// package declaration in the folder from the root
+// highlight-next-line
+package model;  
+
+public class User {
+
+    private String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Main.java">
+
+```java
+// import the User class from the model package
+// highlight-next-line
+import model.User;  
+
+public class Main {
+
+    public static void main(String[] args) {
+        User user = new User("John");
+        String username = user.getName();
+        System.out.println(username);
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>

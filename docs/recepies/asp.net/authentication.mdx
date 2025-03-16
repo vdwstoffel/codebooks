@@ -1,0 +1,325 @@
+---
+sidebar_label: "Authorization & Authentication"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Authorization & Authentication
+
+## Authorization with JWT (PostgreSQL)
+
+```bash
+dotnet add package Microsoft.IdentityModel.Tokens
+dotnet add package System.IdentityModel.Tokens.Jwt
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+```
+
+<Tabs>
+
+<TabItem value="Model">
+
+```csharp title="User.cs"
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace LifeApp.Models
+{
+    public class User
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long UserId { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="ModelDto">
+
+```csharp title="UserDto.cs"
+namespace LifeApp.Models
+{
+    public class UserDto
+    {
+
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="DB Context">
+
+```csharp title="AppDbContext.cs"
+using Microsoft.EntityFrameworkCore;
+
+using LifeApp.Models;
+
+namespace LifeApp.Data
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+
+        }
+
+
+        public DbSet<User> Users {get; set;}
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Helpers">
+
+```csharp title="JwtHelper.cs"
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using LifeApp.Models;
+using Microsoft.IdentityModel.Tokens;
+
+namespace LifeApp.Helpers
+{
+    public class JwtHelper
+    {
+        private const string JwtKey = "Jwt:Key";
+        private const string JwtIssuer = "Jwt:Issuer";
+        private const string JwtAudience = "Jwt:Audience";
+
+        public string GenerateJwtToken(User user, IConfiguration configuration)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration[JwtKey]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: configuration[JwtIssuer],
+                audience: configuration[JwtAudience],
+                claims: claims,
+                expires: DateTime.Now.AddDays(30),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string HashPassword(string password)
+        {
+            if (password == null) throw new ArgumentNullException(nameof(password));
+
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var builder = new StringBuilder();
+                foreach (var b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public bool VerifyPassword(string inputPassword, string hashedPassword)
+        {
+            if (inputPassword == null) throw new ArgumentNullException(nameof(inputPassword));
+            if (hashedPassword == null) throw new ArgumentNullException(nameof(hashedPassword));
+
+            var inputHashed = HashPassword(inputPassword);
+            return inputHashed == hashedPassword;
+        }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Controller">
+
+```csharp title="AuthController.cs"
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+using LifeApp.Models;
+using LifeApp.Data;
+using LifeApp.Helpers;
+
+namespace LifeApp.Controllers
+{
+    [ApiController]
+    [Route("api/v1/auth")]
+    public class AuthController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+
+        public AuthController(AppDbContext context, IConfiguration configuration)
+        {
+            _context = context;
+            _configuration = configuration;
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<UserDto>> Register([FromBody] UserDto user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var newUser = new User
+            {
+                Username = user.Username,
+                Email = user.Email,
+                Password = new JwtHelper().HashPassword(user.Password)
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+            return Ok("User Created");
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] User loginDetails)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDetails.Username);
+            if (user == null || !new JwtHelper().VerifyPassword(loginDetails.Password, user.Password))
+            {
+                return Unauthorized("Invalid user or username");
+            }
+
+            var token = new JwtHelper().GenerateJwtToken(user, _configuration);
+            return Ok(new { Token = token });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !long.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized("Access Denied");
+                }
+
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized("Access Denied");
+                }
+
+                return Ok(new { User = user });
+            }
+            catch (SecurityTokenException)
+            {
+                return Unauthorized("Invalid Token");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Program">
+
+```csharp title="Program.cs"
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+using LifeApp.Data;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddControllers();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwaggerUi(options =>
+    {
+        options.DocumentPath = "/openapi/v1.json";
+    });
+}
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+```
+
+</TabItem>
+
+<TabItem value="Application Settings">
+
+```json title="appsettings.json
+"Jwt": {
+    "Key": "YourSuperSecretKeyHereThatShouldBeLongAndSecure",
+    "Issuer": "YourAppName",
+    "Audience": "YourAppUsers"
+},
+```
+
+</TabItem>
+
+</Tabs>

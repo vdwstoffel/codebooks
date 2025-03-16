@@ -1,0 +1,25 @@
+---
+SidebarLabel: Containers
+SidebarPosition: 2
+---
+
+# Containers
+
+Docker containers are lightweight, standalone, and executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries, and settings. Containers isolate software from its environment and ensure that it works uniformly despite differences for instance between development and staging.
+
+## How to run a container
+
+
+| flag       | description                              | example                                                             |
+| ---------- | ---------------------------------------- | ------------------------------------------------------------------- |
+| `-d`       | runs the container in detached mode      | `docker run -d containerImageName`                                  |
+| `-p`       | maps the container port to the host port | `docker run -p 3000:8000 containerImageName`                        |
+| `--rm`     | removes the container when it stops      | `docker run --rm containerImageName`                                |
+| `--name`   | assigns a name to the container          | `docker run --name my-container containerImageName`                 |
+| `-e`       | sets environment variables               | `docker run -e NODE_ENV=production containerImageName`              |
+| `--volume` | mounts a volume                          | `docker run --volume /host/path:/container/path containerImageName` |
+| `-it`      | runs the container in interactive mode   | `docker run -it containerImageName`                                 |
+
+```bash
+docker run -d -p 3000:8000 containerImageName:my-tag
+```

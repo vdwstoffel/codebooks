@@ -1,0 +1,110 @@
+---
+sidebar_label: 'TypeScript'
+sidebar_position: 10
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Express with TypeScript
+
+
+<Tabs>
+<TabItem value="Dependancies">
+
+
+```bash title="Terminal"
+npm init --yes
+npm install express
+npm install  -D typescript ts-node-dev @types/express
+npx tsc --init
+```
+
+```json title='tsconfig.ts'
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+    // other options remain same
+  }
+}
+```
+
+```json title='package.json'
+"scripts": {
+  "build": "npx tsc",
+  "start": "node dist/index.js",
+  "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+},
+```
+
+```bash
+npm run dev
+```
+
+
+</TabItem>
+<TabItem value="birdsController.ts">
+
+
+```js title="controller/birdsController.ts"
+import { RequestHandler } from "express";
+
+import { getAllBirds } from "../models/birdsModel";
+
+export const getBirds: RequestHandler = async (req, res) => {
+  const birds = await getAllBirds();
+  res.status(200).json({ birds });
+};
+```
+
+
+</TabItem>
+<TabItem value="birdsRouter.ts">
+
+
+```js title="routes/birdsRouter.ts"
+import { Router } from "express";
+
+const router = Router();
+
+import { getBirds } from "../controllers/birdsController";
+
+router.route("/birds").get(getBirds);
+
+export default router;
+```
+
+
+</TabItem>
+<TabItem value="app.ts">
+
+
+```js title="app.ts"
+import express, { Request, Response, Application } from "express";
+
+const app: Application = express();
+
+import birdRouter from "./routes/birdsRouter";
+
+app.use("/", birdRouter);
+
+export default app;
+```
+
+
+</TabItem>
+<TabItem value="server.ts">
+
+
+```js title="routes/server.ts"
+import app from "./app";
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT);
+```
+
+
+</TabItem>
+</Tabs>

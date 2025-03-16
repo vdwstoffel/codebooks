@@ -1,0 +1,429 @@
+---
+sidebar_label: "React Router"
+title: "React Router"
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# React Router
+
+React Router is a collection of navigational components that compose declaratively with your application. Whether you want to have bookmarkable URLs for your web app or a composable way to navigate in React Native, React Router works wherever React is rendering.
+
+```bash
+npm install react-router-dom
+```
+
+## Simple Setup
+
+```jsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  { path: "/", element: <h1>Home Page</h1> },
+  { path: "/menu", element: <h1>Menu Page</h1> },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+## Creating App layout with navbar
+
+:::info
+`NavLink` adds a class `active` to the link when the link is active.
+
+```html
+<a aria-current="page" class="active" href="/">Home</a>
+<a class="" href="/product">Products</a>
+```
+
+:::
+
+:::info
+Link can also be used instead of `NavLink` to navigate to a different page.
+
+```jsx
+import { Link } from "react-router-dom";
+
+<Link to="/home">Home</Link>;
+```
+
+:::
+
+<Tabs>
+
+<TabItem value="Navbar.jsx">
+
+```jsx
+import { NavLink } from "react-router-dom";
+
+export default function Navbar() {
+  return (
+    <nav>
+      <NavLink to="/">Home</NavLink>
+      <NavLink to="/menu">Menu</NavLink>
+    </nav>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="RootLayout.jsx">
+
+```jsx
+import { Outlet } from "react-router-dom";
+
+import Navbar from "./Navbar";
+
+export default function RootLayout() {
+  return (
+    <>
+      <Navbar />
+      {/* Acts as children for the rest of the app */}
+      <Outlet />
+    </>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="App.jsx">
+
+```jsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import RootLayout from "./RootLayout";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <h1>Home Component</h1> },
+      { path: "/menu", element: <h1>Menu Component</h1> },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Adding an Error Boundary Page
+
+<Tabs>
+
+<TabItem value="Error.jsx">
+
+```jsx
+import { useRouteError } from "react-router-dom";
+
+export default function ErrorPage() {
+  const error = useRouteError();
+
+  return (
+    <div>
+      <h1>Oops!</h1>
+      <p>Sorry, an unexpected error has occurred.</p>
+      <p>
+        <i>{error.status}</i>
+        <i>{error.statusText || error.message}</i>
+      </p>
+    </div>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="App.jsx">
+
+```jsx
+/* previous imports */
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Error from "./Error";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <h1>Home</h1>,
+    errorElement: <Error />,
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## How to get the dynamic route parameter
+
+<Tabs>
+
+<TabItem value="App.jsx">
+
+```jsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Product from "./Product";
+
+const router = createBrowserRouter([
+  {
+    path: "/products/:id",
+    element: <Product />,
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+</TabItem>
+<TabItem value="Product.jsx">
+
+```jsx
+// highlight-next-line
+import { useParams } from "react-router-dom";
+
+export default function Product() {
+  // highlight-next-line
+  const { id } = useParams();
+  return <h1>Product: {id}</h1>;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+<BrowserWindow url="http://localhost:3000/products/3">
+  <h1>Product: 3</h1>
+</BrowserWindow>
+
+## How to get the query parameter from the url
+
+```jsx
+import { useSearchParams } from "react-router-dom";
+
+export default function Product() {
+  const [searchParams] = useSearchParams();
+  const productName = searchParams.get("name");
+  return <h1>Product: {productName}</h1>;
+}
+```
+
+<BrowserWindow url="http://localhost:3000/products?name=table">
+  <h1>Product: table</h1>
+</BrowserWindow>
+
+## How to set the query parameter in the url
+
+```jsx
+import { useSearchParams } from "react-router-dom";
+
+export default function User() {
+  //highlight-next-line
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const username = searchParams.get("name");
+  const age = searchParams.get("age");
+
+  function updateParams() {
+    // highlight-next-line
+    setSearchParams({ name: "John", age: 50 });
+  }
+
+  return (
+    <>
+      <h1>Username: {username}</h1>
+      <h1>Age: {age}</h1>
+      <button onClick={updateParams}>Update Params</button>
+    </>
+  );
+}
+```
+
+<BrowserWindow url="http://localhost:3000/products?name=default&age=20">
+  <h1>Username: default</h1>
+  <h1>Age: 20</h1>
+  <button>Update Params</button>
+</BrowserWindow>
+
+<BrowserWindow url="http://localhost:3000/products?name=John&age=50">
+  <h1>Username: John</h1>
+  <h1>Age: 50</h1>
+  <button>Update Params</button>
+</BrowserWindow>
+
+## How to navigate programmatically
+
+`useNavigate` is a hook that returns a navigate function. Use it to navigate programmatically.
+
+```jsx title="ProductItems.jsx"
+import { useNavigate } from "react-router-dom";
+
+export default function ProductItems() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <h1>Product</h1>
+      <button onClick={() => navigate("/products")}>Go to Products</button>
+    </>
+  );
+}
+```
+
+## Navigate away after a certain time
+
+```jsx
+import { useNavigate } from "react-router-dom";
+
+function useLogoutTimer() {
+  const userIsInactive = useFakeInactiveUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userIsInactive) {
+      fake.logout();
+      navigate("/login-screen");
+    }
+  }, [userIsInactive]);
+}
+```
+
+## Redirect back to previous page
+
+`useNavigate` can be used to navigate back to the previous page. Pass `-x` to navigate back `x` number of pages. of `x` to move foreware `x` number of pages.
+
+```jsx
+import { useNavigate } from "react-router-dom";
+
+export default function ProductItems() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <h1>Product</h1>
+      <button onClick={() => navigate(-1)}>Go back</button>
+    </>
+  );
+}
+```
+
+## Fetch data while navigating using loader
+
+useLoader fetches data as the components loads as opposed to useEffect the loads data after the component is rendered.
+
+<Tabs>
+
+<TabItem value="UserData.jsx">
+
+```jsx
+import { useLoaderData } from "react-router-dom";
+
+import { getUsers } from "../../helpers/fakeServer";
+
+export default function UserData() {
+  const users = useLoaderData();
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.name}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+export async function loader() {
+  const user = await getUsers();
+  return user;
+}
+```
+
+</TabItem>
+<TabItem value="App.jsx">
+
+```jsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import RemoteData, { loader as userLoader } from "./UserData";
+
+const router = createBrowserRouter([
+  { path: "/", element: <h1>Home</h1> },
+  { path: "/users", element: <RemoteData />, loader: userLoader },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## How to get the url path in a loader
+
+Since `useParams` is only available in a component you can use `params` from the loader function to get the current url param
+
+- To get the current url path
+
+```jsx
+export async function loader({ params }) {
+  console.log(params);
+}
+```
+
+```jsx
+const router = createBrowserRouter([
+  { path: "/order", element: <Order />, loader: orderLoader },
+]);
+```
+
+- To get dynamic route params
+
+```jsx
+export async function loader({ params }) {
+  console.log(params.orderId);
+}
+```
+
+```jsx
+const router = createBrowserRouter([
+  { path: "/order/:orderId", element: <Order />, loader: orderLoader },
+]);
+```
+
+## Add global check to see if a page is loading
+
+useNavigation returns the current loading state of the global navigation.
+
+```jsx
+import { Outlet, useNavigation } from "react-router-dom";
+
+import Loader from "./Loader";
+
+export default function AppLayout() {
+  //highlight-start
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+  //highlight-end
+  return (
+    <>
+      {isLoading && <Loader />}
+      <Outlet />
+    </>
+  );
+}
+```

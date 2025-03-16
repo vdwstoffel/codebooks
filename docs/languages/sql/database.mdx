@@ -1,0 +1,47 @@
+---
+sidebar_label: "Database"
+sidebar_position: 2
+---
+
+# Databases
+
+## Create a new table
+
+```sql
+CREATE TABLE IF NOT EXISTS "users" (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    age INTEGER,
+    password VARCHAR(255) NOT NULL,
+    subscribed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Drop a table
+
+```sql
+DROP TABLE "users";
+```
+
+## Insert Columns into database
+
+```sql
+ALTER TABLE "users"
+ADD "verified" BOOLEAN;
+```
+
+## Rename a column
+
+```sql
+ALTER TABLE users
+RENAME COLUMN "name" TO "userName";
+```
+
+## Drop a column
+
+```sql
+ALTER TABLE "users"
+DROP COLUMN "password";
+```

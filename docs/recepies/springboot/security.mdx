@@ -1,0 +1,29 @@
+---
+sidebar_label: "Security"
+sidebar_position: 2
+---
+
+# Spring Security
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+Once you start the server in the cli you will see
+
+```shell
+Using generated security password: 5f467679-b717-4341-ad48-9125a1dd1700
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+```
+
+By default the user is `user` and the password is the generated password.
+
+You can use this password to login to the application. You can also set your own password by adding the following line to the `application.properties` file
+
+```properties title="application.properties"
+spring.security.user.name=admin
+spring.security.user.password=admin
+```

@@ -1,0 +1,53 @@
+---
+sidebar_label: "Inheritance"
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Inheritance
+
+Inheritance is a mechanism in Java that allows one class to inherit properties and behavior from another class. The class that inherits is called the subclass, and the class that is inherited from is called the superclass. Inheritance allows for code reusability and establishes a relationship between classes.
+
+## Extending a Class
+
+<Tabs>
+
+<TabItem value="Parent">
+
+```java title="Animal.java"
+public class Animal {
+    void eat() {
+        System.out.println("This animal eats food.");
+    }
+}
+
+```
+
+</TabItem>
+<TabItem value="Child">
+
+```java title="Dog.java"
+public class Dog extends Animal {
+    void bark() {
+        System.out.println("Woof!");
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Main">
+
+```java title="Main.java"
+public class Main {
+    public static void main(String[] args) {
+        Dog myDog = new Dog();
+        myDog.eat();  // Inherited from Animal class
+        myDog.bark(); // Defined in Dog class
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
