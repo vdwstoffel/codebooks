@@ -10,8 +10,6 @@ import TabItem from "@theme/TabItem";
 
 ## Setting up a Database
 
-
-
 ```xml title="pom.xml"
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -30,7 +28,7 @@ import TabItem from "@theme/TabItem";
     <groupId>org.postgresql</groupId>
     <artifactId>postgresql</artifactId>
     <scope>runtime</scope>
-</dependency>      
+</dependency>
 ```
 
 ```bash
@@ -43,7 +41,6 @@ import TabItem from "@theme/TabItem";
     └── Student.java
 ```
 
-
 <Tabs>
 
 <TabItem value="Add DB info">
@@ -53,6 +50,7 @@ spring.datasource.url=jdbc:mysql://192.168.129.15:9998/student_tracker
 spring.datasource.username=demo
 spring.datasource.password=demo
 ```
+
 </TabItem>
 
 <TabItem value="Entity Class">
@@ -105,7 +103,6 @@ public class Student {
 
 </TabItem>
 
-
 <TabItem value="Create Interface">
 
 The DAO (Data Access Object) interface is used to define the methods that will be used to interact with the database.
@@ -116,6 +113,7 @@ public interface StudentDAO {
     public void save(Student theStudent);
 }
 ```
+
 </TabItem>
 
 <TabItem value="Create Implementation">
@@ -123,7 +121,6 @@ public interface StudentDAO {
 The DAO implementation class is used to implement the methods defined in the DAO interface.
 
 - `@Transactional` annotation is used to indicate that the method is transactional. Only needed when making updates, not when reading.
-
 
 ```java title="StudentDAOImpl.java"
 package com.learn.cruddemo.dao;
@@ -147,11 +144,11 @@ public class StudentDAOImpl implements StudentDAO {
     public StudentDAOImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
-    
+
     @Override
     @Transactional
     public void save(Student theStudent) {
-        entityManager.persist(theStudent);       
+        entityManager.persist(theStudent);
     }
 
     @Override
@@ -167,7 +164,49 @@ public class StudentDAOImpl implements StudentDAO {
 </Tabs>
 
 
+
+## Database Configuration
+
+```application.properties title="application.properties"
+spring.datasource.url=jdbc:mysql://192.168.129.15:9998/student_tracker
+spring.datasource.username=demo
+spring.datasource.password=demo
+// highlight-next-line
+spring.jpa.hibernate.ddl-auto=update // Don't use in production
+```
+
+| Property | Description |
+| --- | --- |
+| none | No action is taken. |
+| create | Creates the schema, destroying previous data. |
+| create-drop | Drops the schema at the end of the session. |
+| update | Updates the schema. No data is lost |
+| validate | Validates the schema. |
+
+## Using JPQL
+
+JQPL (Java Persistence Query Language) is used to query the database. It is similar to SQL but uses entity class names and field names instead of table names and column names.
+
+```SQl
+SELECT * FROM student WHERE last_name='Doe';
+```
+
+```java
+TypedQuery<Student> theQuery = entityManager.createQuery("FROM Student s WHERE s.lastName='Doe'", Student.class);
+theQuery.getResultList();
+```
+
+```sql
+DELETE FROM student;
+```
+
+```java
+entityManager.createQuery("DELETE FROM Student").executeUpdate();
+```
+
+
 ## CRUD
+
 ### Create
 
 ```java title="StudentDAO.java"
@@ -218,6 +257,40 @@ public List<Student> findAll() {
 }
 ```
 
+### Update
+
+```java title="StudentDAO.java"
+    void updateStudent(int studentId, String newStudentName);
+
+```
+
+```java title="StudentDAOImpl.java"
+@Override
+@Transactional
+public void updateStudent(int studentId, String newStudentName) {
+    Student student = this.findById(studentId); // some find by id function
+    student.setFirstName(newStudentName);	// Method taken from the Student entity/class
+    entityManager.merge(student);
+    System.out.println("Updated student " + student);
+}
+```
+
+### Delete
+
+```java title="StudentDAO.java"
+public void deleteStudent(int studentId);
+```
+
+```java title="StudentDAOImpl.java"
+@Override
+@Transactional
+public void deleteStudent(int studentId) {
+    Student student = this.findById(studentId);
+    entityManager.remove(student);
+}
+```
+
+
 ## Injecting query parameters
 
 ```java title="StudentDAO.java"
@@ -234,3 +307,5 @@ public List<Student> getStudents(String lastName) {
     return theQuery.getResultList();
 }
 ```
+
+
