@@ -122,6 +122,11 @@ const config = {
                 label: "Docker",
                 docId: "docker/docker",
               },
+              {
+                type: "doc",
+                label: "CLI",
+                docId: "cli/cli",
+              },
             ],
           },
           // {

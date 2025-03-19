@@ -1,0 +1,57 @@
+---
+sidebar_label: CLI
+---
+
+# CLI (Command Line Interface)
+
+## cURL
+
+### GET Request
+
+```bash
+curl -X GET http://localhost:8080/api/v1/employees
+```
+
+### POST Request
+
+```bash
+curl -X POST http://localhost:8080/api/v1/employees \
+-H "Content-Type: application/json" \
+-d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "email.com"
+}'
+```
+
+### PUT Request
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/employees/1 \
+-H "Content-Type: application/json" \
+-d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "email.com"
+}'
+```
+
+### DELETE Request
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/employees/1
+```
+
+### Adding Auth Header
+
+```bash
+curl -X GET http://localhost:8080/api/v1/employees \
+-H "Authorization: Bearer token"
+```
+
+### Uploadiong a File
+
+```bash
+curl -X POST http://localhost:8080/api/v1/employees/upload \
+-F "file=@/path/to/file"
+```
