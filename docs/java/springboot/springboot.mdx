@@ -42,77 +42,57 @@ To start a Spring Boot project, you can use the Spring Initializr. The Spring In
 │   │   ├── java
 │   │   │   └── com
 │   │   │       └── tutorial
-│   │   │           └── crudapi
-│   │   │               ├── CrudapiApplication.java
+│   │   │           └── basic_rest
+│   │   │               ├── BasicRestApplication.java
 │   │   │               ├── entity
-│   │   │               │   ├── StudentInterface.java
-│   │   │               │   └── Student.java
+│   │   │               │   └── User.java
 │   │   │               └── rest
-│   │   │                   └── StudentController.java
+│   │   │                   └── UserController.java
 ```
 
 <Tabs>
-
-<TabItem value="Create Interface">
-
-```java title="StudentInterface.java"
-package com.tutorial.crudapi.entity;
-
-public interface StudentInterface {
-    String getFirstName();
-    void setFirstName(String firstName);
-    String getLastName();
-    void setLastName(String lastName);
-}
-
-```
-
-</TabItem>
 
 <TabItem value="Create Class">
 
 - `@Component` annotation tells Spring that this class is a bean and should be managed by the Spring container
 - `@Override` annotation tells the compiler that the method is an override of a method in the parent class
 
-```java title="Student.java"
-package com.tutorial.crudapi.entity;
+```java title="User.java"
+package com.example.basic_rest.entity;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class Student implements StudentInterface {
-    private String firstName;
-    private String lastName;
+public class User {
+    private String username;
+    private int age;
 
     // Empty constructor required for Spring to create an instance of the class
-    public Student() {}
+    public User() {
+    };
 
-    public Student(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User(String username, int age) {
+        this.username = username;
+        this.age = age;
     }
 
-    @Override
-    public String getFirstName() {
-        return this.firstName;
+    public String getUsername() {
+        return this.username;
     }
 
-    @Override
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    @Override
-    public String getLastName() {
-        return this.lastName;
+    public int getAge() {
+        return this.age;
     }
 
-    @Override
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setAge(int age) {
+        this.age = age;
     }
+
 }
-
 ```
 
 </TabItem>
@@ -124,39 +104,57 @@ public class Student implements StudentInterface {
 - `@Autowired` annotation tells Spring to inject an instance of Student into this controller
 - `@GetMapping` annotation tells Spring that this method will handle GET requests to /api/students
 
-Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of students into a JSON array.
+Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of user into a JSON array if returnung the user as is.
 
-```java title="StudentController.java"
-package com.tutorial.crudapi.rest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+```java title="UserController.java"
+package com.example.basic_rest.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.tutorial.crudapi.entity.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.basic_rest.entity.User;
 
 @RestController
-@RequestMapping("/api")
-public class StudentController {
+@RequestMapping("/api/users")
+public class UserController {
 
-    private List<Student> students;
+    private List<User> users;
 
     @Autowired
-    public StudentController() {
-        this.students = new ArrayList<>();
-
-        this.students.add(new Student("John", "Strong"));
-        this.students.add(new Student("Dave", "Weak"));
-
+    public UserController() {
+        this.users = new ArrayList<>();
     }
-    
-    @GetMapping("/students")
-    public List<Student> getStudents() {
-        return this.students;
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getAllUser() {
+
+        Map<String, Object> response = Map.of(
+                "statusCode", 200,
+                "length", this.users.size(),
+                "data", this.users);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/adduser")
+    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
+        users.add(new User(user.getUsername(), user.getAge()));
+
+        Map<String, Object> response = Map.of(
+            "statusCode", 201,
+            "data", user
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
 ```
@@ -192,13 +190,6 @@ public class HelloWorldApplication {
 ```bash
  mvn clean spring-boot:run
 ```
-
-<BrowserWindow url="http://localhost:8080/api/students">
-    {[
-      '{"firstName":"John","lastName":"Strong"}',
-      '{"firstName":"Dave","lastName":"Weak"}'
-    ]}
-</BrowserWindow>
 
 ## Injecting custom properties
 

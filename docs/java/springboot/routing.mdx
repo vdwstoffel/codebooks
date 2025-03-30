@@ -125,3 +125,159 @@ public class ExpenseController {
 </TabItem>
 
 </Tabs>
+
+
+## Creating a custom Response
+
+
+
+<Tabs>
+
+<TabItem value="Entity">
+
+- `@Component` annotation tells Spring that this class is a bean and should be managed by the Spring container
+- `@Override` annotation tells the compiler that the method is an override of a method in the parent class
+
+```java title="User.java"
+package com.example.basic_rest.entity;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class User {
+    private String username;
+    private int age;
+
+    // Empty constructor required for Spring to create an instance of the class
+    public User() {
+    };
+
+    public User(String username, int age) {
+        this.username = username;
+        this.age = age;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getAge() {
+        return this.age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+}
+```
+
+</TabItem>
+
+<TabItem value="Response Dto">
+
+DTO (Data Transfer Object) is a design pattern used to transfer data between different layers of an application, such as from the controller to the service layer or between client and server in APIs.
+
+```java title="UserApiResponse.java"
+package com.example.basic_rest.dto;
+
+public class UserApiResponse<T> {
+    private int statusCode;
+    private int length;
+    private T data; // It allows the class to work with any type of data, making it flexible and reusable.
+
+    public UserApiResponse(int statusCode, int length, T data) {
+        this.statusCode = statusCode;
+        this.length = length;
+        this.data = data;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Create Controller">
+
+- `@RestController` annotation tells Spring that this class is a controller
+- `@RequestMapping` annotation tells Spring that this controller will handle requests that start with /api
+- `@Autowired` annotation tells Spring to inject an instance of Student into this controller
+- `@GetMapping` annotation tells Spring that this method will handle GET requests to /api/students
+
+Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of user into a JSON array if returnung the user as is.
+
+```java title="UserController.java"
+package com.example.basic_rest.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.basic_rest.dto.UserApiResponse;
+import com.example.basic_rest.entity.User;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    private List<User> users;
+
+    @Autowired
+    public UserController() {
+        this.users = new ArrayList<>();
+    }
+
+    @GetMapping
+    public ResponseEntity<UserApiResponse<List<User>>> getAllUser() {
+
+        List<User> users = this.users;
+        UserApiResponse<List<User>> response = new UserApiResponse<List<User>>(200, users.size(), users);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/adduser")
+    public ResponseEntity<UserApiResponse<User>> createUser(@RequestBody User user) {
+        users.add(new User(user.getUsername(), user.getAge()));
+
+        UserApiResponse<User> response = new UserApiResponse<User>(201, 1, user);
+        return ResponseEntity.ok(response);
+    }
+}
+```
+</TabItem>
+</Tabs>
