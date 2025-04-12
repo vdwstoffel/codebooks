@@ -109,3 +109,64 @@ app.listen(3000);
 
 </Tabs>
 
+## Springboot app with hot reload
+
+<Tabs>
+
+    <TabItem value="Script">
+
+        ```bash title="docker_run.sh"
+        #!/bin/bash
+        # Specifies that this script should be run using the Bash shell.
+
+        dos2unix mvnw
+        # Converts the 'mvnw' file to Unix format by fixing line endings (from DOS/Windows to Unix).
+
+        # Runs the 'mvnw' (Maven Wrapper) script with the following commands:
+        # - 'clean': Deletes all build artifacts to ensure a clean build environment.
+        # - 'spring-boot:run': Starts the Spring Boot application.
+        # The '&' runs this process in the background, allowing the script to proceed without waiting.
+        ./mvnw clean spring-boot:run &
+
+        # Starts an infinite loop that will continuously execute the commands inside it.
+        while true; do
+
+        # Monitors the 'src/' directory recursively for any of the following events:
+        # - 'modify': A file is modified.
+        # - 'create': A file is created.
+        # - 'delete': A file is deleted.
+        # - 'move': A file is moved.
+        # The script will pause and wait here until any of these events occur.
+        inotifywait -e modify,create,delete,move -r ./src/
+
+        # Once a change is detected, this command compiles the source code using Maven,
+        # incorporating the changes into the application.
+        ./mvnw compile
+
+        done
+        # Ends the 'while' loop and makes the process repeat indefinitely.
+
+        ```
+
+    </TabItem>
+
+    <TabItem value="Dockerfile">
+
+        ```dockerfile title="Dockerfile"
+        FROM amazoncorretto:24.0.0-alpine3.21
+
+        WORKDIR /app
+
+        COPY . .
+
+        RUN apk add --no-cache inotify-tools
+
+        EXPOSE 7001
+
+        CMD [ "sh", "docker_run.sh" ]
+        ```
+
+    </TabItem>
+
+</Tabs>
+
