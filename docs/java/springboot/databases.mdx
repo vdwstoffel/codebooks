@@ -415,6 +415,157 @@ public List<Student> getStudents(String lastName) {
 }
 ```
 
+## Foreig Keys
+
+- @OneToMany: This establishes a one-to-many relationship, meaning one User entity is associated with multiple Expense entities.
+
+- mappedBy = "user": This specifies the field in the Expense entity that defines the relationship. In this case, user is the field in the Expense entity annotated with @ManyToOne. It tells JPA that the User side is the "inverse" side of the relationship, and the Expense entity owns the relationship (i.e., holds the foreign key).
+
+- cascade = CascadeType.ALL: This enables cascading operations. When a User entity is persisted, updated, or deleted, the same operations will automatically be applied to the associated Expense entities. For example:
+When you save a User, all its Expense entries are saved automatically.
+If you delete a User, all its Expense entries are deleted as well.
+
+- orphanRemoval = true: This ensures that if an Expense entry is removed from the User's expenses list, it is also deleted from the database. It's useful for maintaining database integrity—no "orphaned" records (i.e., records not referenced by any parent entity) are left behind.
+
+<Tabs>
+
+<TabItem value="User">
+
+```java
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // One-to-Many relationship
+    private List<Expense> expenses;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(List<Expense> expenses) {
+        this.expenses = expenses;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Expense">
+
+```java
+import jakarta.persistence.*;
+
+@Entity
+public class Expense {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    private Long id;
+
+    private String description;
+    private Double amount;
+
+    @ManyToOne // Many-to-One relationship with User
+    @JoinColumn(name = "user_id") // Foreign key in Expense table
+    private User user;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
+
+```
+
+</TabItem>
+
+<TabItem value="Service">
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ExpenseService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
+    // Method to create and save an Expense
+    public Expense createExpense(Long userId, String description, Double amount) {
+        // Fetch the User entity by its ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create a new Expense instance
+        Expense expense = new Expense();
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setUser(user); // Set the foreign key relationship
+
+        // Save the Expense in the database
+        return expenseRepository.save(expense);
+    }
+}
+```
+</TabItem>
+
+</Tabs>
+
 ## Spring Data JPA
 
 Spring Data JPA is a module of the Spring Framework that simplifies working with databases in Java applications. It builds on JPA (Java Persistence API) and provides powerful tools to perform common database operations, such as saving, retrieving, and updating data, with minimal boilerplate code
@@ -630,7 +781,6 @@ public class EmployeeRestController {
 
 </Tabs>
 
-
 ## Spring Data Rest
 
 Spring Data REST is a Spring module that automatically exposes the repositories you define in Spring Data as RESTful web services. It simplifies the process of building REST APIs by handling the creation of endpoints for CRUD operations, pagination, and sorting out of the box
@@ -729,6 +879,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>  {
 - Now go to http://localhost:8080/employees
 
 ### Rename resource
+
 ```java title="EmployeeRepository"
 package com.example.cruddemo.dao;
 
@@ -749,4 +900,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>  {
 
 ```properties title="application.properties"
 spring.data.rest.default-page-size=3
+```
+
+```
+
 ```

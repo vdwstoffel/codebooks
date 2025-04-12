@@ -104,6 +104,17 @@ export default function TanstackApp() {
 
 <TanstackApp app="BasicExample" />
 
+## Passing arguments to fetchQuery
+
+```jsx
+export function useGetExpenses(idToken) {
+  const { data } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: () => getAllExpenseByUserId(idToken),
+  });
+}
+```
+
 ## Updating data with mutations
 
 <Tabs>
