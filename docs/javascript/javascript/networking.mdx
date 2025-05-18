@@ -1,0 +1,31 @@
+---
+sidebar_label: Networking
+sidebar_position: 10
+---
+
+# Networking
+
+## Axios
+
+```bash
+npm install axios
+```
+
+### Upload a file
+
+```javascript
+import axios from "axios";
+import FormData from "form-data";
+
+const formData = new FormData();
+const csvFile = document.querySelector('#file'); // Assuming an input element with id="file"
+formData.append("file", csvFile.files[0]);
+
+axios.post('/upload', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+})
+.then(response => console.log('File uploaded successfully', response))
+.catch(error => console.error('Error uploading file', error));
+```

@@ -84,3 +84,26 @@ WHERE "email" LIKE '%@gmail.com';
 SELECT * FROM "users"
 WHERE "name" LIKE 'J%';
 ```
+
+## Grouping Results
+
+Imagine you have a table called Sales that looks like this:
+| Product | Category | Quantity | Price |
+|---------|----------|----------|-------|
+| Laptop | Electronics | 5 | 1000 |
+| Smartphone | Electronics | 10 | 800 |
+| Chair | Furniture | 7 | 120 |
+| Table | Furniture | 4 | 200 |
+
+```sql
+SELECT Category, SUM(Quantity) AS TotalQuantity
+FROM Sales
+GROUP BY Category;
+```
+
+The result of this query will be:
+
+| Category    | TotalQuantity |
+| ----------- | ------------- |
+| Electronics | 15            |
+| Furniture   | 11            |

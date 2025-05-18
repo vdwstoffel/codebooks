@@ -1,0 +1,204 @@
+---
+sidebar_Label: Authentication
+description: Authentication in Spring Boot
+sidebar_position: 5
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Authentication
+
+## Authentication with Auth0 (and React)
+
+Auto0 account is required. In your dashbaord create a new single page application.
+
+<Tabs>
+
+<TabItem value="Depandancies">
+
+```java title="pom.xml"
+<dependency>
+    <groupId>com.okta.spring</groupId>
+    <artifactId>okta-spring-boot-starter</artifactId>
+    <version>3.0.7</version>
+</dependency>
+```
+
+```properties title="application.properties"
+okta.oauth2.issuer=https://yourAuth0domain.com/
+okta.oauth2.audience=placeholderValue
+```
+
+</TabItem>
+
+<TabItem value="Security Config">
+
+```java title="SecurityConfig.java"
+package com.auth0exmaple.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+/**
+ * Configures our application with Spring Security to restrict access to our API endpoints.
+ */
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        /*
+        This is where we configure the security required for our endpoints and setup our app to serve as
+        an OAuth2 Resource Server, using JWT validation.
+        */
+        return http
+                .authorizeHttpRequests((authorize) -> authorize
+                    .requestMatchers("/api/demo/public").permitAll()
+                    .requestMatchers("/api/demo/private").authenticated()
+                )
+                .cors(withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(withDefaults())
+                )
+                .build();
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Controller">
+
+```java title="DemoController.java"
+package com.auth0exmaple.controllers;
+
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+@RestController
+@RequestMapping("/api/demo")
+class DemoController {
+
+    @Autowired
+    public DemoController() {
+
+    };
+
+    @GetMapping("/public")
+    public String publuc() {
+        return "Public acces";
+    }
+
+    @GetMapping("/private")
+	public String index(@AuthenticationPrincipal Jwt jwt) {
+		return String.format("Hello, %s!", jwt.getSubject());
+	}
+
+}
+```
+
+</TabItem>
+
+<TabItem value="Frontend Setup">
+
+```bash
+npm install @auth0/auth0-react
+```
+
+```tsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Auth0Provider } from "@auth0/auth0-react";
+
+import "./index.css";
+import App from "./App.tsx";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <Auth0Provider
+      domain="yourAuth0domain.com"
+      clientId="placeholderValue"
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
+      <App />
+    </Auth0Provider>
+  </StrictMode>
+);
+```
+
+</TabItem>
+
+<TabItem value="Component">
+
+```tsx
+import axios from "axios";
+import "./App.css";
+import { useAuth0 } from "@auth0/auth0-react";
+
+export default function App() {
+  const {
+    isLoading,
+    isAuthenticated,
+    user,
+    loginWithRedirect,
+    logout,
+    getAccessTokenSilently,
+  } = useAuth0();
+
+  if (isLoading) return <h1>Loading page...</h1>;
+
+  function loginHandler() {
+    loginWithRedirect();
+  }
+
+  function logoutHandler() {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+  }
+
+  async function getBackendData() {
+    const token = await getAccessTokenSilently({ detailedResponse: true });
+    const result = await axios.get("/api/demo/private", {
+      headers: { Authorization: `Bearer ${token.id_token}` },
+    });
+    console.log(result);
+  }
+
+  async function getPublicData() {
+    const result = await axios.get("/api/demo/public");
+    console.log(result);
+  }
+
+  return (
+    <>
+      {isAuthenticated && (
+        <>
+          <h1>Hello {user?.email}</h1>
+          <button onClick={logoutHandler}>Logout</button>
+          <button onClick={getBackendData}>Get Backend Data</button>
+        </>
+      )}
+      {!isAuthenticated && (
+        <>
+          <button onClick={loginHandler}>Login</button>
+          <button onClick={getPublicData}>Get public Data</button>
+        </>
+      )}
+    </>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>

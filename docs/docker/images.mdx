@@ -8,7 +8,6 @@ import TabItem from "@theme/TabItem";
 
 # Images
 
-
 Docker Images are the building blocks of a Docker container. They are created with the build command, and they are used to create containers.
 
 ## How to create an image
@@ -64,6 +63,7 @@ CMD [ "npm", "run", "start" ]
 ```bash
 docker build -t node-docker-demo:dev .
 ```
+
 - Run Container
 
 ```bash
@@ -113,60 +113,36 @@ app.listen(3000);
 
 <Tabs>
 
-    <TabItem value="Script">
+<TabItem value="Script">
 
-        ```bash title="docker_run.sh"
-        #!/bin/bash
-        # Specifies that this script should be run using the Bash shell.
+```bash title="docker_run.sh"
 
-        dos2unix mvnw
-        # Converts the 'mvnw' file to Unix format by fixing line endings (from DOS/Windows to Unix).
+#!/bin/bash
+dos2unix mvnw
+./mvnw clean spring-boot:run &
+while true; do
+inotifywait -e modify,create,delete,move -r ./src/ && ./mvnw compile
+done
+```
 
-        # Runs the 'mvnw' (Maven Wrapper) script with the following commands:
-        # - 'clean': Deletes all build artifacts to ensure a clean build environment.
-        # - 'spring-boot:run': Starts the Spring Boot application.
-        # The '&' runs this process in the background, allowing the script to proceed without waiting.
-        ./mvnw clean spring-boot:run &
+</TabItem>
 
-        # Starts an infinite loop that will continuously execute the commands inside it.
-        while true; do
+<TabItem value="Dockerfile">
 
-        # Monitors the 'src/' directory recursively for any of the following events:
-        # - 'modify': A file is modified.
-        # - 'create': A file is created.
-        # - 'delete': A file is deleted.
-        # - 'move': A file is moved.
-        # The script will pause and wait here until any of these events occur.
-        inotifywait -e modify,create,delete,move -r ./src/
+```dockerfile title="Dockerfile"
+FROM amazoncorretto:24.0.0-alpine3.21
 
-        # Once a change is detected, this command compiles the source code using Maven,
-        # incorporating the changes into the application.
-        ./mvnw compile
+WORKDIR /app
 
-        done
-        # Ends the 'while' loop and makes the process repeat indefinitely.
+COPY . .
 
-        ```
+RUN apk add --no-cache inotify-tools
 
-    </TabItem>
+EXPOSE 7001
 
-    <TabItem value="Dockerfile">
+CMD [ "sh", "docker_run.sh" ]
+```
 
-        ```dockerfile title="Dockerfile"
-        FROM amazoncorretto:24.0.0-alpine3.21
-
-        WORKDIR /app
-
-        COPY . .
-
-        RUN apk add --no-cache inotify-tools
-
-        EXPOSE 7001
-
-        CMD [ "sh", "docker_run.sh" ]
-        ```
-
-    </TabItem>
+</TabItem>
 
 </Tabs>
-

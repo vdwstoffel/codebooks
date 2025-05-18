@@ -1,5 +1,6 @@
 ---
 sidebar_label: Arrays
+sidebar_position: 4
 ---
 
 # Arrays
@@ -19,6 +20,19 @@ Sorting happens in place, so the original array is modified.
 const languages = ["Python", "JavaScript", "Java", "C++"];
 languages.sort();
 console.log(languages); // ["C++", "Java", "JavaScript", "Python"]
+```
+
+## Sorting an array of objects
+
+```js
+const languages = [
+  { name: "Python", year: 1991 },
+  { name: "JavaScript", year: 1995 },
+  { name: "Java", year: 1995 },
+  { name: "C++", year: 1985 },
+];
+languages.sort((a, b) => a.year - b.year);
+console.log(languages);
 ```
 
 ## Mapping

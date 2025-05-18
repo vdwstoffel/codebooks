@@ -124,3 +124,24 @@ String str = "Hello";
 
 String subStr = str.substring(1, 3); // "el"
 ```
+
+## Split a string
+
+```java
+String str = "Hello World";
+String[] arr = str.split(" "); // ["Hello", "World"]
+```
+
+## Split a string by a regex
+
+```java
+String str = "Hello, World!";
+String[] arr = str.split("[,\\s]+"); // ["Hello", "World!"]
+```
+
+## Check if a string contains a substring
+
+```java
+String str = "Hello World";
+boolean contains = str.contains("World"); // true
+```

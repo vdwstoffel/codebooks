@@ -1,319 +1,90 @@
 ---
 sidebar_label: "Spring Boot"
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
-import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # Spring Boot
 
-<div
-  style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
->
-  <img src="https://repository-images.githubusercontent.com/149085612/76e31b00-782c-11e9-8fdc-eec6e93d055b" />
-</div>
+## Starting a client project
 
-Spring Boot is an open-source framework that simplifies the development of Java-based, production-ready applications.
+- Set Up Your Project
+  Use the Spring Initializr to generate a project:
 
-## Starting a Spring Boot Project
+- Write Your Command-Line Runner
+  Spring Boot provides CommandLineRunner and ApplicationRunner interfaces, which let you execute code when the application starts.
 
-To start a Spring Boot project, you can use the Spring Initializr. The Spring Initializr is a web-based tool that generates a Spring Boot project structure for you.
+```java
+package com.example;
 
-[Spring Initializer](https://start.spring.io/)
-
-**Dependencies**
-
-- Spring Web
-
-## Spring Boot quick start
-
-- Copy the zip file to your project directory
-
-```bash
-.
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── tutorial
-│   │   │           └── basic_rest
-│   │   │               ├── BasicRestApplication.java
-│   │   │               ├── entity
-│   │   │               │   └── User.java
-│   │   │               └── rest
-│   │   │                   └── UserController.java
-```
-
-<Tabs>
-
-<TabItem value="Create Class">
-
-- `@Component` annotation tells Spring that this class is a bean and should be managed by the Spring container
-- `@Override` annotation tells the compiler that the method is an override of a method in the parent class
-
-```java title="User.java"
-package com.example.basic_rest.entity;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class User {
-    private String username;
-    private int age;
-
-    // Empty constructor required for Spring to create an instance of the class
-    public User() {
-    };
-
-    public User(String username, int age) {
-        this.username = username;
-        this.age = age;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public int getAge() {
-        return this.age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-}
-```
-
-</TabItem>
-
-<TabItem value="Create Controller">
-
-- `@RestController` annotation tells Spring that this class is a controller
-- `@RequestMapping` annotation tells Spring that this controller will handle requests that start with /api
-- `@Autowired` annotation tells Spring to inject an instance of Student into this controller
-- `@GetMapping` annotation tells Spring that this method will handle GET requests to /api/students
-
-Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of user into a JSON array if returnung the user as is.
-
-```java title="UserController.java"
-package com.example.basic_rest.controller;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.basic_rest.entity.User;
-
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
-
-    private List<User> users;
-
-    @Autowired
-    public UserController() {
-        this.users = new ArrayList<>();
-    }
-
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllUser() {
-
-        Map<String, Object> response = Map.of(
-                "statusCode", 200,
-                "length", this.users.size(),
-                "data", this.users);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/adduser")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-        users.add(new User(user.getUsername(), user.getAge()));
-
-        Map<String, Object> response = Map.of(
-            "statusCode", 201,
-            "data", user
-        );
-
-        return ResponseEntity.ok(response);
-    }
-}
-```
-
-</TabItem>
-<TabItem value="Main">
-
-- `@SpringBootApplication` annotation tells Spring that this class is the entry point for the application
-
-```java title="CrudapiApplication.java"
-package com.stoffel.firstApp;
-
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HelloWorldApplication {
+public class MyApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        System.out.println("Hello, Spring CLI!");
+    }
+}
+```
+
+- Run Your Application
+
+```bash
+Run: mvn spring-boot:run
+```
+
+## Parse A CSV File
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-csv</artifactId>
+    <version>1.10.0</version> <!-- Check for latest version -->
+</dependency>
+```
+
+```java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.apache.commons.csv.*;
+import java.io.*;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+
+@SpringBootApplication
+public class DemoApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HelloWorldApplication.class, args);
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) {
+		try (Reader reader = new FileReader("test.csv");
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+
+            for (CSVRecord record : csvParser) {
+                String name = record.get("name"); // Assuming column header "name"
+                String age = record.get("age");
+                System.out.println("Name: " + name + ", Age: " + age);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 }
-
-```
-
- </TabItem>
-
-</Tabs>
-
-- Run the application
-
-```bash
- mvn clean spring-boot:run
-```
-
-## Injecting custom properties
-
-```application title="application.properties"
-secret.name="Ted Lasso"
-```
-
-```java title="ExampleRestController.java"
-package com.stoffel.firstApp.rest;
-
-// highlight-next-line
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class ExampleRestController {
-
-    // highlight-next-line
-    @Value("${secret.name}")
-    // highlight-next-line
-    private String secretName;
-
-    @GetMapping("/secret")
-    public String getSecret() {
-       return secretName;
-    }
-}
-```
-
-<BrowserWindow url="http://localhost:8080/secret">"Ted Lasso"</BrowserWindow>
-
-## Adding hot reload
-
-- Add the following dependency to the `pom.xml` file
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-devtools</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-
-## Monitoring the application
-
-Spring Boot Actuator provides a set of production-ready features to help you monitor and manage your application.
-
-- Add the following dependency to the `pom.xml` file
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-```
-
-- in the `application.properties` file, add the following line to enable the endpoints
-
-```properties title="application.properties"
-management.endpoints.web.exposure.include=health,info
-```
-
-| Name             | Description                                                          |
-| ---------------- | -------------------------------------------------------------------- |
-| /actuator/health | Shows application health information                                 |
-| /actuator/info   | Displays arbitrary application info                                  |
-| /actuator/beans  | Displays a complete list of all the Spring beans in your application |
-
-- To add properties to the /info endpoint
-
-```properties title="application.properties"
-management.info.env.enabled=true
-info.app.author=John Doe
-info.app.description=This is a test
-info.app.version=1.0.0
-```
-
-<BrowserWindow url="http://localhost:8080/actuator/info">
-  <p>
-    {
-      '{"app":{"author":"John Doe","description":"This is a test ","version":"1.0.0"}'
-    }
-  </p>
-</BrowserWindow>
-
-## Configuring the server
-
-```bash
-.
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── ...
-│   │   └── resources
-│   │       ├── application.properties
-│   │       ├── static
-│   │       └── templates
-```
-
-### Updating the default port
-
-- Add the following line to the `application.properties` file
-
-```properties title="application.properties"
-server.port=8081
-```
-
-### Update context path
-
-- Add the following line to the `application.properties` file
-
-```properties title="application.properties"
-server.servlet.context-path=/firstApp
-```
-
-Now go to [http://localhost:8081/firstApp/](http://localhost:8081/firstApp/)
-
-### Set logging for application
-
-```properties title="application.properties"
-logging.file.name=logs/firstApp.log
 ```

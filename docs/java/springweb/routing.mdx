@@ -126,10 +126,7 @@ public class ExpenseController {
 
 </Tabs>
 
-
 ## Creating a custom Response
-
-
 
 <Tabs>
 
@@ -279,5 +276,61 @@ public class UserController {
     }
 }
 ```
+
 </TabItem>
 </Tabs>
+
+## How to parse query parameters
+
+- `@RequestParam` annotation is used to extract query parameters from the URL. It allows you to access the values of the parameters passed in the URL.
+
+
+- `@RequestParam(required = false)` indicates that the parameter is optional. If the parameter is not present in the request, it will be set to null.
+
+```java title="QueryController.java"
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class QueryParameterController {
+
+    @GetMapping("/example")
+    public String getQueryParameters(@RequestParam(required = false) String param1,
+                                     @RequestParam(required = false) Integer param2) {
+        return "Received query parameters: param1 = " + param1 + ", param2 = " + param2;
+    }
+}
+```
+`example.com/example?param1=value1&param2=123`
+
+## Upload a file
+
+```java
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
+@PostMapping("/upload-statement")
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a valid file");
+        }
+
+        try (Reader reader = new InputStreamReader(file.getInputStream());
+                CSVParser csvParser = new CSVParser(reader,
+                        CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader().withTrim())) {
+
+            for (CSVRecord record : csvParser) {
+                // System.out.println("Processing record: " + record);
+                String date = record.get("Date");
+                String amount = record.get("Amount");
+                System.out.println(date + " " + amount);
+            }
+
+            return ResponseEntity.ok("File processed successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file");
+        }
+    }
+```

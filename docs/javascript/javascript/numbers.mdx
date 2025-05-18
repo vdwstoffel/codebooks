@@ -1,0 +1,69 @@
+---
+sidebar_label: "Numbers"
+sidebar_position: 3
+---
+
+# Numbers
+
+## Generating a random number
+
+```javascript
+const randomNumber = Math.random();
+console.log(randomNumber); // 0.123456789
+```
+
+```javascript
+const randomNumber = Math.floor(Math.random() * 10) + 1;
+console.log(randomNumber); // 1 - 10
+```
+
+## Generating a cryptographically secure random number
+
+```javascript
+const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
+console.log(randomNumber); // 123456789
+```
+
+- Convert to a fractional number between 0 and 1:
+
+```javascript
+const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
+const randomFraction = randomBuffer / (0xffffffff + 1);
+```
+
+## Rounding to a specific number of decimal places
+
+```javascript
+const num = 3.141592653589793;
+const decimalPlaces = 2;
+
+let roundedNum = Math.round(num * (10 ** decimalPlaces)) / (10 ** decimalPlaces);
+console.log(roundedNum); // 3.14
+```
+
+
+```javascript
+const num = 3.141592653589793;
+const roundedNum = Math.round(num);
+console.log(roundedNum); // 3
+```
+
+## Convert string to number
+
+```javascript
+const str = "123.45";
+const num = parseFloat(str);
+console.log(num); // 123.45
+```
+
+```javascript
+const str = "123";
+const num = parseInt(str);
+console.log(num); // 123
+```
+
+```javascript
+const str = "123.45";
+const num = Number(str);
+console.log(num); // 123.45
+```

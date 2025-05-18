@@ -44,3 +44,47 @@ server: {
 ```js title="App.js"
 const res = await axios.get("api/backend-route");
 ```
+
+## Add SSL certificate to use HTTPS in Vite
+
+# Enabling HTTPS in Vite for Local Development
+
+To use HTTPS in Vite, you can set up a self-signed SSL certificate. Here's how to do it:
+
+- Install `mkcert` to create a self-signed certificate:
+
+```bash
+sudo apt-get install wget libnss3-tools
+wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
+mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
+chmod +x /usr/bin/mkcert
+```
+
+- Set Up a Local Certificate Authority:
+
+```bash
+mkcert -install
+```
+
+- Generate a Certificate for Your Localhost:
+
+```bash
+mkcert localhost
+```
+
+- Update Your Vite Configuration:
+
+```js title="vite.config.js"
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  server: {
+    https: {
+      key: "./localhost-key.pem",
+      cert: "./localhost.pem",
+    },
+    host: "localhost",
+    port: 3000,
+  },
+});
+```

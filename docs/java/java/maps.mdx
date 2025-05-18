@@ -87,3 +87,20 @@ inventory.put("Apples", 2.99);
 inventory.remove("Oranges");
 System.out.println(inventory); // {Apples=2.99}
 ```
+
+## Iterate through a map
+
+```java
+Map<String, Double> inventory = new HashMap<>();
+inventory.put("Oranges", 5.99);
+inventory.put("Apples", 2.99);
+inventory.put("Bananas", 1.99);
+
+for (Map.Entry<String, Double> entry : inventory.entrySet()) {
+    System.out.println(entry.getKey() + ": " + entry.getValue());
+}
+// Output:
+// Oranges: 5.99
+// Apples: 2.99
+// Bananas: 1.99
+```
