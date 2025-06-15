@@ -1,0 +1,27 @@
+---
+sidebar_label: Joins
+sidebar_position: 7
+---
+
+# Joins
+
+## Inner Join
+
+
+| id | name    | country |
+|----|---------|---------|
+| 1  | Alice   | USA     |
+| 2  | Bob     | Canada  |
+| 3  | Charlie | UK      |
+
+| id | cust_id | product  |
+|----|---------|----------|
+| 1  | 1       | Laptop   |
+| 2  | 2       | Phone    |
+| 3  | 1       | Tablet   |
+
+```sql
+SELECT Customers.name, Orders.product
+FROM Customers
+INNER JOIN Orders ON Customers.id = Orders.cust_id;
+```

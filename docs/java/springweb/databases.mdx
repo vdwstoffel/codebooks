@@ -55,9 +55,7 @@ Spring Data JPA is a module of the Spring Framework that simplifies working with
 </dependency>
 ```
 
-
 </TabItem>
-
 
 <TabItem value="application.properties">
 
@@ -69,12 +67,7 @@ spring.datasource.password=demo
 
 </TabItem>
 
-
 </Tabs>
-
-
-
-
 
 <Tabs>
 
@@ -125,6 +118,11 @@ public class Todo {
 
 In Spring Data JPA, a repository is an interface that handles the interaction with the database. It provides built-in methods for common tasks like saving, retrieving, updating, and deleting data, so you don't need to write boilerplate code
 
+- `@Query`: This annotation allows you to define custom queries using JPQL (Java Persistence Query Language) or SQL. It can be used to retrieve data based on specific conditions.
+- `@Param`: This annotation is used to bind method parameters to named parameters in the query. It allows you to pass values to the query dynamically.
+- `@Modifying`: This annotation is used to indicate that the query modifies the database (e.g., delete, update). It is required for queries that change data.
+- `@Transactional`: This annotation is used to define the scope of a transaction. It ensures that the database operations are executed within a transaction context, which is important for data integrity.
+
 ```java title="TodoRepository.java"
 package com.example.demo.doa;
 
@@ -141,6 +139,12 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     // Using custom queries
     @Query("FROM Todo t WHERE t.priority = :prio")
     List<Todo> findAllTodosByPriority(@Param("prio") String prio);
+
+    // Custom delete query
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Todo t WHERE t.todoId = :id")
+    void deleteTodoById(@Param("id") int id);
 }
 
 ```
@@ -301,7 +305,6 @@ public class TodoController {
 
 </Tabs>
 
-
 ## Database Configuration
 
 ```application.properties title="application.properties"
@@ -427,8 +430,8 @@ public List<Student> getStudents(String lastName) {
 - mappedBy = "user": This specifies the field in the Expense entity that defines the relationship. In this case, user is the field in the Expense entity annotated with @ManyToOne. It tells JPA that the User side is the "inverse" side of the relationship, and the Expense entity owns the relationship (i.e., holds the foreign key).
 
 - cascade = CascadeType.ALL: This enables cascading operations. When a User entity is persisted, updated, or deleted, the same operations will automatically be applied to the associated Expense entities. For example:
-When you save a User, all its Expense entries are saved automatically.
-If you delete a User, all its Expense entries are deleted as well.
+  When you save a User, all its Expense entries are saved automatically.
+  If you delete a User, all its Expense entries are deleted as well.
 
 - orphanRemoval = true: This ensures that if an Expense entry is removed from the User's expenses list, it is also deleted from the database. It's useful for maintaining database integrity—no "orphaned" records (i.e., records not referenced by any parent entity) are left behind.
 
@@ -567,10 +570,10 @@ public class ExpenseService {
     }
 }
 ```
+
 </TabItem>
 
 </Tabs>
-
 
 ## Spring Data Rest
 
