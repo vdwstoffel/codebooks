@@ -317,3 +317,19 @@ Now go to [http://localhost:8081/firstApp/](http://localhost:8081/firstApp/)
 ```properties title="application.properties"
 logging.file.name=logs/firstApp.log
 ```
+
+## Working with environment variables
+
+You can use environment variables to configure your application. Spring Boot will automatically map environment variables to properties in the `application.properties` file.
+
+Setp and .env file in the root of your project directory
+
+```bash
+SECRET_NAME="Ted Lasso"
+```
+
+Then in the `application.properties` file, you can use the following syntax to access the environment variable:
+
+```properties title="application.properties"
+secret.name=${SECRET_NAME}
+```
