@@ -1,0 +1,98 @@
+---
+sidebar_label: API
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Working with APIs
+
+APIs (Application Programming Interfaces) allow different software applications to communicate with each other. In the context of web development, APIs are often used to interact with backend services, databases, or external services.
+
+## Making a get request to an API
+
+Here's how you can send a GET request to an API using Spring Boot's `RestTemplate`:
+
+```java
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+public class GetExample {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Define the URL
+        String url = "https://example.com/api/users/1";
+
+        // Send GET request
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        // Print the response
+        System.out.println("Response: " + response.getBody());
+    }
+}
+```
+
+
+## Sending a post request to an API
+
+
+
+<Tabs>
+
+<TabItem value="Body DTO" default>
+
+```java
+public class User {
+    private String name;
+    private String email;
+
+    // Constructors
+    public User() {}
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    // Getters and setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
+```
+
+</TabItem>
+
+<TabItem value="API">
+
+```java
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+public class PostExample {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Create the request body
+        User user = new User("Alice", "alice@example.com");
+
+        // Define the URL
+        String url = "https://example.com/api/users";
+
+        // Send POST request
+        ResponseEntity<String> response = restTemplate.postForEntity(url, user, User.class);
+
+        // Print the response
+        System.out.println("Response: " + response.getBody());
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+

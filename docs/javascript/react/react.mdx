@@ -88,3 +88,16 @@ export default defineConfig({
   },
 });
 ```
+
+## Working with environment variables
+
+## Loading environment variables from an .env file
+
+```js title=".env"
+VITE_API_URL=http://localhost:8000/api
+```
+
+```js title="App.js"
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log(apiUrl); // Outputs: http://localhost:8000/api
+```

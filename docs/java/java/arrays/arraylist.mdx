@@ -130,3 +130,18 @@ entities.sort(Comparator.comparing(Entity::getDate).reversed());
 }
 
 ```
+
+## Get a sublist from an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+list.add("World");
+list.add("Java");   
+
+List<String> sublist = list.subList(0, 2); // Gets the first two elements
+System.out.println(sublist); // Output: [Hello, World]
+```
