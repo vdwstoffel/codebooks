@@ -84,83 +84,93 @@ const config = {
         items: [
           {
             type: "dropdown",
-            label: "Languages",
+            label: "Snippets",
             position: "left",
             items: [
               {
                 type: "doc",
+                label: "HTML/CSS",
+                docId: "html/html",
+              },
+              {
+                type: "doc",
                 label: "Python",
-                docId: "languages/python/python",
+                docId: "python/python/python",
               },
               {
                 type: "doc",
                 label: "JavaScript",
-                docId: "languages/javascript/javascript",
+                docId: "javascript/javascript/javascript",
               },
               {
                 type: "doc",
                 label: "Java",
-                docId: "languages/java/java",
+                docId: "java/java/java",
               },
               {
                 type: "doc",
                 label: "C#",
-                docId: "languages/cs/cs",
+                docId: "cs/cs/cs",
               },
               {
                 type: "doc",
                 label: "SQL",
-                docId: "languages/sql/sql",
+                docId: "sql/sql",
               },
               {
                 type: "doc",
                 label: "Docker",
-                docId: "languages/docker/docker",
+                docId: "docker/docker",
+              },
+              {
+                type: "doc",
+                label: "CLI",
+                docId: "cli/cli",
               },
             ],
           },
-          {
-            type: "dropdown",
-            label: "Recepies",
-            position: "left",
-            items: [
-              {
-                type: "doc",
-                label: "HTML/CSS/JS",
-                docId: "recepies/html_css/recepies",
-              },
-              {
-                type: "doc",
-                label: "Express",
-                docId: "recepies/express/express",
-              },
-              {
-                type: "doc",
-                label: "React",
-                docId: "recepies/react/react",
-              },
-              {
-                type: "doc",
-                label: "FastApi",
-                docId: "recepies/fastapi/fastapi",
-              },
-              {
-                type: "doc",
-                label: "Spring Boot",
-                docId: "recepies/springboot/springboot",
-              },
-              {
-                type: "doc",
-                label: "ASP.NET",
-                docId: "recepies/asp.net/asp",
-              },
-              {
-                type: "doc",
-                label: "Devops",
-                docId: "recepies/devops/docker",
-              },
-            ],
-          },
+          // {
+          //   type: "dropdown",
+          //   label: "Recepies",
+          //   position: "left",
+          //   items: [
+          //     {
+          //       type: "doc",
+          //       label: "HTML/CSS/JS",
+          //       docId: "recepies/html_css/recepies",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "Express",
+          //       docId: "recepies/express/express",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "React",
+          //       docId: "recepies/react/react",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "FastApi",
+          //       docId: "recepies/fastapi/fastapi",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "Spring Boot",
+          //       docId: "recepies/springboot/springboot",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "ASP.NET",
+          //       docId: "recepies/asp.net/asp",
+          //     },
+          //     {
+          //       type: "doc",
+          //       label: "Devops",
+          //       docId: "recepies/devops/docker",
+          //     },
+          //   ],
+          // },
           { to: "/blog", label: "Blog", position: "left" },
         ],
       },
@@ -221,6 +231,11 @@ const config = {
           "java",
           "csharp",
         ],
+      },
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
+        },
       },
     }),
 };

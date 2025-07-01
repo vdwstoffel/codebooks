@@ -1,0 +1,39 @@
+---
+sidebar_label: Objects
+sidebar_position: 5
+---
+
+# Objects
+
+## Check if a object exists in an array
+
+```javascript
+const arr = [
+  { name: "John", age: 30 },
+  { name: "Jane", age: 25 },
+];
+const exists = arr.some(obj => obj.name === "John");
+console.log(exists); // true
+```
+
+## Find an object in an array
+
+```javascript
+const arr = [
+  { name: "John", age: 30 },
+  { name: "Jane", age: 25 },
+];
+const found = arr.find(obj => obj.name === "John");
+console.log(found); // { name: "John", age: 30 }
+```
+
+## Find the index of an object in an array
+
+```javascript
+const arr = [
+  { name: "John", age: 30 },
+  { name: "Jane", age: 25 },
+];
+const index = arr.findIndex(obj => obj.name === "John");
+console.log(index); // 0
+```

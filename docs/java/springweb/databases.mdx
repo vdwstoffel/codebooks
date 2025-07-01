@@ -1,0 +1,701 @@
+---
+sidebar_label: "Databases"
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Databases
+
+## Spring Data JPA
+
+Spring Data JPA is a module of the Spring Framework that simplifies working with databases in Java applications. It builds on JPA (Java Persistence API) and provides powerful tools to perform common database operations, such as saving, retrieving, and updating data, with minimal boilerplate code
+
+<Tabs>
+
+<TabItem value="Project Structure">
+
+```bash
+.
+├── controllers
+│   └── TodoController.java
+├── DemoApplication.java
+├── doa
+│   └── TodoRepository.java
+├── entity
+│   └── Todo.java
+└── service
+    ├── TodoServiceInterface.java
+    └── TodoService.java
+```
+
+</TabItem>
+
+<TabItem value="pom.xml">
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<!-- MYSQL -->
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <scope>runtime</scope>
+</dependency>
+
+<!-- POSTGRESQL -->
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+</TabItem>
+
+<TabItem value="application.properties">
+
+```properties title="application.properties"
+spring.datasource.url=jdbc:postgresql://192.168.129.15:9998/database_name
+spring.datasource.username=root
+spring.datasource.password=demo
+```
+
+</TabItem>
+
+</Tabs>
+
+<Tabs>
+
+<TabItem value="Entity Class">
+
+- `@Entity` annotation is used to define a JPA entity.
+- `@Table` annotation is used to define the table name.
+- `@Id` annotation is used to define the primary key.
+- `@GeneratedValue` annotation is used to define the generation strategy for the primary key.
+- `@Column` annotation is used to define the column name.
+
+```java title="Todo.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "todo")
+public class Todo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "todo_id")
+    private int todoId;
+
+    @Column(name = "todo", nullable = false)
+    private String todo;
+
+    @Column(name = "priority", nullable = false)
+    private String priority = "low";
+
+    // Required Empty Bean constructor
+    public Todo() {};
+
+    public Todo(String todo, String priority) {
+        this.todo = todo;
+        this.priority = priority;
+    };
+
+    // required getters and setters
+}
+
+```
+
+</TabItem>
+
+<TabItem value="Repository">
+
+In Spring Data JPA, a repository is an interface that handles the interaction with the database. It provides built-in methods for common tasks like saving, retrieving, updating, and deleting data, so you don't need to write boilerplate code
+
+- `@Query`: This annotation allows you to define custom queries using JPQL (Java Persistence Query Language) or SQL. It can be used to retrieve data based on specific conditions.
+- `@Param`: This annotation is used to bind method parameters to named parameters in the query. It allows you to pass values to the query dynamically.
+- `@Modifying`: This annotation is used to indicate that the query modifies the database (e.g., delete, update). It is required for queries that change data.
+- `@Transactional`: This annotation is used to define the scope of a transaction. It ensures that the database operations are executed within a transaction context, which is important for data integrity.
+
+```java title="TodoRepository.java"
+package com.example.demo.doa;
+
+import com.example.demo.entity.Todo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface TodoRepository extends JpaRepository<Todo, Integer> {
+    // basic crud operation will be implemented by JPA
+
+    // Using custom queries
+    @Query("FROM Todo t WHERE t.priority = :prio")
+    List<Todo> findAllTodosByPriority(@Param("prio") String prio);
+
+    // Custom delete query
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Todo t WHERE t.todoId = :id")
+    void deleteTodoById(@Param("id") int id);
+}
+
+```
+
+</TabItem>
+
+<TabItem value="Service Layer">
+
+The service layer in a Spring Boot application is responsible for implementing the business logic of the application. It acts as a bridge between the controller layer (which handles HTTP requests) and the DAO/repository layer (which interacts with the database).
+
+- `@Service`: Specifies that this class contains business logic and makes it discoverable as a Spring-managed service component.
+
+- EmployeeDAO: The DAO (Data Access Object) is injected into the service layer to handle database operations. This approach ensures separation of concerns.
+- Constructor Injection with `@Autowired`: Spring automatically injects the required dependency (EmployeeDAO) into this service class at runtime. Constructor injection is preferred for mandatory dependencies as it makes them explicit.
+
+```java title="TodoServiceInterface.java"
+package com.example.demo.service;
+
+import com.example.demo.entity.Todo;
+
+import java.util.List;
+
+public interface TodoServiceInterface {
+    List<Todo> getAllTodos();
+    List<Todo> getAllTodosByPriority(String priority);
+    Todo createNewTodo(Todo todo);
+    Todo updateTodo(int id, Todo todo);
+    void deleteTodoById(int id);
+}
+
+```
+
+```java title="TodoService.java"
+package com.example.demo.service;
+
+import com.example.demo.doa.TodoRepository;
+import com.example.demo.entity.Todo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class TodoService implements  TodoServiceInterface{
+
+    private final TodoRepository todoRepository;
+
+    @Autowired
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
+
+    @Override
+    public Todo createNewTodo(Todo todo) {
+        todo.setPriority(todo.getPriority().toLowerCase());
+        return todoRepository.save(todo);
+    }
+
+    @Override
+    public List<Todo> getAllTodos() {
+        return this.todoRepository.findAll();
+    }
+
+    @Override
+    public List<Todo> getAllTodosByPriority(String priority) {
+        return this.todoRepository.findAllTodosByPriority(priority.toLowerCase());
+    }
+
+    @Override public Todo updateTodo(int id, Todo todo) {
+        Optional<Todo> todoExist = this.todoRepository.findById(id);
+
+        if (todoExist.isEmpty()) {
+            throw new RuntimeException("Id does not exist");
+        }
+
+        Todo todoToEdit = todoExist.get();
+        todoToEdit.setTodo(todo.getTodo());
+        todoToEdit.setPriority(todo.getPriority());
+        return this.todoRepository.save(todoToEdit);
+    }
+
+    @Override
+    public void deleteTodoById(int id) {
+        this.todoRepository.deleteById(id);
+    }
+}
+
+```
+
+</TabItem>
+
+<TabItem value="Controller">
+
+- `@RestController`: Indicates that this class will handle RESTful web requests. It combines @Controller and @ResponseBody, meaning the methods will return data (e.g., JSON) directly to the client.
+
+- `@RequestMapping`: Sets a common URL prefix (/api) for all endpoints in the controller.
+
+- Constructor Injection: The service layer (EmployeeService) is injected into the controller to access business logic and delegate tasks like fetching data.
+
+- `@GetMapping`: Specifies that this method handles GET requests for the endpoint /api/employees.
+
+```java title="TodoController.java"
+package com.example.demo.controllers;
+
+import com.example.demo.entity.Todo;
+import com.example.demo.service.TodoService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+public class TodoController {
+
+    private final TodoService todoService;
+
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    };
+
+    @PostMapping
+    public ResponseEntity<Todo> test(@RequestBody Todo newTodo) {
+        Todo createdTodo  = this.todoService.createNewTodo(newTodo);
+        return  ResponseEntity.ok(createdTodo);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Todo>> getAllTodos() {
+        List<Todo> todos = this.todoService.getAllTodos();
+        return ResponseEntity.ok(todos);
+    }
+
+    @GetMapping("/{priority}")
+    public ResponseEntity<List<Todo>> getAllTodosByPriority(@PathVariable String priority) {
+        List<Todo> todos = this.todoService.getAllTodosByPriority(priority);
+        return ResponseEntity.ok(todos);
+    }
+
+    @PutMapping("/{todoId}")
+    public ResponseEntity<Todo> updateTodo(@PathVariable int todoId, @RequestBody Todo todo) {
+        Todo updatedTodo =  this.todoService.updateTodo(todoId, todo);
+        return ResponseEntity.ok(updatedTodo);
+    }
+
+    @DeleteMapping("/{todoId}")
+    public ResponseEntity<String> deleteTodo(@PathVariable int todoId) {
+        this.todoService.deleteTodoById(todoId);
+        return ResponseEntity.ok("Todo Deleted");
+    }
+
+}
+
+```
+
+</TabItem>
+
+</Tabs>
+
+## Database Configuration
+
+```application.properties title="application.properties"
+spring.datasource.url=jdbc:mysql://192.168.129.15:9998/student_tracker
+spring.datasource.username=demo
+spring.datasource.password=demo
+// highlight-next-line
+spring.jpa.hibernate.ddl-auto=update // Don't use in production
+```
+
+| Property    | Description                                   |
+| ----------- | --------------------------------------------- |
+| none        | No action is taken.                           |
+| create      | Creates the schema, destroying previous data. |
+| create-drop | Drops the schema at the end of the session.   |
+| update      | Updates the schema. No data is lost           |
+| validate    | Validates the schema.                         |
+
+## CRUD
+
+### Create
+
+```java
+@Override
+@Transactional
+public void createStudent(Student theStudent) {
+    entityManager.persist(theStudent);
+}
+```
+
+### Read
+
+- Read One
+
+```java
+@Override
+public Student getStudent(int studentId) {
+    return entityManager.find(Student.class, studentId);
+}
+```
+
+- Read All
+
+JPQL (Java Persistence Query Language) is used to query the database. In the below example Student refers to the entity class name, not the table name. Similarly, the field names refer to the entity class field names not the column names.
+
+```java
+import jakarta.persistence.TypedQuery;
+import java.util.List;
+
+@Override
+public List<Student> findAll() {
+    TypedQuery<Student> theQuery = entityManager.createQuery("FROM Student", Student.class);
+    return theQuery.getResultList();
+}
+```
+
+### Update
+
+```java
+@Override
+@Transactional
+public void updateStudent(int studentId, String newStudentName) {
+    Student student = this.findById(studentId); // some find by id function
+    student.setFirstName(newStudentName);	// Method taken from the Student entity/class
+    entityManager.merge(student);
+    System.out.println("Updated student " + student);
+}
+```
+
+### Delete
+
+```java
+@Override
+@Transactional
+public void deleteStudent(int studentId) {
+    Student student = this.findById(studentId);
+    entityManager.remove(student);
+}
+```
+
+## Using JPQL
+
+JQPL (Java Persistence Query Language) is used to query the database. It is similar to SQL but uses entity class names and field names instead of table names and column names.
+
+```SQl
+SELECT * FROM student WHERE last_name='Doe';
+```
+
+```java
+TypedQuery<Student> theQuery = entityManager.createQuery("FROM Student s WHERE s.lastName='Doe'", Student.class);
+theQuery.getResultList();
+```
+
+```sql
+DELETE FROM student;
+```
+
+```java
+entityManager.createQuery("DELETE FROM Student").executeUpdate();
+```
+
+### Injecting query parameters
+
+```java title="StudentDAO.java"
+public List<Student> getStudents(String lastName);
+```
+
+The `:lastName` is a named parameter that will be replaced by the value passed to the `setParameter` method.
+
+```java title="StudentDAOImpl.java"
+@Override
+public List<Student> getStudents(String lastName) {
+    TypedQuery<Student> theQuery = entityManager.createQuery("FROM Student s WHERE s.lastName=:lastName", Student.class);
+    theQuery.setParameter("lastName", lastName);
+    return theQuery.getResultList();
+}
+```
+
+## Foreig Keys
+
+- @OneToMany: This establishes a one-to-many relationship, meaning one User entity is associated with multiple Expense entities.
+
+- mappedBy = "user": This specifies the field in the Expense entity that defines the relationship. In this case, user is the field in the Expense entity annotated with @ManyToOne. It tells JPA that the User side is the "inverse" side of the relationship, and the Expense entity owns the relationship (i.e., holds the foreign key).
+
+- cascade = CascadeType.ALL: This enables cascading operations. When a User entity is persisted, updated, or deleted, the same operations will automatically be applied to the associated Expense entities. For example:
+  When you save a User, all its Expense entries are saved automatically.
+  If you delete a User, all its Expense entries are deleted as well.
+
+- orphanRemoval = true: This ensures that if an Expense entry is removed from the User's expenses list, it is also deleted from the database. It's useful for maintaining database integrity—no "orphaned" records (i.e., records not referenced by any parent entity) are left behind.
+
+<Tabs>
+
+<TabItem value="User">
+
+```java
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // One-to-Many relationship
+    private List<Expense> expenses;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(List<Expense> expenses) {
+        this.expenses = expenses;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="Expense">
+
+```java
+import jakarta.persistence.*;
+
+@Entity
+public class Expense {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    private Long id;
+
+    private String description;
+    private Double amount;
+
+    @ManyToOne // Many-to-One relationship with User
+    @JoinColumn(name = "user_id") // Foreign key in Expense table
+    private User user;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
+
+```
+
+</TabItem>
+
+<TabItem value="Service">
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ExpenseService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
+    // Method to create and save an Expense
+    public Expense createExpense(Long userId, String description, Double amount) {
+        // Fetch the User entity by its ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create a new Expense instance
+        Expense expense = new Expense();
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setUser(user); // Set the foreign key relationship
+
+        // Save the Expense in the database
+        return expenseRepository.save(expense);
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Spring Data Rest
+
+Spring Data REST is a Spring module that automatically exposes the repositories you define in Spring Data as RESTful web services. It simplifies the process of building REST APIs by handling the creation of endpoints for CRUD operations, pagination, and sorting out of the box
+
+```bash
+cruddemo
+├── CruddemoApplication.java
+├── dao
+│   └── EmployeeRepository.java
+├── entity
+│   └── Employee.java
+```
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-rest</artifactId>
+</dependency>
+```
+
+<Tabs>
+
+<TabItem value="Entity">
+
+```java title="Employee.java"
+
+package com.example.cruddemo.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "employee")
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "email")
+    private String email;
+
+    public Employee() {
+    };
+
+    public Employee(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    };
+
+    // getter and setter
+
+    @Override
+    public String toString() {
+        return "Employee {" +
+                "id=" + this.id +
+                ", firstName='" + this.firstName + "\'" +
+                ", LastName='" + this.lastName + "\'" +
+                ", email='" + this.email + "\'" +
+                "}";
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Repository">
+
+```java title="EmployeeRepositort.java"
+package com.example.cruddemo.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.cruddemo.entity.Employee;
+
+public interface EmployeeRepository extends JpaRepository<Employee, Integer>  {
+    // basic crud operation extends from the JPA Repository
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+- Now go to http://localhost:8080/employees
+
+### Rename resource
+
+```java title="EmployeeRepository"
+package com.example.cruddemo.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+// highlight-next-line
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import com.example.cruddemo.entity.Employee;
+
+// highlight-next-line
+@RepositoryRestResource(path = "members")
+public interface EmployeeRepository extends JpaRepository<Employee, Integer>  {
+    // basic crud operation extends from the JPA Repository
+}
+```
+
+### Changing configs
+
+```properties title="application.properties"
+spring.data.rest.default-page-size=3
+```
+
+```
+
+```

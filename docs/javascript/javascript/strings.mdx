@@ -1,0 +1,116 @@
+---
+sidebar_label: Strings
+sidebar_position: 2
+---
+
+# Strings
+
+## Check for a valid string
+
+```javascript
+if (typeof str === "string" && str.trim() !== "") {
+  console.log("Valid string");
+}
+```
+
+## Convert number to string
+
+```javascript
+let num = 123;
+let str = num.toString();
+console.log(str); // "123"
+```
+
+```javascript
+let num = 123;
+let str = String(num);
+console.log(str); // "123"
+```
+
+```javascript
+let num = 123;
+let str = num + "";
+console.log(str); // "123"
+```
+
+## String template litterals
+
+```javascript
+let str1 = "Hello, World!";
+console.log(`The msg is: ${str1}`); // "The msg is: Hello, World!"
+```
+
+## Comparing cases insensitive
+
+```javascript
+let str1 = "Hello";
+let str2 = "hello";
+
+if (str1.toLowerCase() === str2.toLowerCase()) {
+  console.log("Equal");
+}
+```
+
+## Check if string contains a substring
+
+Check is case sensitive, use `toLowerCase()` to make it case insensitive.
+
+```javascript
+let str = "Hello, World!";
+let substring = "World";
+
+if (str.includes(substring)) {
+  console.log("Contains substring");
+}
+```
+
+## Repalce a substring
+
+```javascript
+let str = "Hello, World! Hello!, World!";
+let newStr = str.replace("World", "JavaScript");
+console.log(newStr); // "Hello, JavaScript! Hello!, World!"
+```
+
+## Replace all instances of a substring
+
+```javascript
+let str = "Hello, World! Hello, World!";
+let newStr = str.replace(/World/g, "JavaScript");
+console.log(newStr); // "Hello, JavaScript! Hello, JavaScript!"
+```
+
+````javascript
+let str = "Hello, World! Hello, World!";
+let newStr = str.replaceAll("World", "JavaScript");
+console.log(newStr); // "Hello, JavaScript! Hello, JavaScript!"
+````
+
+## Creating a list from a  string
+
+```javascript
+let str = "apple,banana,orange";
+let arr = str.split(",");
+console.log(arr); // ["apple", "banana", "orange"]
+```
+
+## Removing whitespace
+
+```javascript
+let str = "   Hello, World!   ";
+let newStr = str.trim();
+console.log(newStr); // "Hello, World!"
+```
+
+## Converting to uppercase and lowercase
+
+```javascript
+let str = "Hello, World!";
+let upperStr = str.toUpperCase(); // "HELLO, WORLD!"
+let lowerStr = str.toLowerCase(); // "hello, world!"
+```
+```javascript
+let str = "first letter capitalized";
+let capitalizedStr = str.charAt(0).toUpperCase() + str.slice(1);
+console.log(capitalizedStr); // "First letter capitalized"
+```

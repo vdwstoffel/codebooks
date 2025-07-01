@@ -1,0 +1,402 @@
+---
+sidebar_label: How to
+sidebar_position: 99
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import InputWithDropDown from "@site/src/components/reactExamples/InputWithDropDown";
+
+# How to
+
+## Create a input with a dropdown menu
+
+<Tabs>
+
+<TabItem value="Example"><InputWithDropDown /></TabItem>
+<TabItem value="Full Code">
+
+<Tabs>
+
+<TabItem value="JSX">
+
+```jsx
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import styles from "./InputWithDropDown.module.css";
+
+const Dropdown = ({ children, position }) => {
+  return createPortal(
+    <div
+      className={styles.dropdown}
+      style={{
+        left: position.left,
+        top: position.top,
+        width: position.width,
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
+
+export default function InputWithDropDown() {
+  const items = ["Apple", "Banana", "Orange", "Grapes", "Mango", "Kiwi"];
+  const [query, setQuery] = useState("");
+  const [showList, setShowList] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({
+    left: 0,
+    top: 0,
+    width: 0,
+  });
+  const inputRef = useRef(null);
+
+  const updateDropdownPosition = () => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        left: rect.left,
+        top: rect.bottom, // positions the dropdown right underneath the input
+        width: rect.width,
+      });
+    }
+  };
+
+  // Update position when the dropdown is visible, or on scroll/resize.
+  useEffect(() => {
+    if (showList) {
+      updateDropdownPosition();
+      window.addEventListener("scroll", updateDropdownPosition);
+      window.addEventListener("resize", updateDropdownPosition);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition);
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [showList]);
+
+  // Update query value on changes and show/hide dropdown accordingly.
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setQuery(newValue);
+    setShowList(newValue.length > 0);
+  };
+
+  // When an item is clicked, update the query and hide the dropdown.
+  const handleItemClick = (item) => {
+    setQuery(item);
+    setShowList(false);
+  };
+
+  // Filter the items based on the current input.
+  const filteredItems = items.filter((item) =>
+    item.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        type="text"
+        placeholder="Search fruits..."
+        value={query}
+        onChange={handleChange}
+        className={styles.searchInput}
+      />
+      {showList && filteredItems.length > 0 && (
+        <Dropdown position={dropdownPosition}>
+          <ul className={styles.dropdownList}>
+            {filteredItems.map((item, index) => (
+              <li
+                key={index}
+                onClick={() => handleItemClick(item)}
+                className={styles.dropdownItem}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </Dropdown>
+      )}
+      {/* Extra content to enable scrolling */}
+      <div style={{ height: "2000px" }}></div>
+    </div>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="CSS">
+
+```css
+/* Input Styles */
+.searchInput {
+  padding: 8px;
+  width: 300px;
+  margin: 20px auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Dropdown Container, using fixed positioning so it stays in place on scroll */
+.dropdown {
+  position: fixed;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* List styling */
+.dropdownList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual dropdown item styling */
+.dropdownItem {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+</TabItem>
+
+</Tabs>
+
+<Tabs>
+
+<TabItem value="Create Component">
+
+**Create the Component File**
+
+1. **Import Dependencies**: At the top of your file, import React along with the necessary hooks and for rendering portals
+
+```jsx
+import { useState, useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./App.css"; // Import your external CSS
+```
+
+2. **Plan the Component Structure**: Think of your component as having two main pieces:
+
+- The input field with state management.
+
+- The dropdown list, rendered via a portal to ensure it isn’t affecting the document layout.
+
+</TabItem>
+<TabItem value="Set State">
+
+**Set Up Your State and Refs**
+
+- **Create State Variables**: You’ll need a state for the input (`query`), a state to control the visibility of the dropdown (`showList`), and a state for the dropdown’s position (`dropdownPosition`).
+
+- **Set Up a Ref for the Input**: This will be used to get the input’s size and position so you can properly position the dropdown.
+
+```jsx
+// Example inside your component:
+const [query, setQuery] = useState("");
+const [showList, setShowList] = useState(false);
+const [dropdownPosition, setDropdownPosition] = useState({
+  left: 0,
+  top: 0,
+  width: 0,
+});
+const inputRef = useRef(null);
+```
+
+</TabItem>
+<TabItem value="Build Input">
+
+**Build the Input Field**
+
+- **Render the Input Element**: Attach the ref (inputRef) and set up an onChange handler. This handler should update your input state and toggle the dropdown visibility.
+
+```jsx
+<input
+  ref={inputRef}
+  type="text"
+  placeholder="Search fruits..."
+  value={query}
+  onChange={(event) => {
+    const newValue = event.target.value;
+    setQuery(newValue);
+    setShowList(newValue.length > 0);
+  }}
+  className="search-input"
+/>
+```
+
+</TabItem>
+<TabItem value="Filter Items">
+
+**Create a Static Items List and Filter It**
+
+- **Define the Items Array**: Create a simple array of items (e.g., fruits) in your component.
+
+- **Implement Filtering**: Based on the `query`, filter the items. This filter should be case-insensitive.
+
+```jsx
+const items = ["Apple", "Banana", "Orange", "Grapes", "Mango", "Kiwi"];
+const filteredItems = items.filter((item) =>
+  item.toLowerCase().includes(query.toLowerCase())
+);
+```
+
+</TabItem>
+<TabItem value="Create Dropdown">
+
+**Create a Portal-Based Dropdown Component**
+
+- **Why a Portal?** Rendering the list in a portal ensures the dropdown overlays other content without affecting the page layout.
+
+- **Build the Dropdown Component**: Create a new component inside the same file that receives the filtered items and the dynamic position.
+
+```jsx
+const Dropdown = ({ children, position }) => {
+  return ReactDOM.createPortal(
+    <div
+      className="dropdown"
+      style={{
+        left: position.left,
+        top: position.top,
+        width: position.width,
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
+```
+
+</TabItem>
+<TabItem value="Calculate Position">
+
+**Calculate and Update the Dropdown's Position**
+
+- **Get the Input’s Position**: Use getBoundingClientRect() on the input ref to measure its position (left, bottom) and width.
+
+- **Attach Scroll and Resize Listeners**: With useEffect, update the position whenever the dropdown is visible, or the window is scrolled/resized.
+
+```jsx
+const updateDropdownPosition = () => {
+  if (inputRef.current) {
+    const rect = inputRef.current.getBoundingClientRect();
+    setDropdownPosition({
+      left: rect.left,
+      top: rect.bottom,
+      width: rect.width,
+    });
+  }
+};
+
+useEffect(() => {
+  if (showList) {
+    updateDropdownPosition();
+    window.addEventListener("scroll", updateDropdownPosition);
+    window.addEventListener("resize", updateDropdownPosition);
+  }
+  return () => {
+    window.removeEventListener("scroll", updateDropdownPosition);
+    window.removeEventListener("resize", updateDropdownPosition);
+  };
+}, [showList]);
+```
+
+</TabItem>
+<TabItem value="Render Dropdown">
+
+**Render the Dropdown List Conditionally**
+
+- **Conditionally Render**: Only render the dropdown if there’s a query (i.e., showList is true) and the filtered items exist.
+
+- **Set Up Item Click Handling**: When an item is clicked, update the query with that item and hide the dropdown.
+
+```jsx
+{
+  showList && filteredItems.length > 0 && (
+    <Dropdown position={dropdownPosition}>
+      <ul className="dropdown-list">
+        {filteredItems.map((item, index) => (
+          <li
+            key={index}
+            onClick={() => {
+              setQuery(item);
+              setShowList(false);
+            }}
+            className="dropdown-item"
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </Dropdown>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="CSS">
+
+**Separate Your CSS**
+
+Extract All Styles: Move styling out of your component into the App.css file. Here’s an example of the styles:
+
+```css
+/* App.css */
+
+/* Input Styles */
+.search-input {
+  padding: 8px;
+  width: 300px;
+  margin: 20px auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Dropdown Container: Fixed position so it isn’t part of the document flow */
+.dropdown {
+  position: fixed;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* List styling */
+.dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual dropdown items */
+.dropdown-item {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+```
+
+</TabItem>
+
+</Tabs>

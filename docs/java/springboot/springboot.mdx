@@ -1,0 +1,90 @@
+---
+sidebar_label: "Spring Boot"
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Spring Boot
+
+## Starting a client project
+
+- Set Up Your Project
+  Use the Spring Initializr to generate a project:
+
+- Write Your Command-Line Runner
+  Spring Boot provides CommandLineRunner and ApplicationRunner interfaces, which let you execute code when the application starts.
+
+```java
+package com.example;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MyApplication implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        System.out.println("Hello, Spring CLI!");
+    }
+}
+```
+
+- Run Your Application
+
+```bash
+Run: mvn spring-boot:run
+```
+
+## Parse A CSV File
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-csv</artifactId>
+    <version>1.10.0</version> <!-- Check for latest version -->
+</dependency>
+```
+
+```java
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.apache.commons.csv.*;
+import java.io.*;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+
+@SpringBootApplication
+public class DemoApplication implements CommandLineRunner {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) {
+		try (Reader reader = new FileReader("test.csv");
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
+
+            for (CSVRecord record : csvParser) {
+                String name = record.get("name"); // Assuming column header "name"
+                String age = record.get("age");
+                System.out.println("Name: " + name + ", Age: " + age);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+}
+```

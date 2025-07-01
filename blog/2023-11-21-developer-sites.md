@@ -36,6 +36,7 @@ tags: [web dev, interesting]
 ## General
 
 - [Regex101](https://regex101.com/) - Build and test regular expression
+- [JsonPlaceholder](https://jsonplaceholder.typicode.com/) - Free fake and reliable API for testing and prototyping.
 
 ## Sandbox Environments
 

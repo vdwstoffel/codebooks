@@ -1,0 +1,147 @@
+# ArrayList
+
+An ArrayList is a resizable array that can grow or shrink in size.
+
+## Creating an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+```
+
+## Adding an element to an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+```
+
+## Removing an element from an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+list.remove(0); // Removes the element at index 0
+```
+
+## Updating an element in an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+list.set(0, "World"); // Replaces the element at index 0 with "World"
+```
+
+## Getting the size of an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+
+int size = list.size(); // 1
+```
+
+## Iterating over an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> myList = new ArrayList<>();
+list.add("Hello");
+list.add("World");
+
+for (String str : myList) {
+    System.out.println(str);
+}
+```
+
+## Get an element from an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+
+String str = list.get(0); // "Hello"
+```
+
+## Sort an array list of objects
+
+```java
+import java.util.Comparator;
+import java.util.List;
+
+class Entity {
+    private String name;
+    private Date date;
+
+    public Entity(String name, Date date) {
+        this.name = name;
+        this.date = date;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    @Override
+    public String toString() {
+        return "Entity{name='" + name + "', date=" + date + "}";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        List<Entity> entities = new ArrayList<>();
+        entities.add(new Entity("Entity1", new Date(2025, 4, 2)));
+        entities.add(new Entity("Entity2", new Date(2025, 3, 25)));
+        entities.add(new Entity("Entity3", new Date(2025, 4, 1)));
+
+        // Sort using List.sort and a custom comparator
+        entities.sort(Comparator.comparing(Entity::getDate));
+
+        // Sort in descending order using a custom comparator
+entities.sort(Comparator.comparing(Entity::getDate).reversed());
+
+        System.out.println("Sorted by date:");
+        entities.forEach(System.out::println);
+    }
+}
+
+```
+
+## Get a sublist from an ArrayList
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> list = new ArrayList<>();
+list.add("Hello");
+list.add("World");
+list.add("Java");   
+
+List<String> sublist = list.subList(0, 2); // Gets the first two elements
+System.out.println(sublist); // Output: [Hello, World]
+```

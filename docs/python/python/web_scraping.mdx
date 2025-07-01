@@ -1,0 +1,102 @@
+---
+sidebar_label: Web Scraping
+sidebar_position: 9
+---
+
+# Web Scarping
+
+```bash
+pip isntall request
+pip install beatifulsoup
+```
+
+## Getting started
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+# Step 1: Send an HTTP request to the website
+url = 'https://example.com'
+response = requests.get(url)
+
+# Step 2: Parse the HTML content of the webpage
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Step 3: Extract specific elements (e.g., all links)
+links = soup.find_all('a')  # Finds all <a> tags (hyperlinks)
+
+# Step 4: Print the extracted links
+for link in links:
+    print(link.get('href'))  # Get the 'href' attribute of each link
+
+```
+
+## Find an item by class name
+
+```python
+from bs4 import BeautifulSoup
+
+html_content = '''
+<div class="example-class">Hello, World!</div>
+<div class="example-class">Another item</div>
+<div class="other-class">Not this one</div>
+'''
+
+# Step 1: Parse the HTML content
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Step 2: Find elements by class name
+items = soup.find_all(class_='example-class')
+
+# Step 3: Print the items
+for item in items:
+    print(item.text)  # Get the text inside the element
+```
+
+## How to get an attribute from an element
+
+```python
+from bs4 import BeautifulSoup
+
+html_content = '''
+<img src="image1.jpg" alt="First Image">
+<img src="image2.png" alt="Second Image">
+'''
+
+# Step 1: Parse the HTML content
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Step 2: Find all image tags
+images = soup.find_all('img')
+
+# Step 3: Get the 'src' attribute from each image
+for img in images:
+    print(img.get('src'))  # Extract and print the 'src' attribute
+
+```
+
+## Get the text between tags
+
+```python
+from bs4 import BeautifulSoup
+
+html_content = '''
+<p>This is a paragraph.</p>
+<div>Here is some text inside a div.</div>
+<span>Span text</span>
+'''
+
+# Step 1: Parse the HTML content
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Step 2: Extract text between specific tags
+paragraph_text = soup.find('p').text  # Text within <p> tags
+div_text = soup.find('div').text  # Text within <div> tags
+span_text = soup.find('span').text  # Text within <span> tags
+
+# Step 3: Print the extracted text
+print("Paragraph:", paragraph_text)
+print("Div:", div_text)
+print("Span:", span_text)
+```
