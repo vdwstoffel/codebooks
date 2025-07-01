@@ -136,3 +136,46 @@ import LoaderSpinner from "@site/src/components/htmlCssExamples/LoaderSpinner";
     <label>email</label>
     <input type="email" required class="userInput" />
 </div>
+
+## Styled File Input
+
+import StyledFileInput from "@site/src/components/htmlCssExamples/StyledFileInput";
+
+<Tabs>
+<TabItem value="HTML">
+
+```html
+<input type="file" id="fileInput" class="input-file" />
+<span id="fileName" class="file-name"></span>
+```
+
+</TabItem>
+<TabItem value="CSS">
+
+```css
+.input-file {
+    /* Add your styling here. For this example, we'll just add a border. */
+    border: 1px solid #ccc;
+}
+
+.file-name {
+    margin-left: 10px;
+    font-style: italic;
+    color: #555;
+}
+```
+
+</TabItem>
+<TabItem value="JavaScript">
+
+```javascript
+document.getElementById('fileInput').addEventListener('change', function() {
+    var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+    document.getElementById('fileName').textContent = fileName;
+});
+```
+
+</TabItem>
+</Tabs>
+
+<StyledFileInput />

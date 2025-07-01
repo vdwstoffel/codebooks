@@ -98,43 +98,78 @@ export default function ModalPortal() {
 
 ## Upload a file
 
-```javascript
+This example shows how to create a React component to handle file uploads. It manages the selected file, provides user feedback during the upload process, and displays status messages.
+
+Note: This component is designed to send a file to a server. For this to work, you need a server endpoint ready to receive the file at the specified URL (e.g., `http://localhost:5000/upload`).
+
+```jsx
 import React, { useState } from "react";
 import axios from "axios";
 
-const FileUpload = () => {
+export default function FileUpload() {
+  // State to hold the selected file.
   const [file, setFile] = useState(null);
+  // State to store messages for the user (e.g., success or error).
+  const [message, setMessage] = useState("");
+  // State to track whether an upload is in progress.
+  const [uploading, setUploading] = useState(false);
 
-  const handleFileChange = (event) => {
+  // Handles the file input change event.
+  function handleFileChange(event) {
+    // Set the selected file from the input.
     setFile(event.target.files[0]);
-  };
+    // Clear any previous messages.
+    setMessage("");
+  }
 
-  const handleUpload = async () => {
+  // Handles the file upload logic.
+  async function handleUpload() {
+    // If no file is selected, show a message and exit.
     if (!file) {
-      alert("Please select a file first.");
+      setMessage("Please select a file first.");
       return;
     }
 
+    // Set uploading state to true to provide user feedback.
+    setUploading(true);
+    setMessage("");
+
+    // Create a FormData object to package the file for the request.
     const formData = new FormData();
     formData.append("file", file);
 
     try {
+      // Make a POST request to the server's upload endpoint.
+      // The server URL should be replaced with your actual endpoint.
       const response = await axios.post("http://localhost:5000/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          // This header is important for file uploads.
+          "Content-Type": "multipart/form-data",
+        },
       });
+      // On success, display a success message.
+      setMessage("File uploaded successfully!");
       console.log("File uploaded successfully:", response.data);
     } catch (error) {
+      // If an error occurs, show an error message.
+      setMessage("Error uploading file. See console for details.");
       console.error("Error uploading file:", error);
+    } finally {
+      // Set uploading state back to false after the request is complete.
+      setUploading(false);
     }
-  };
+  }
 
   return (
     <div>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload File</button>
+      {/* Disable the button while uploading to prevent multiple submissions. */}
+      <button onClick={handleUpload} disabled={uploading}>
+        {uploading ? "Uploading..." : "Upload File"}
+      </button>
+      {/* Display any messages to the user. */}
+      {message && <p>{message}</p>}
     </div>
   );
-};
-
-export default FileUpload;
+}
 ```

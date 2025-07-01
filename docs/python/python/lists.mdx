@@ -1,0 +1,133 @@
+---
+sidebar_label: Lists
+---
+
+# Python Lists
+
+Lists are one of the most versatile and commonly used data types in Python. They are ordered, mutable collections of items.
+
+## Creating a List
+
+You can create a list by placing comma-separated items inside square brackets `[]`.
+
+```python
+# An empty list
+empty_list = []
+
+# A list of integers
+numbers = [1, 2, 3, 4, 5]
+
+# A list of strings
+fruits = ["apple", "banana", "cherry"]
+
+# A list with mixed data types
+mixed_list = [1, "hello", 3.14, True]
+```
+
+## Accessing Elements
+
+You can access list items by referring to their index number. Python uses 0-based indexing.
+
+```python
+fruits = ["apple", "banana", "cherry"]
+
+# Get the first item
+print(fruits[0])  # Output: apple
+
+# Get the last item
+print(fruits[-1]) # Output: cherry
+
+# Slicing: Get a range of items
+print(fruits[1:3]) # Output: ['banana', 'cherry']
+
+# Slicing from the beginning
+print(fruits[:2]) # Output: ['apple', 'banana']
+```
+
+## Adding Elements
+
+You can add new items to a list using the `append()` or `insert()` methods.
+
+```python
+fruits = ["apple", "banana"]
+
+# Add an item to the end
+fruits.append("cherry")
+print(fruits)  # Output: ['apple', 'banana', 'cherry']
+
+# Insert an item at a specific position
+fruits.insert(1, "orange")
+print(fruits)  # Output: ['apple', 'orange', 'banana', 'cherry']
+```
+
+## Removing Elements
+
+You can remove items using `remove()`, `pop()`, or the `del` keyword.
+
+```python
+fruits = ["apple", "orange", "banana", "cherry"]
+
+# Remove a specific item
+fruits.remove("orange")
+print(fruits)  # Output: ['apple', 'banana', 'cherry']
+
+# Remove an item by index and get its value
+popped_fruit = fruits.pop(1)
+print(popped_fruit) # Output: banana
+print(fruits)       # Output: ['apple', 'cherry']
+
+# Remove an item by index with del
+del fruits[0]
+print(fruits)       # Output: ['cherry']
+```
+
+## Looping Through a List
+
+You can loop through the list items by using a `for` loop.
+
+```python
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(fruit)
+# Output:
+# apple
+# banana
+# cherry
+```
+
+## List Comprehensions
+
+List comprehensions provide a concise way to create lists.
+
+```python
+# Create a list of squares from 0 to 9
+squares = [x**2 for x in range(10)]
+print(squares) # Output: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+# Create a list of even numbers from another list
+numbers = [1, 2, 3, 4, 5, 6]
+even_numbers = [x for x in numbers if x % 2 == 0]
+print(even_numbers) # Output: [2, 4, 6]
+```
+
+## Common List Methods
+
+Here are some other useful list methods.
+
+```python
+numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+
+# Get the length of a list
+print(len(numbers)) # Output: 8
+
+# Sort the list in place
+numbers.sort()
+print(numbers) # Output: [1, 1, 2, 3, 4, 5, 6, 9]
+
+# Reverse the list in place
+numbers.reverse()
+print(numbers) # Output: [9, 6, 5, 4, 3, 2, 1, 1]
+
+# Count occurrences of an item
+print(numbers.count(1)) # Output: 2
+```

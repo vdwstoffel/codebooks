@@ -124,7 +124,11 @@ export default function LeafletGettingStarted() {
 }
 ```
 
-<LeafletBasicExample />
+import BrowserOnly from '@docusaurus/BrowserOnly';
+
+<BrowserOnly>
+  {() => <LeafletBasicExample />}
+</BrowserOnly>
 
 ### Re-Center map to new location
 
@@ -170,7 +174,9 @@ function ChangeCenter({ position }) {
 }
 ```
 
-<RecenterMap />
+<BrowserOnly>
+  {() => <RecenterMap />}
+</BrowserOnly>
 
 ### Add click event to map
 
@@ -229,4 +235,6 @@ export default function MapClickEvent() {
 }
 ```
 
-<MapClickEvent />
+<BrowserOnly>
+  {() => <MapClickEvent />}
+</BrowserOnly>

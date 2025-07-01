@@ -1,0 +1,22 @@
+.inputFile {
+    display: none;
+}
+
+.customFileUpload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.customFileUpload:hover {
+    background-color: #f1f1f1;
+}
+
+.fileName {
+    margin-left: 10px;
+    font-style: italic;
+    color: #555;
+}

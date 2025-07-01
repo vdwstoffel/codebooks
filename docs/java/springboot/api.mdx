@@ -6,13 +6,13 @@ sidebar_position: 2
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Working with APIs
+# Consuming APIs with RestTemplate
 
-APIs (Application Programming Interfaces) allow different software applications to communicate with each other. In the context of web development, APIs are often used to interact with backend services, databases, or external services.
+In Spring Boot, `RestTemplate` is a central class for making synchronous HTTP requests to consume RESTful APIs. These examples show how to consume an external API.
 
-## Making a get request to an API
+## GET Request
 
-Here's how you can send a GET request to an API using Spring Boot's `RestTemplate`:
+A GET request retrieves data from a server. Here's how to get a resource by its ID.
 
 ```java
 import org.springframework.http.ResponseEntity;
@@ -21,52 +21,46 @@ import org.springframework.web.client.RestTemplate;
 public class GetExample {
     public static void main(String[] args) {
         RestTemplate restTemplate = new RestTemplate();
-
-        // Define the URL
-        String url = "https://example.com/api/users/1";
+        String url = "https://api.example.com/users/1";
 
         // Send GET request
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-        // Print the response
-        System.out.println("Response: " + response.getBody());
+        // Print the response details
+        System.out.println("Status Code: " + response.getStatusCode());
+        System.out.println("Response Body: " + response.getBody());
     }
 }
 ```
 
+## POST Request
 
-## Sending a post request to an API
-
-
+A POST request sends data to a server to create a new resource.
 
 <Tabs>
-
-<TabItem value="Body DTO" default>
+<TabItem value="dto" label="User DTO">
 
 ```java
+// This is the Data Transfer Object (DTO) that represents the request body.
 public class User {
     private String name;
     private String email;
 
-    // Constructors
+    // Constructors, Getters, and Setters
     public User() {}
     public User(String name, String email) {
         this.name = name;
         this.email = email;
     }
-
-    // Getters and setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 }
 ```
 
 </TabItem>
-
-<TabItem value="API">
+<TabItem value="consumer" label="Consumer">
 
 ```java
 import org.springframework.http.ResponseEntity;
@@ -75,24 +69,90 @@ import org.springframework.web.client.RestTemplate;
 public class PostExample {
     public static void main(String[] args) {
         RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.example.com/users";
 
-        // Create the request body
-        User user = new User("Alice", "alice@example.com");
-
-        // Define the URL
-        String url = "https://example.com/api/users";
+        // Create the request body object
+        User newUser = new User("John Doe", "john.doe@example.com");
 
         // Send POST request
-        ResponseEntity<String> response = restTemplate.postForEntity(url, user, User.class);
+        ResponseEntity<User> response = restTemplate.postForEntity(url, newUser, User.class);
 
-        // Print the response
-        System.out.println("Response: " + response.getBody());
+        System.out.println("Status Code: " + response.getStatusCode());
+        System.out.println("Created User: " + response.getBody().getName());
     }
 }
 ```
 
 </TabItem>
-
 </Tabs>
 
+## PUT Request
 
+A PUT request updates an existing resource on the server.
+
+<Tabs>
+<TabItem value="dto" label="User DTO">
+
+```java
+// Same User DTO as in the POST example.
+public class User {
+    private String name;
+    private String email;
+
+    // Constructors, Getters, and Setters...
+    public User() {}
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
+```
+
+</TabItem>
+<TabItem value="consumer" label="Consumer">
+
+```java
+import org.springframework.web.client.RestTemplate;
+
+public class PutExample {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.example.com/users/1";
+
+        // Create the updated user object
+        User updatedUser = new User("Jane Doe", "jane.doe@example.com");
+
+        // Send PUT request
+        restTemplate.put(url, updatedUser);
+
+        System.out.println("User with ID 1 updated successfully.");
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## DELETE Request
+
+A DELETE request removes a resource from the server.
+
+```java
+import org.springframework.web.client.RestTemplate;
+
+public class DeleteExample {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.example.com/users/1";
+
+        // Send DELETE request
+        restTemplate.delete(url);
+
+        System.out.println("User with ID 1 deleted successfully.");
+    }
+}
+```
