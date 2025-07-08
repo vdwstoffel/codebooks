@@ -1,147 +1,173 @@
 ---
 sidebar_label: "Strings"
-sidebar_position: 2
+sidebar_position: 1
 ---
 
+# Strings in Java
 
-# Strings
+In Java, a `String` is an object representing a sequence of characters. It's a fundamental part of the language.
 
-Strings must contain only characters enclosed in double quotes.
+## Key Concepts
 
-```java
-String name = "John";
-```
+### 1. Creating Strings
 
-## String formatting
-
-```java
-String name = "John";
-int age = 25;
-
-String formattedString = String.format("My name is %s and I am %d years old", name, age);
-```
-
-## Get string length
+The most common way is using a string literal. This is efficient as Java uses a "string pool" to reuse existing strings.
 
 ```java
-String greeting = "Hello";
-greeting.length(); // 5
+String literal = "Hello, World!"; // Created in the string pool
+
+// You can also use the `new` keyword, but this is less common.
+// It creates a new object in memory every time.
+String fromNew = new String("Hello, World!");
 ```
 
-## Comparing strings
+### 2. Immutability
+
+**Strings in Java are immutable.** Once a `String` object is created, its value cannot be changed. Methods that seem to modify a string actually return a *new* `String` object.
+
+```java
+String s1 = "Java";
+s1.toUpperCase(); // This has no effect on s1 because the result is not assigned
+
+// s1 is still "Java"
+
+String s2 = s1.toUpperCase(); // A new string s2 is created
+// s2 is "JAVA"
+```
+
+## Comparing Strings
+
+### Using `equals()` for Content Comparison
+
+To check if two strings have the same sequence of characters, always use the `equals()` method.
 
 ```java
 String str1 = "Hello";
-String str2 = "Hello";
+String str2 = "hello";
+String str3 = new String("Hello");
 
-str1.equals(str2); // true
+boolean r1 = str1.equals("Hello");      // true
+boolean r2 = str1.equals(str3);         // true (content is the same)
+boolean r3 = str1.equals(str2);         // false (it's case-sensitive)
+boolean r4 = str1.equalsIgnoreCase(str2); // true (ignores case)
 ```
 
-## Turn String Array into a string
+### Using `==` for Reference Comparison
+
+The `==` operator checks if two variables point to the exact same object in memory. You should generally avoid this for string comparison.
 
 ```java
-String[] arr = {"Hello", "World"};
+String s1 = "Test"; // From string pool
+String s2 = "Test"; // From string pool (points to the same object as s1)
+String s3 = new String("Test"); // A new object in heap memory
 
-String str = String.join(" ", arr); // "Hello World"
+boolean r5 = (s1 == s2); // true
+boolean r6 = (s1 == s3); // false
 ```
 
-## Turn char array into string
+## Common String Operations
+
+### Basic Methods
 
 ```java
-char[] charArray = {'H', 'e', 'l', 'l', 'o'};
+String text = "  Java Programming  ";
 
-String str = new String(charArray); // "Hello"
+int length = text.length();                  // 20
+String lower = text.toLowerCase();           // "  java programming  "
+String upper = text.toUpperCase();           // "  JAVA PROGRAMMING  "
+String trimmed = text.trim();                // "Java Programming" (removes leading/trailing spaces)
+String replaced = trimmed.replace('a', 'o'); // "Jovo Progromming"
 ```
 
-## Turn int into a string
+### Searching and Indexing
 
 ```java
-int a = 10;
+String phrase = "The quick brown fox";
 
-String str = Integer.toString(a); // "10"
+boolean c1 = phrase.contains("fox");   // true
+boolean c2 = phrase.startsWith("The"); // true
+boolean c3 = phrase.endsWith("cat");   // false
+
+int i1 = phrase.indexOf('q');      // 4 (index of the first occurrence)
+int i2 = phrase.indexOf("brown");  // 10 (index of the start of the substring)
+int i3 = phrase.lastIndexOf('o');  // 16 (index of the last occurrence)
 ```
 
-## Index of a character in a string
+### Extracting Substrings
 
 ```java
-String str = "Hello";
+String data = "Hello-World";
 
-int index = str.indexOf('e'); // 1
+String sub1 = data.substring(6);    // "World" (from index 6 to the end)
+String sub2 = data.substring(0, 5); // "Hello" (from index 0 up to, but not including, 5)
+char c = data.charAt(1);            // 'e' (character at a specific index)
 ```
 
-## Access a char in a string
+### Splitting and Joining
 
 ```java
-String str = "Hello";
+// Splitting a string into an array
+String csv = "apple,banana,orange";
+String[] fruits = csv.split(","); // ["apple", "banana", "orange"]
 
-char c = str.charAt(1); // 'e'
+// Joining an array into a string
+String[] words = {"Java", "is", "powerful"};
+String sentence = String.join(" ", words); // "Java is powerful"
 ```
 
-## Convert a string to lowercase
+## Formatting Strings
+
+Use `String.format()` to create formatted strings with placeholders.
 
 ```java
-String str = "Hello";
+String name = "Alice";
+int age = 30;
 
-String lowerCaseStr = str.toLowerCase(); // "hello"
+String formatted = String.format("User: %s, Age: %d", name, age);
+// formatted is "User: Alice, Age: 30"
 ```
 
-## Convert a string to uppercase
+| Specifier | Description                  |
+| :-------- | :--------------------------- |
+| `%s`      | String                       |
+| `%d`      | Integer                      |
+| `%f`      | Floating-point number        |
+| `%b`      | Boolean                      |
+| `%n`      | Platform-independent newline |
+
+
+## Converting To and From Strings
 
 ```java
-String str = "Hello";
+// Number to String
+int a = 100;
+String strFromInt = String.valueOf(a); // "100"
 
-String upperCaseStr = str.toUpperCase(); // "HELLO"
+// String to Number
+String numStr = "250";
+int b = Integer.parseInt(numStr); // 250
+
+// Char array to String
+char[] charArray = {'J', 'a', 'v', 'a'};
+String strFromChars = new String(charArray); // "Java"
 ```
 
-## Get the length of a string
+## Mutable Strings: `StringBuilder`
+
+When you need to perform many string modifications, `String` is inefficient because it creates new objects for each change. For these cases, use `StringBuilder`.
+
+`StringBuilder` is a mutable sequence of characters. It's the standard choice for building strings in a single thread.
 
 ```java
-String str = "Hello";
+String[] items = {"Apple", "Banana", "Cherry"};
+StringBuilder sb = new StringBuilder("Shopping List: ");
 
-int length = str.length(); // 5
-```
+for (String item : items) {
+    sb.append(item).append(", "); // Efficiently appends to the internal buffer
+}
 
-## Replace a character in a string
+// Remove the final trailing comma and space
+sb.setLength(sb.length() - 2);
 
-```java
-String str = "Hello";
-
-String newStr = str.replace('e', 'a'); // "Hallo"
-```
-
-## Replace all occurrences of a character in a string
-
-```java
-String str = "Hello";
-
-String newStr = str.replaceAll("l", "a"); // "Heaao"
-```
-
-## Get a substring
-
-```java
-String str = "Hello";
-
-String subStr = str.substring(1, 3); // "el"
-```
-
-## Split a string
-
-```java
-String str = "Hello World";
-String[] arr = str.split(" "); // ["Hello", "World"]
-```
-
-## Split a string by a regex
-
-```java
-String str = "Hello, World!";
-String[] arr = str.split("[,\\s]+"); // ["Hello", "World!"]
-```
-
-## Check if a string contains a substring
-
-```java
-String str = "Hello World";
-boolean contains = str.contains("World"); // true
+String finalList = sb.toString(); // "Shopping List: Apple, Banana, Cherry"
 ```

@@ -1,0 +1,166 @@
+---
+sidebar_label: "Arrays & Lists"
+sidebar_position: 3
+---
+
+# Arrays and Lists in Java
+
+Java provides several ways to store and manage collections of elements. The most fundamental is the `Array`, while the Collections Framework offers more flexible options like `ArrayList` and `LinkedList`.
+
+## 1. Arrays
+
+An array is a container object that holds a **fixed number of values** of a single type. The length of an array is established when the array is created and cannot be changed.
+
+### Declaration and Initialization
+
+```java
+// Declare and initialize an array of integers
+int[] numbers = {10, 20, 30, 40, 50};
+
+// Declare an array of strings with a size of 5
+String[] names = new String[5];
+names[0] = "Alice";
+names[1] = "Bob";
+```
+
+### Common Operations
+
+```java
+int[] numbers = {10, 20, 30, 40, 50};
+
+// Get the length of an array
+int length = numbers.length; // 5
+
+// Access an element by index
+int thirdNumber = numbers[2]; // 30
+
+// Iterate over an array
+for (int number : numbers) {
+    // System.out.println(number);
+}
+
+// Convert a string to a character array
+char[] letters = "Hello".toCharArray(); // ['H', 'e', 'l', 'l', 'o']
+```
+
+### The `Arrays` Utility Class
+
+The `java.util.Arrays` class provides static methods for common array manipulations.
+
+```java
+import java.util.Arrays;
+
+int[] arr = {5, 2, 8, 1, 9};
+
+// Print an array as a string
+String s = Arrays.toString(arr); // "[5, 2, 8, 1, 9]"
+
+// Sort an array in place
+Arrays.sort(arr);
+// arr is now {1, 2, 5, 8, 9}
+
+// Create a copy of an array
+int[] copy = Arrays.copyOf(arr, arr.length);
+
+// Find the index of an element (requires a sorted array)
+int index = Arrays.binarySearch(arr, 5); // 2
+```
+
+## 2. ArrayList
+
+An `ArrayList` is a resizable array from the Java Collections Framework. It can grow or shrink in size dynamically, which makes it more flexible than a standard array.
+
+### Declaration and Initialization
+
+It's good practice to program to the `List` interface.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<String> fruits = new ArrayList<>();
+```
+
+### Common Operations
+
+```java
+List<String> fruits = new ArrayList<>();
+
+// Add elements
+fruits.add("Apple");
+fruits.add("Banana");
+fruits.add(1, "Orange"); // Add at a specific index
+// fruits is now ["Apple", "Orange", "Banana"]
+
+// Get an element
+String fruit = fruits.get(0); // "Apple"
+
+// Get the size
+int size = fruits.size(); // 3
+
+// Update an element
+fruits.set(0, "Cherry"); // Replaces "Apple" with "Cherry"
+
+// Remove an element
+fruits.remove(1); // Removes "Orange"
+// fruits is now ["Cherry", "Banana"]
+
+// Check if an element exists
+boolean hasBanana = fruits.contains("Banana"); // true
+
+// Find the index of an element
+fruits.add("Banana"); // fruits is now ["Cherry", "Banana", "Banana"]
+int firstBanana = fruits.indexOf("Banana"); // 1
+int lastBanana = fruits.lastIndexOf("Banana"); // 2
+int pineappleIndex = fruits.indexOf("Pineapple"); // -1 (returns -1 if not found)
+```
+
+## 3. LinkedList
+
+A `LinkedList` is also part of the Collections Framework. It stores elements in a doubly-linked list structure, where each element holds a reference to the previous and next element. This makes adding or removing elements from the beginning or end very efficient.
+
+### When to use LinkedList
+
+- When you need to do a lot of insertions and deletions, especially at the beginning or end of the list.
+- When you need queue-like behavior (e.g., `addFirst`, `removeLast`).
+
+### Common Operations
+
+```java
+import java.util.LinkedList;
+
+LinkedList<String> animals = new LinkedList<>();
+
+// Add elements
+animals.add("Dog");
+animals.addFirst("Cat"); // Add to the beginning
+animals.addLast("Horse"); // Add to the end
+// animals is now ["Cat", "Dog", "Horse"]
+
+// Remove elements
+animals.removeFirst(); // Removes "Cat"
+animals.removeLast();  // Removes "Horse"
+// animals is now ["Dog"]
+
+// Get elements without removing them
+String first = animals.peekFirst(); // "Dog"
+String last = animals.peekLast();   // "Dog"
+
+// Find the index of an element
+animals.add("Tiger");
+animals.add("Dog");
+// animals is now ["Dog", "Tiger", "Dog"]
+int firstDog = animals.indexOf("Dog"); // 0
+int lastDog = animals.lastIndexOf("Dog"); // 2
+int lionIndex = animals.indexOf("Lion"); // -1 (returns -1 if not found)
+```
+
+## Array vs. ArrayList vs. LinkedList
+
+| Feature             | Array                               | ArrayList                           | LinkedList                          |
+| :------------------ | :---------------------------------- | :---------------------------------- | :---------------------------------- |
+| **Size**            | Fixed                               | Dynamic (resizable)                 | Dynamic (resizable)                 |
+| **Performance (Get)** | Fast (`O(1)`)                       | Fast (`O(1)`)                       | Slow (`O(n)`)                       |
+| **Performance (Add/Remove)** | Slow (`O(n)`) - requires new array | Fast at end (`O(1)`), slow otherwise (`O(n)`) | Fast at ends (`O(1)`), slow otherwise (`O(n)`) |
+| **Type**            | Primitives and Objects              | Objects only                        | Objects only                        |
+| **Memory**          | More memory efficient               | Less memory efficient               | Uses more memory due to node overhead |

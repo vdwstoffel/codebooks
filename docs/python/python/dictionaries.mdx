@@ -1,0 +1,153 @@
+---
+sidebar_label: Dictionaries
+sidebar_position: 4
+---
+
+# Python Dictionaries
+
+A dictionary in Python is an unordered collection of data values, used to store data values like a map, which, unlike other Data Types that hold only a single value as an element, holds `key:value` pair. Key-value pairs are separated by a colon, and each key-value pair is separated by a comma.
+
+## Creating Dictionaries
+
+Dictionaries can be created by placing a sequence of elements in curly `{}` braces, separated by commas. Values can be of any data type and can be duplicated, whereas keys can't be repeated and must be immutable.
+
+```python
+# Empty dictionary
+my_dict = {}
+print(f"Empty dictionary: {my_dict}") # {}
+
+# Dictionary with integer keys
+my_dict = {1: 'apple', 2: 'banana'}
+print(f"Integer keys: {my_dict}") # {1: 'apple', 2: 'banana'}
+
+# Dictionary with mixed keys (not recommended for consistency)
+mixed_dict = {'name': 'Alice', 1: [2, 4, 6]}
+print(f"Mixed keys: {mixed_dict}") # {'name': 'Alice', 1: [2, 4, 6]}
+
+# Using dict() constructor
+another_dict = dict(name='Bob', age=30)
+print(f"Using dict() constructor: {another_dict}") # {'name': 'Bob', 'age': 30}
+
+# From a list of tuples
+from_tuples = dict([(1, 'one'), (2, 'two')])
+print(f"From list of tuples: {from_tuples}") # {1: 'one', 2: 'two'}
+```
+
+## Accessing Values
+
+Values can be accessed by using their corresponding keys inside square brackets `[]` or by using the `get()` method.
+
+```python
+my_dict = {'name': 'Alice', 'age': 25, 'city': 'New York'}
+
+# Using square brackets
+print(f"Name: {my_dict['name']}") # Name: Alice
+
+# Using get() method
+print(f"Age: {my_dict.get('age')}") # Age: 25
+
+# Accessing a non-existent key using get() returns None by default
+print(f"Country (using get): {my_dict.get('country')}") # Country (using get): None
+
+# Accessing a non-existent key using get() with a default value
+print(f"Country (using get with default): {my_dict.get('country', 'Unknown')}") # Country (using get with default): Unknown
+
+# Trying to access a non-existent key using [] will raise a KeyError
+# print(my_dict['country']) # Uncommenting this will cause an error
+```
+
+## Adding and Modifying Elements
+
+Elements can be added to a dictionary by assigning a value to a new key. Existing values can be modified by assigning a new value to an existing key.
+
+```python
+my_dict = {'name': 'Alice', 'age': 25}
+print(f"Original dictionary: {my_dict}") # Original dictionary: {'name': 'Alice', 'age': 25}
+
+# Adding a new element
+my_dict['city'] = 'New York'
+print(f"After adding city: {my_dict}") # After adding city: {'name': 'Alice', 'age': 25, 'city': 'New York'}
+
+# Modifying an existing element
+my_dict['age'] = 26
+print(f"After modifying age: {my_dict}") # After modifying age: {'name': 'Alice', 'age': 26, 'city': 'New York'}
+```
+
+## Removing Elements
+
+Elements can be removed using `del` keyword, `pop()` method, or `popitem()` method.
+
+```python
+my_dict = {'name': 'Alice', 'age': 26, 'city': 'New York'}
+print(f"Original dictionary: {my_dict}") # Original dictionary: {'name': 'Alice', 'age': 26, 'city': 'New York'}
+
+# Using del keyword
+del my_dict['city']
+print(f"After deleting city: {my_dict}") # After deleting city: {'name': 'Alice', 'age': 26}
+
+# Using pop() method (removes a specific key and returns its value)
+age = my_dict.pop('age')
+print(f"After popping age: {my_dict}, Popped value: {age}") # After popping age: {'name': 'Alice'}, Popped value: 26
+
+# Using popitem() method (removes and returns an arbitrary key-value pair, usually the last inserted in Python 3.7+)
+# For older Python versions, it removes an arbitrary item.
+item = my_dict.popitem()
+print(f"After popping item: {my_dict}, Popped item: {item}") # After popping item: {}, Popped item: ('name', 'Alice')
+
+# Clearing all elements
+my_dict = {'a': 1, 'b': 2}
+my_dict.clear()
+print(f"After clearing: {my_dict}") # After clearing: {}
+```
+
+## Iterating Through Dictionaries
+
+You can iterate over keys, values, or key-value pairs.
+
+```python
+my_dict = {'name': 'Alice', 'age': 25, 'city': 'New York'}
+
+for key in my_dict:
+    print(key)
+# name
+# age
+# city
+
+for value in my_dict.values():
+    print(value)
+# Alice
+# 25
+# New York
+
+for key, value in my_dict.items():
+    print(f"{key}: {value}")
+# name: Alice
+# age: 25
+# city: New York
+```
+
+## Dictionary Methods
+
+Some common dictionary methods:
+
+- `keys()`: Returns a view object that displays a list of all the keys in the dictionary.
+- `values()`: Returns a view object that displays a list of all the values in the dictionary.
+- `items()`: Returns a view object that displays a list of a dictionary's key-value tuple pairs.
+- `copy()`: Returns a shallow copy of the dictionary.
+- `update()`: Updates the dictionary with the elements from another dictionary object or from an iterable of key/value pairs.
+
+```python
+my_dict = {'a': 1, 'b': 2, 'c': 3}
+
+print(f"Keys: {my_dict.keys()}") # Keys: dict_keys(['a', 'b', 'c'])
+print(f"Values: {my_dict.values()}") # Values: dict_values([1, 2, 3])
+print(f"Items: {my_dict.items()}") # Items: dict_items([('a', 1), ('b', 2), ('c', 3)])
+
+# Copying a dictionary
+new_dict = my_dict.copy()
+print(f"Copied dictionary: {new_dict}") # Copied dictionary: {'a': 1, 'b': 2, 'c': 3}
+
+# Updating a dictionary
+my_dict.update({'d': 4, 'b': 20})
+print(f"Updated dictionary: {my_dict}") # Updated dictionary: {'a': 1, 'b': 20, 'c': 3, 'd': 4}
+```

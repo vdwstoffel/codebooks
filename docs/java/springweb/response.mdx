@@ -1,0 +1,209 @@
+---
+sidebar_label: "ResponseEntity"
+title: "Using ResponseEntity"
+sidebar_position: 8
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Using ResponseEntity
+
+`ResponseEntity` is a powerful tool in Spring Framework that represents the entire HTTP response. It allows you to control everything that goes into it, including the status code, headers, and the body. This makes it ideal for building flexible and precise REST APIs.
+
+## Returning a Simple String
+
+You can easily send a simple string message with a success status code.
+
+```java title="ResponseController.java"
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ResponseController {
+
+    @GetMapping("/hello")
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok("Hello, World!");
+    }
+}
+```
+
+This will produce an HTTP response with a `200 OK` status and "Hello, World!" as the body.
+
+## Returning an Object
+
+When you need to return a JSON object, you can pass a POJO (Plain Old Java Object) to the `ResponseEntity`. Spring, with the help of Jackson, will automatically serialize the object into JSON.
+
+<Tabs>
+<TabItem value="User" label="User.java">
+
+```java
+public class User {
+    private Long id;
+    private String name;
+
+    public User(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+```
+
+</TabItem>
+<TabItem value="Controller" label="Controller.java">
+
+```java
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class UserController {
+
+    // Dummy user for example purposes
+    private final User user = new User(1L, "John Doe");
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        // In a real app, you would fetch the user from a database
+        if (id.equals(user.getId())) {
+            return ResponseEntity.ok(user);
+        } else {
+            // We'll cover error responses next
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Returning a List of Objects
+
+Similarly, you can return a list of objects, which will be serialized into a JSON array.
+
+<Tabs>
+<TabItem value="User" label="User.java">
+
+```java
+public class User {
+    private Long id;
+    private String name;
+
+    public User(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+```
+
+</TabItem>
+<TabItem value="Controller" label="Controller.java">
+
+```java
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+public class UserController {
+
+    private final List<User> users = Arrays.asList(
+        new User(1L, "John Doe"),
+        new User(2L, "Jane Smith")
+    );
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(users);
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Returning Error Responses
+
+`ResponseEntity` provides convenient methods for returning common HTTP error statuses.
+
+<Tabs>
+<TabItem value="Controller" label="Controller.java">
+
+```java
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+public class ErrorResponseController {
+
+    // Dummy data
+    private final User user = new User(1L, "John Doe");
+
+    // Example for 404 Not Found
+    @GetMapping("/items/{id}")
+    public ResponseEntity<?> getItem(@PathVariable Long id) {
+        if (id.equals(user.getId())) {
+            return ResponseEntity.ok(user);
+        } else {
+            // .notFound() is a shortcut for status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Example for 400 Bad Request
+    @PostMapping("/items")
+    public ResponseEntity<String> createItem(@RequestBody(required = false) User newItem) {
+        if (newItem == null || newItem.getName() == null || newItem.getName().isEmpty()) {
+            // .badRequest() is a shortcut for status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.badRequest().body("User name is required.");
+        }
+        // Logic to save the new item...
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
+    }
+
+    // Example for a generic error with a custom body
+    @GetMapping("/error-example")
+    public ResponseEntity<Map<String, String>> getError() {
+        Map<String, String> errorResponse = Map.of(
+            "error", "Internal Server Error",
+            "message", "Something went wrong on our end."
+        );
+        // You can use any HttpStatus enum
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+// Dummy User class for context
+class User {
+    private Long id;
+    private String name;
+    public User(Long id, String name) { this.id = id; this.name = name; }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+}
+```
+
+</TabItem>
+</Tabs>

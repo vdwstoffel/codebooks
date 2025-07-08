@@ -1,59 +1,146 @@
 ---
 sidebar_label: "Numbers"
-sidebar_position: 3
+sidebar_position: 2
 ---
 
-# Numbers
+# Numbers in Java
+
+Java has a rich set of types and classes for handling numbers, from simple integers to complex mathematical operations.
+
+## Primitive Numeric Types
+
+These are the basic building blocks for numbers in Java. They are not objects and are stored directly in memory, which makes them very efficient.
+
+### Integer Types
+
+Used for whole numbers.
+
+| Type  | Size (bits) | Range                                       |
+| :---- | :---------- | :------------------------------------------ |
+| `byte`  | 8           | -128 to 127                                 |
+| `short` | 16          | -32,768 to 32,767                           |
+| `int`   | 32          | -2.1 billion to 2.1 billion                 |
+| `long`  | 64          | -9 quintillion to 9 quintillion (approx.)   |
 
 ```java
-int a = 10;
-long b = 1000000000L;
-double c = 10.5;
+int a = 100;
+long b = 9000000000L; // Note the 'L' suffix for long literals
 ```
 
-## Converting Number to a string
+### Floating-Point Types
+
+Used for numbers with a fractional part.
+
+| Type    | Size (bits) | Precision (Decimal Digits) |
+| :------ | :---------- | :------------------------- |
+| `float`   | 32          | ~6-7                       |
+| `double`  | 64          | ~15                        |
+
+`double` is the default and most commonly used type for decimal numbers due to its higher precision.
 
 ```java
-int a = 10;
-String str = Integer.toString(a);
+double pi = 3.14159;
+float price = 19.99f; // Note the 'f' suffix for float literals
 ```
 
-## Convert string to number
+## Wrapper Classes
+
+Every primitive numeric type has a corresponding **wrapper class** (e.g., `int` -> `Integer`, `double` -> `Double`). These classes wrap the primitive value in an object, allowing you to treat them as objects, which is necessary for use in collections like `ArrayList`.
 
 ```java
-String str = "10";
-int a = Integer.parseInt(str);
+Integer score = 100; // Autoboxing: Java automatically converts int to Integer
+int primitiveScore = score; // Unboxing: Integer to int
+
+Double temperature = Double.valueOf(98.6);
 ```
 
-## Getting the remainder of a division
+## Arithmetic Operations
+
+Standard arithmetic operators are supported.
 
 ```java
 int a = 10;
 int b = 4;
-int remainder = a % b; // 2
+
+int sum = a + b;     // 14
+int difference = a - b; // 6
+int product = a * b;   // 40
+int quotient = a / b;  // 2 (integer division truncates the decimal)
+double preciseQuotient = (double) a / b; // 2.5
+int remainder = a % b; // 2 (modulo operator)
 ```
 
-## Generating a random number
+## Type Casting and Conversion
+
+### Casting
+
+This is how you convert a value from one primitive type to another.
+
+```java
+// Widening casting (automatic)
+int myInt = 9;
+double myDouble = myInt; // 9.0
+
+// Narrowing casting (manual, requires explicit cast)
+// This can result in data loss.
+double pi = 3.14;
+int integerPi = (int) pi; // 3
+```
+
+### String Conversions
+
+```java
+// Convert String to Number
+String str = "123";
+int num1 = Integer.parseInt(str); // 123
+double num2 = Double.parseDouble("99.5"); // 99.5
+
+// Convert Number to String
+int a = 10;
+String s1 = Integer.toString(a); // "10"
+String s2 = String.valueOf(a);   // "10"
+```
+
+## The `Math` Class
+
+The `java.lang.Math` class provides static methods for common mathematical functions.
+
+```java
+Math.max(5, 10);      // 10
+Math.min(5, 10);      // 5
+Math.abs(-4.7);       // 4.7 (absolute value)
+Math.pow(2, 3);       // 8.0 (2 to the power of 3)
+Math.sqrt(64);        // 8.0 (square root)
+Math.round(2.7);      // 3 (rounds to the nearest long)
+Math.ceil(2.1);       // 3.0 (rounds up)
+Math.floor(2.9);      // 2.0 (rounds down)
+```
+
+## Generating Random Numbers
+
+### Using `Math.random()`
+
+This method returns a `double` value in the range `[0.0, 1.0)`.
+
+```java
+double rand = Math.random(); // e.g., 0.43512...
+
+// To get a random integer in a specific range, e.g., 1 to 10:
+int min = 1;
+int max = 10;
+int randomInt = (int) (Math.random() * (max - min + 1)) + min;
+```
+
+### Using the `Random` Class
+
+For more flexibility, use the `java.util.Random` class.
 
 ```java
 import java.util.Random;
 
 Random rand = new Random();
-int randNumber = rand.nextInt(3); // 0 - 2
-```
 
-```java
-double randomNumber = Math.random();
-System.out.println(randomNumber);   // 0.2412344874800766
-
-// Get random number between 1 - 6
-int numberInt =  (int) (randomNumber * 6) + 1;
-System.out.println(numberInt);  // 5
-```
-
-## Convert double to int
-
-```java
-double a = 10.5;
-int b = (int) a; // 10
+int r1 = rand.nextInt(10); // A random integer between 0 (inclusive) and 10 (exclusive)
+double r2 = rand.nextDouble(); // A random double between 0.0 (inclusive) and 1.0 (exclusive)
+boolean r3 = rand.nextBoolean(); // A random boolean (true or false)
 ```

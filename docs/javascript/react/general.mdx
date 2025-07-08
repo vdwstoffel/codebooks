@@ -102,6 +102,9 @@ This example shows how to create a React component to handle file uploads. It ma
 
 Note: This component is designed to send a file to a server. For this to work, you need a server endpoint ready to receive the file at the specified URL (e.g., `http://localhost:5000/upload`).
 
+<Tabs>
+<TabItem value="JavaScript" label="JavaScript">
+
 ```jsx
 import React, { useState } from "react";
 import axios from "axios";
@@ -173,3 +176,70 @@ export default function FileUpload() {
   );
 }
 ```
+
+</TabItem>
+<TabItem value="TypeScript" label="TypeScript">
+
+```tsx
+import React, { useState } from "react";
+import axios from "axios";
+
+export default function FileUpload(): React.ReactElement {
+  // State to hold the selected file.
+  const [file, setFile] = useState<File | null>(null);
+  // State to store messages for the user (e.g., success or error).
+  const [message, setMessage] = useState<string>("");
+  // State to track whether an upload is in progress.
+  const [uploading, setUploading] = useState<boolean>(false);
+
+  // Handles the file input change event.
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+      setMessage("");
+    }
+  }
+
+  // Handles the file upload logic.
+  async function handleUpload(): Promise<void> {
+    if (!file) {
+      setMessage("Please select a file first.");
+      return;
+    }
+
+    setUploading(true);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post("http://localhost:5000/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setMessage("File uploaded successfully!");
+      console.log("File uploaded successfully:", response.data);
+    } catch (error) {
+      setMessage("Error uploading file. See console for details.");
+      console.error("Error uploading file:", error);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div>
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={handleUpload} disabled={uploading}>
+        {uploading ? "Uploading..." : "Upload File"}
+      </button>
+      {message && <p>{message}</p>}
+    </div>
+  );
+}
+```
+
+</TabItem>
+</Tabs>
