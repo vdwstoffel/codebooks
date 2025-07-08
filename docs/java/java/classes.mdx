@@ -1,103 +1,153 @@
-# Classes
+---
+sidebar_label: "Classes & Objects"
+sidebar_position: 8
+---
 
-## Creating an object/class
+# Classes and Objects in Java
+
+Classes are the cornerstone of Object-Oriented Programming (OOP) in Java. A **class** is a blueprint for creating **objects**. An object is an instance of a class, with its own state and behavior.
+
+## Defining a Class
+
+A class defines the properties (state) and actions (behavior) that its objects will have.
+
+-   **Fields (Instance Variables):** These are variables within a class that hold the state of an object (e.g., `name`, `age`). They are typically declared `private` to enforce encapsulation.
+-   **Constructors:** A special method used to initialize a new object. It has the same name as the class and no return type.
+-   **Methods:** These define the behavior of an object. They perform actions, often using the object's fields.
+
+### Example: The `Person` Class
+
+Here is a complete example of a `Person` class that demonstrates these concepts.
 
 ```java title="Person.java"
 public class Person {
+    // 1. Fields (State)
+    // private fields are only accessible within this class (encapsulation).
     private String name;
     private int age;
 
+    // 2. Constructor
+    // Used to create and initialize a new Person object.
     public Person(String name, int age) {
+        // The 'this' keyword refers to the current instance of the object.
+        // It disambiguates between the field and the parameter.
         this.name = name;
         this.age = age;
     }
 
+    // 3. Methods (Behavior)
+
+    // Getter for the 'name' field
     public String getName() {
         return this.name;
     }
 
+    // Setter for the 'name' field
     public void setName(String name) {
         this.name = name;
     }
 
+    // Getter for the 'age' field
     public int getAge() {
         return this.age;
     }
 
+    // Setter for the 'age' field
     public void setAge(int age) {
-        this.age = age;
+        if (age > 0) { // Simple validation
+            this.age = age;
+        }
     }
 
-    public void printInfo() {
-        System.out.println("Name: " + this.name + ", Age: " + this.age);
+    // A method to display the person's info
+    public void introduce() {
+        // System.out.println("Hello, my name is " + this.name);
     }
 }
-
 ```
+
+## Creating an Object (Instantiation)
+
+To use the `Person` class, you create an instance of it using the `new` keyword and its constructor.
 
 ```java title="Main.java"
 public class Main {
     public static void main(String[] args) {
-        Person person = new Person("John", 25);
-        person.printInfo();
+        // Create an instance of the Person class
+        Person person1 = new Person("Alice", 30);
+
+        // Access its methods
+        person1.introduce(); // Prints "Hello, my name is Alice"
+
+        // Use a getter to retrieve data
+        String name = person1.getName(); // "Alice"
+
+        // Use a setter to modify data
+        person1.setAge(31);
     }
 }
 ```
 
-## Copy Constructor
+## Advanced Constructor Concepts
 
-```java title="Person.java"
-public class Person {
-    private String name;
-    private int age;
+### Copy Constructor
+A copy constructor creates an object by copying an existing object of the same class. It's useful for creating a duplicate of an object.
 
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public Person(Person source) {
-        this.name = source.name;
-        this.age = source.age;
-    }
+```java
+// Add this constructor to the Person class
+public Person(Person source) {
+    this.name = source.name;
+    this.age = source.age;
 }
+
+// How to use it
+Person person1 = new Person("Bob", 40);
+Person person2 = new Person(person1); // person2 is a copy of person1
 ```
 
-```java title="Main.java"
-public class Main {
-    public static void main(String[] args) {
-        Person person1 = new Person("John", 25);
-        Person person2 = new Person(person1);
-    }
+## The `toString()` Method
+
+If you try to print an object directly, you'll get a memory address. To provide a meaningful string representation of your object, you should override the `toString()` method from the `Object` class.
+
+```java
+// Add this method to the Person class
+@Override
+public String toString() {
+    return "Person[name=" + this.name + ", age=" + this.age + "]";
 }
+
+// Now you can print the object
+Person person = new Person("Charlie", 25);
+// System.out.println(person); // Prints: Person[name=Charlie, age=25]
 ```
 
-## Print class isntatance
+## The `static` Keyword
 
-To print the object in a human-readable format, you need to override the `toString` method.
+The `static` keyword means a variable or method belongs to the **class itself**, not to any specific instance of the class.
 
-```java title="Person.java"
-public class Person {
-    private String name;
-    private int age;
+-   **Static Fields:** All instances of the class share the same static variable.
+-   **Static Methods:** Can be called directly on the class without creating an instance.
 
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
+```java
+public class Counter {
+    // Static field: shared by all instances
+    public static int instanceCount = 0;
+
+    public Counter() {
+        instanceCount++;
     }
 
-    @Override
-    public String toString() {
-        return "Name: " + this.name + ", Age: " + this.age;
-    }
-}
-```
-
-```java title="Main.java"
-public class Main {
-    public static void main(String[] args) {
-        Person person = new Person("John", 25);
-        System.out.println(person); // Name: John, Age: 25
+    // Static method: belongs to the class
+    public static void printCount() {
+        // System.out.println("Instances created: " + instanceCount);
     }
 }
+
+// Usage
+Counter.printCount(); // Instances created: 0
+
+Counter c1 = new Counter();
+Counter c2 = new Counter();
+
+Counter.printCount(); // Instances created: 2
 ```

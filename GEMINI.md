@@ -29,3 +29,4 @@ All examples are in the `docs` folder, separated by language and then by concept
 - When providing code examples, focus solely on the technology or concept explicitly requested. Do not introduce 
 code from other technologies or frameworks unless specifically instructed to do so by the user. 
 - In code examples, show the output of a variable or expression as a comment (e.g., `// "Hello"`) on the same line, rather than using a separate print statement.
+- When creating or updating a topic, ensure the main introduction file for that language or technology (e.g., `java.mdx` for Java topics) is updated with a link to the new or modified file.

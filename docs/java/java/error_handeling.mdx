@@ -1,91 +1,109 @@
 ---
-sidebar_label: "Error Handeling"
-sidebar_position: 203
+sidebar_label: "Exception Handling"
+sidebar_position: 9
 ---
 
-# Error Handeling
+# Exception Handling in Java
 
-## Try/Catch/Finallly
+Exception handling is a powerful mechanism that allows you to manage runtime errors in a structured way. An exception is an event that disrupts the normal flow of the program. When an error occurs, Java throws an exception.
+
+## Exception Hierarchy
+
+In Java, all exceptions are subclasses of the `Throwable` class.
+
+-   **Checked Exceptions:** These are exceptions that are checked at compile-time (e.g., `IOException`, `FileNotFoundException`). You **must** handle them using a `try-catch` block or declare them with the `throws` keyword.
+-   **Unchecked Exceptions (Runtime Exceptions):** These are exceptions that occur at runtime (e.g., `NullPointerException`, `ArrayIndexOutOfBoundsException`). The compiler does not require you to handle them, but it's often good practice to do so.
+
+## 1. The `try-catch` Block
+
+This is the fundamental way to handle exceptions. You place code that might throw an exception inside the `try` block and the handling logic inside the `catch` block.
+
+```java
+try {
+    // Code that may throw an exception
+    int[] numbers = {1, 2, 3};
+    int x = numbers[5]; // This will throw an ArrayIndexOutOfBoundsException
+} catch (ArrayIndexOutOfBoundsException e) {
+    // This block executes if the specified exception occurs
+    // System.out.println("Error: Array index is out of bounds.");
+    // e.printStackTrace(); // Prints the stack trace of the exception
+}
+
+// The program continues to run after the catch block.
+```
+
+## 2. The `finally` Block
+
+The `finally` block is optional and is always executed after the `try` and `catch` blocks, regardless of whether an exception was thrown or caught. It's typically used for cleanup code, like closing files or database connections.
+
+```java
+try {
+    // ... some code ...
+} catch (Exception e) {
+    // ... handle exception ...
+} finally {
+    // This code will always run, for cleanup.
+    // System.out.println("The 'finally' block has executed.");
+}
+```
+
+## 3. The `try-with-resources` Statement
+
+Introduced in Java 7, this is the modern, preferred way to handle resources that need to be closed (like file streams or database connections). It automatically closes the resources for you, making the code cleaner and safer than using a `finally` block for cleanup.
 
 ```java
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
-public class ErrorHandling {
+// The resource (Scanner) is declared in the try() statement.
+// It will be automatically closed.
+try (Scanner scanner = new Scanner(new FileInputStream("greeting.txt"))) {
+    // System.out.println(scanner.nextLine());
+} catch (IOException e) {
+    // System.out.println("Error reading file: " + e.getMessage());
+}
+```
 
-    public static void main(String[] args) {
+## 4. The `throws` and `throw` Keywords
 
-        try {
-            FileInputStream myFile = new FileInputStream("./greeting.txt");
-            Scanner scanner = new Scanner(myFile);
-            System.out.println(scanner.nextLine());
-            scanner.close();
+### `throws`
+The `throws` keyword is used in a method signature to declare that the method might throw one or more checked exceptions. It delegates the responsibility of handling the exception to the caller of the method.
 
-        } catch (FileNotFoundException exception) {
-            System.out.println(exception.getMessage());
-            System.out.println("File not found");
+```java
+import java.io.FileNotFoundException;
 
-        } finally {
-            System.out.println("Finally block ran");
-        }
+// This method declares that it can throw a FileNotFoundException
+public void readFile(String fileName) throws FileNotFoundException {
+    // ... code that might throw the exception ...
+}
+
+// The caller must handle it
+public void processFile() {
+    try {
+        readFile("test.txt");
+    } catch (FileNotFoundException e) {
+        // Handle the error here
     }
 }
 ```
 
-## Using throws in function declaration
-
-In certain situations, you might want to handle an exception outside the function where the error-prone code resides, rather than within the function itself. This is where the 'throws' keyword becomes particularly useful.
+### `throw`
+The `throw` keyword is used to manually throw an exception. This is often used for validating arguments or signaling an error state.
 
 ```java
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
-public class FunctionThrows {
-
-    public static void main(String[] args) {
-
-        try {
-            readFile("./greeting.txt");
-        } catch (FileNotFoundException error) {
-            System.out.println(error);
-        }
+public void setAge(int age) {
+    if (age < 0) {
+        // Manually throw an exception for invalid input
+        throw new IllegalArgumentException("Age cannot be negative.");
     }
-
-    public static void readFile(String filename) throws FileNotFoundException {
-        FileInputStream myFile = new FileInputStream(filename);
-        Scanner scanner = new Scanner(myFile);
-        System.out.println(scanner.nextLine());
-        scanner.close();
-    }
+    // ...
 }
-```
 
-## Argument validation
-
-```java
-public class ArgumentValidation {
-
-    public static void main(String[] args) {
-        showAge(-1);
-        showName("");
-    }
-
-    public static void showAge(int age) {
-        if (age < 1) {
-            throw new IllegalArgumentException("Age cannot be less than one");
-        }
-
-        System.out.println(age);
-    }
-
-    public static void showName(String Name) {
-        if (title.isBlank() || title == null) {
-            throw new IllegalArgumentException("Name is mandatory");
-        }
-
-        System.out.println(name);
-    }
+// Calling the method with invalid input
+try {
+    setAge(-5);
+} catch (IllegalArgumentException e) {
+    // System.out.println(e.getMessage()); // "Age cannot be negative."
 }
 ```

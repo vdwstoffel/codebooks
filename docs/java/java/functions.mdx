@@ -1,89 +1,109 @@
-# Functions
+---
+sidebar_label: "Methods (Functions)"
+sidebar_position: 7
+---
 
-## Function with no return a
+# Methods (Functions) in Java
 
-```java
-public static void noReturn() {
-    System.out.println("This function has no return");
-}
+In Java, a function is called a **method**. Methods are blocks of code that run when they are called. They are defined within a class and are used to perform specific actions, making code more organized, reusable, and readable.
 
-noReturn();
-```
+## Structure of a Method
 
-## Function with string return
-
-```java
-public static String stringReturn() {
-    return "This function returns a string";
-}
-
-String returnedStr = stringReturn();
-```
-
-## Function with int return
+A method has the following structure:
 
 ```java
-public static int intReturn() {
-    return 10;
+<access_modifier> <return_type> <method_name>(<parameter_list>) {
+    // body of the method
+    return <value>; // required if return_type is not void
 }
-
-int returnedInt = intReturn();
 ```
 
-## Function with double return
+-   **`access_modifier`**: (e.g., `public`, `private`) Defines the visibility of the method.
+-   **`return_type`**: The data type of the value the method returns (e.g., `int`, `String`, `void`). `void` means the method does not return any value.
+-   **`method_name`**: The name of the method.
+-   **`parameter_list`**: The list of input parameters (type and name) that the method accepts.
+
+## Defining and Calling Methods
+
+Here are examples of different kinds of methods inside a class.
 
 ```java
-public static double doubleReturn() {
-    return 10.5;
-}
+public class MethodExamples {
 
-double returnedDouble = doubleReturn();
+    // 1. Method with no parameters and no return value
+    public void displayMessage() {
+        // System.out.println("Hello from a method!");
+    }
+
+    // 2. Method with a return value
+    public String getGreeting() {
+        return "Hello, World!";
+    }
+
+    // 3. Method with parameters
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
 ```
 
-## Function with boolean return
+### Calling the Methods
+
+To call a method, you need an instance of the class.
 
 ```java
-public static boolean booleanReturn() {
-    return true;
-}
+MethodExamples examples = new MethodExamples();
 
-boolean returnedBoolean = booleanReturn();
+examples.displayMessage(); // Prints "Hello from a method!"
+
+String greeting = examples.getGreeting(); // "Hello, World!"
+int sum = examples.add(5, 10);          // 15
 ```
 
-## Function with parameters
+## Method Overloading
+
+Java allows you to define multiple methods with the **same name** in the same class, as long as their **parameter lists are different**. This is called method overloading. It's often used to provide more flexible ways to call a method or to simulate default parameter values.
 
 ```java
-public static void withParameters(int a, int b) {
-    System.out.println(a + b);
+public class OverloadingExample {
+
+    // Method with two parameters
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    // Overloaded method with three parameters
+    public int add(int a, int b, int c) {
+        return a + b + c;
+    }
+
+    // Overloaded method with different types
+    public double add(double a, double b) {
+        return a + b;
+    }
 }
 
-withParameters(10, 20);
+// Calling the overloaded methods
+OverloadingExample calc = new OverloadingExample();
+
+int sum1 = calc.add(5, 10);       // 15 (calls the first method)
+int sum2 = calc.add(5, 10, 20);   // 35 (calls the second method)
+double sum3 = calc.add(2.5, 3.5); // 6.0 (calls the third method)
 ```
 
-## Function with default parameters
+## Documenting Methods with Javadoc
 
-```java
-public static void withDefaultParameters(int a, int b = 10) {
-    System.out.println(a + b);
-}
-
-withDefaultParameters(10); // 20
-```
-
-## Add documentation to a function
+It is standard practice to add documentation to your methods using Javadoc comments (`/** ... */`). This allows you to generate HTML documentation for your code and helps other developers understand how to use your methods.
 
 ```java
 /**
- * This function adds two numbers
- * @param a
- * @param b
- * @return sum of a and b
+ * Calculates the sum of two integers.
+ *
+ * @param a The first integer.
+ * @param b The second integer.
+ * @return The sum of a and b.
  */
-
-public static int add(int a, int b) {
+public int add(int a, int b) {
     return a + b;
-
 }
-
-int sum = add(10, 20);
 ```

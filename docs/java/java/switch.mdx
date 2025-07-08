@@ -5,13 +5,13 @@ int day = 3;
 
 switch (day) {
     case 1:
-        System.out.println("Monday");
+        System.out.println("Monday"); // "Monday"
         break;
     case 2:
-        System.out.println("Tuesday");
+        System.out.println("Tuesday"); // "Tuesday"
         break;
     case 3:
-        System.out.println("Wednesday");
+        System.out.println("Wednesday"); // "Wednesday"
         break;
     default:
         System.out.println("Invalid day");
@@ -29,13 +29,58 @@ switch (day) {
     case 3:
     case 4:
     case 5:
-        System.out.println("Weekday");
+        System.out.println("Weekday"); // "Weekday"
         break;
     case 6:
     case 7:
-        System.out.println("Weekend");
+        System.out.println("Weekend"); // "Weekend"
         break;
     default:
         System.out.println("Invalid day");
 }
+```
+
+## Enhanced Switch and Switch Expressions (Java 14+)
+
+Java 14 introduced enhanced switch statements and switch expressions, offering a more concise and readable syntax.
+
+### Enhanced Switch Statement
+
+The `->` operator simplifies `case` labels, eliminating the need for `break` statements and preventing fall-through issues.
+
+```java
+int day = 3;
+switch (day) {
+    case 1 -> System.out.println("Monday"); // "Monday"
+    case 2 -> System.out.println("Tuesday"); // "Tuesday"
+    case 3 -> System.out.println("Wednesday"); // "Wednesday"
+    default -> System.out.println("Invalid day");
+}
+```
+
+### Switch Expression
+
+Switch expressions can return a value, making them useful for assigning values to variables. The `yield` keyword is used to return a value from a `case` block.
+
+```java
+int day = 3;
+String dayType = switch (day) {
+    case 1, 2, 3, 4, 5 -> "Weekday"; // "Weekday"
+    case 6, 7 -> "Weekend";
+    default -> "Invalid day";
+};
+System.out.println(dayType); // "Weekday"
+
+// Using yield for more complex logic within a case
+String dayName = switch (day) {
+    case 1 -> "Monday";
+    case 2 -> "Tuesday";
+    case 3 -> {
+        // Can have multiple statements
+        System.out.println("Calculating day name...");
+        yield "Wednesday"; // "Wednesday"
+    }
+    default -> "Unknown";
+};
+System.out.println(dayName); // "Wednesday"
 ```

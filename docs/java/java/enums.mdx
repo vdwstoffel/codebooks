@@ -1,19 +1,100 @@
 ---
 sidebar_label: "Enums"
-description: "Enums in Java"
+sidebar_position: 10
 ---
 
-# Enums
+# Enums in Java
 
-```Java
-public class JavaEnums {
+An **enum** (short for "enumeration") is a special type that represents a fixed set of constants. Enums are used when you have a variable that can only take one of a small, predefined set of possible values, such as the days of the week, the seasons of the year, or the planets in our solar system.
 
-    public enum ShirtSize {
-        LARGE, MEDIUM, SMALL
-    };
+Using enums improves type safety, meaning you can't assign an invalid value to a variable of an enum type.
 
-    public static void main(String[] args) {
-        System.out.println(ShirtSize.LARGE);
+## Defining a Basic Enum
+
+You define an enum using the `enum` keyword. The constants are listed in uppercase letters.
+
+```java
+public enum Level {
+    LOW,
+    MEDIUM,
+    HIGH
+}
+```
+
+## Using an Enum
+
+You can declare variables of the enum type and use the constants in your code, for example, in a `switch` statement.
+
+```java
+Level myLevel = Level.MEDIUM;
+
+switch(myLevel) {
+    case LOW:
+        // System.out.println("Low level");
+        break;
+    case MEDIUM:
+        // System.out.println("Medium level");
+        break;
+    case HIGH:
+        // System.out.println("High level");
+        break;
+}
+// Output:
+// Medium level
+```
+
+## Enums with Fields and Methods
+
+Unlike in many other languages, enums in Java are much more powerful. They are a special kind of class and can have fields, constructors, and methods.
+
+This allows you to associate data and behavior with each constant.
+
+### Example: Enum with a Constructor and Method
+
+Here's an example of a `ShirtSize` enum where each size has an associated abbreviation.
+
+```java
+public enum ShirtSize {
+    // The constants call the constructor
+    SMALL("S"),
+    MEDIUM("M"),
+    LARGE("L"),
+    EXTRA_LARGE("XL");
+
+    // Field for each enum constant
+    private final String abbreviation;
+
+    // Constructor for the enum
+    // Note: Enum constructors are implicitly private
+    ShirtSize(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
+
+    // Method for the enum
+    public String getAbbreviation() {
+        return this.abbreviation;
     }
 }
+
+// --- How to use it ---
+ShirtSize size = ShirtSize.LARGE;
+
+String abbr = size.getAbbreviation(); // "L"
+String name = size.name();            // "LARGE" (built-in method)
+int ordinal = size.ordinal();         // 2 (position in the enum declaration, starts at 0)
+```
+
+## Iterating Over Enum Constants
+
+You can loop through all the constants of an enum using the built-in `values()` method.
+
+```java
+for (ShirtSize size : ShirtSize.values()) {
+    // System.out.println(size + " (" + size.getAbbreviation() + ")");
+}
+// Output:
+// SMALL (S)
+// MEDIUM (M)
+// LARGE (L)
+// EXTRA_LARGE (XL)
 ```
