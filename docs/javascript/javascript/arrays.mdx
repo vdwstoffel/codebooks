@@ -3,74 +3,238 @@ sidebar_label: Arrays
 sidebar_position: 4
 ---
 
-# Arrays
+# Arrays in JavaScript
 
-## Getting the length of an array
+Arrays are ordered, integer-indexed collections of values. They are a special type of object and are used to store multiple values in a single variable. Arrays in JavaScript are dynamic, meaning their size can change during runtime.
 
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
-console.log(languages.length); // 4
+## Creating Arrays
+
+### Array Literal (Most Common)
+
+```javascript
+let fruits = ["Apple", "Banana", "Cherry"];
+let mixed = [1, "hello", true, null];
 ```
 
-## Sorting an array
+### Array Constructor
 
-Sorting happens in place, so the original array is modified.
-
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
-languages.sort();
-console.log(languages); // ["C++", "Java", "JavaScript", "Python"]
+```javascript
+let numbers = new Array(1, 2, 3);
+let emptyArray = new Array(); // Creates an empty array
+let fixedSize = new Array(5); // Creates an array with 5 empty slots
 ```
 
-## Sorting an array of objects
+## Accessing Elements
 
-```js
-const languages = [
-  { name: "Python", year: 1991 },
-  { name: "JavaScript", year: 1995 },
-  { name: "Java", year: 1995 },
-  { name: "C++", year: 1985 },
-];
-languages.sort((a, b) => a.year - b.year);
-console.log(languages);
+Array elements are accessed using zero-based indexing.
+
+```javascript
+let colors = ["Red", "Green", "Blue"];
+
+console.log(colors[0]); // "Red"
+console.log(colors[1]); // "Green"
+console.log(colors[2]); // "Blue"
+console.log(colors[3]); // undefined (index out of bounds)
 ```
 
-## Mapping
+### Getting the Length
 
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
-const capitals = languages.map((lang) => lang.toLocaleUpperCase());
-console.log(capitals); // ["PYTHON", "JAVASCRIPT", "JAVA", "C++"]
+The `length` property returns the number of elements in an array.
+
+```javascript
+let items = ["A", "B", "C"];
+console.log(items.length); // 3
 ```
 
-## Filter
+## Adding and Removing Elements
 
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
-const filtered = languages.filter((lang) => lang.startsWith("J"));
-console.log(filtered); // ["JavaScript", "Java"]
+### Adding Elements
+
+-   `push()`: Adds one or more elements to the end of an array and returns the new length.
+-   `unshift()`: Adds one or more elements to the beginning of an array and returns the new length.
+
+```javascript
+let arr = ["a", "b"];
+arr.push("c", "d");    // arr is now ["a", "b", "c", "d"]
+arr.unshift("x", "y"); // arr is now ["x", "y", "a", "b", "c", "d"]
 ```
 
-## Reducer
+### Removing Elements
 
-```js
-const numbers = [1, 2, 3, 4, 5];
-const sum = numbers.reduce((acc, curr) => acc + curr, 0);
-console.log(sum); // 15
+-   `pop()`: Removes the last element from an array and returns that element.
+-   `shift()`: Removes the first element from an array and returns that element.
+
+```javascript
+let arr = ["x", "y", "z"];
+let last = arr.pop();   // last is "z", arr is ["x", "y"]
+let first = arr.shift(); // first is "x", arr is ["y"]
 ```
 
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
-const reduced = languages.reduce((acc, lan) => acc + lan.length, 0);
-console.log(reduced); // 23
-```
+## Iterating Over Arrays
 
-## ForEach
+### `forEach()`
 
-```js
-const languages = ["Python", "JavaScript", "Java", "C++"];
+Executes a provided function once for each array element.
 
-languages.forEach((lan) => {
-  console.log(lan.toLocaleLowerCase());
+```javascript
+let numbers = [1, 2, 3];
+numbers.forEach(function(number, index) {
+    console.log(`Element at index ${index}: ${number}`);
 });
+// Output:
+// Element at index 0: 1
+// Element at index 1: 2
+// Element at index 2: 3
+```
+
+### `for...of` Loop (ES6+)
+
+Provides a simpler way to iterate over the values of an iterable object (like an array).
+
+```javascript
+let names = ["Alice", "Bob", "Charlie"];
+for (let name of names) {
+    console.log(name);
+}
+// Output:
+// Alice
+// Bob
+// Charlie
+```
+
+## Transforming Arrays
+
+### `map()`
+
+Creates a new array populated with the results of calling a provided function on every element in the calling array.
+
+```javascript
+let numbers = [1, 2, 3];
+let doubled = numbers.map(num => num * 2); // [2, 4, 6]
+```
+
+### `filter()`
+
+Creates a new array with all elements that pass the test implemented by the provided function.
+
+```javascript
+let ages = [12, 19, 25, 8];
+let adults = ages.filter(age => age >= 18); // [19, 25]
+```
+
+### `reduce()`
+
+Executes a reducer function on each element of the array, resulting in a single output value.
+
+```javascript
+let prices = [10, 20, 30];
+let total = prices.reduce((accumulator, currentValue) => accumulator + currentValue, 0); // 60
+
+// Example: Sum of lengths of strings
+const languages = ["Python", "JavaScript", "Java", "C++"];
+const totalLength = languages.reduce((acc, lang) => acc + lang.length, 0);
+console.log(totalLength); // 23
+```
+
+## Searching and Checking
+
+### `indexOf()` and `lastIndexOf()`
+
+Returns the first/last index at which a given element can be found in the array, or -1 if it is not present.
+
+```javascript
+let fruits = ["apple", "banana", "cherry", "apple"];
+console.log(fruits.indexOf("apple"));    // 0
+console.log(fruits.lastIndexOf("apple")); // 3
+console.log(fruits.indexOf("grape"));    // -1
+```
+
+### `find()` and `findIndex()`
+
+-   `find()`: Returns the value of the first element in the array that satisfies the provided testing function.
+-   `findIndex()`: Returns the index of the first element in the array that satisfies the provided testing function.
+
+```javascript
+let users = [{id: 1, name: "Alice"}, {id: 2, name: "Bob"}];
+let alice = users.find(user => user.name === "Alice"); // {id: 1, name: "Alice"}
+let bobIndex = users.findIndex(user => user.name === "Bob"); // 1
+```
+
+### `includes()`
+
+Determines whether an array includes a certain value among its entries, returning `true` or `false`.
+
+```javascript
+let numbers = [1, 2, 3, 4, 5];
+console.log(numbers.includes(3)); // true
+console.log(numbers.includes(6)); // false
+```
+
+### `Array.isArray()`
+
+Checks if a value is an array.
+
+```javascript
+console.log(Array.isArray([1, 2])); // true
+console.log(Array.isArray("hello")); // false
+```
+
+## Modifying Arrays (in place)
+
+### `sort()`
+
+Sorts the elements of an array in place and returns the sorted array. The default sort is lexicographical (string comparison).
+
+```javascript
+let words = ["banana", "apple", "cherry"];
+words.sort(); // ["apple", "banana", "cherry"]
+
+// Sorting numbers (requires a compare function)
+let nums = [3, 1, 10, 2];
+nums.sort((a, b) => a - b); // [1, 2, 3, 10]
+
+// Sorting objects
+const products = [
+  { name: "Laptop", price: 1200 },
+  { name: "Mouse", price: 25 },
+  { name: "Keyboard", price: 75 },
+];
+products.sort((a, b) => a.price - b.price);
+// products is now sorted by price
+```
+
+### `splice()`
+
+Changes the contents of an array by removing or replacing existing elements and/or adding new elements in place.
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+arr.splice(2, 1);       // Remove 1 element at index 2 (arr is now [1, 2, 4, 5])
+arr.splice(1, 0, 99);   // Add 99 at index 1 (arr is now [1, 99, 2, 4, 5])
+arr.splice(3, 2, 100, 101); // Remove 2 elements from index 3, add 100, 101
+// arr is now [1, 99, 2, 100, 101]
+```
+
+## Combining Arrays
+
+### `concat()`
+
+Used to merge two or more arrays. This method does not change the existing arrays, but instead returns a new array.
+
+```javascript
+let arr1 = [1, 2];
+let arr2 = [3, 4];
+let combined = arr1.concat(arr2); // [1, 2, 3, 4]
+```
+
+### Spread Operator (`...`) (ES6+)
+
+Provides a concise way to combine arrays or create new arrays from existing ones.
+
+```javascript
+let arrA = [1, 2];
+let arrB = [3, 4];
+let newCombined = [...arrA, ...arrB]; // [1, 2, 3, 4]
+
+let copy = [...arrA]; // Creates a shallow copy of arrA
 ```

@@ -3,67 +3,127 @@ sidebar_label: "Numbers"
 sidebar_position: 3
 ---
 
-# Numbers
+# Numbers in JavaScript
 
-## Generating a random number
+In JavaScript, numbers are a fundamental data type used to represent both integer and floating-point values. Unlike some other programming languages, JavaScript does not distinguish between different types of numbers (like `int`, `float`, `double`); all numbers are internally represented as double-precision 64-bit floating-point numbers.
+
+## Number Types
+
+### Standard Numbers
+
+These are the most common numbers you'll work with.
 
 ```javascript
-const randomNumber = Math.random();
-console.log(randomNumber); // 0.123456789
+let integer = 10;
+let float = 3.14;
+let negative = -5;
+let scientific = 1.23e5; // 123000
 ```
 
+### `BigInt` (ES11+)
+
+`BigInt` is a new primitive data type that can represent integers with arbitrary precision. This means you can work with numbers larger than `2^53 - 1` (the maximum safe integer for standard numbers).
+
 ```javascript
-const randomNumber = Math.floor(Math.random() * 10) + 1;
-console.log(randomNumber); // 1 - 10
+let bigInteger = 9007199254740991n; // Add 'n' suffix for BigInt
+let anotherBigInt = BigInt("123456789012345678901234567890");
+
+// BigInt operations require both operands to be BigInts
+let sum = bigInteger + 1n; // 9007199254740992n
 ```
 
-## Generating a cryptographically secure random number
+## Arithmetic Operations
+
+Standard mathematical operations are performed using arithmetic operators.
 
 ```javascript
-const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
-console.log(randomNumber); // 123456789
+let a = 10;
+let b = 3;
+
+let sum = a + b;        // 13
+let difference = a - b; // 7
+let product = a * b;    // 30
+let division = a / b;   // 3.3333333333333335
+let remainder = a % b;  // 1
+let exponent = a ** 2;  // 100 (10 to the power of 2)
+
+// Increment and Decrement
+let counter = 0;
+counter++; // 1
+counter--; // 0
 ```
 
-- Convert to a fractional number between 0 and 1:
+## Number Conversion
+
+JavaScript often performs type coercion, but you can also explicitly convert values to numbers.
 
 ```javascript
-const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
-const randomFraction = randomBuffer / (0xffffffff + 1);
+let strInt = "123";
+let strFloat = "123.45";
+
+let num1 = parseInt(strInt);   // 123 (parses as integer)
+let num2 = parseFloat(strFloat); // 123.45 (parses as float)
+let num3 = Number(strInt);     // 123 (general conversion)
+let num4 = +strFloat;          // 123.45 (unary plus operator, concise)
+
+// When parsing fails
+let notANumber = parseInt("abc"); // NaN (Not a Number)
 ```
 
-## Rounding to a specific number of decimal places
+## The `Math` Object
+
+The built-in `Math` object provides properties and methods for mathematical constants and functions.
+
+### Common `Math` Methods
 
 ```javascript
-const num = 3.141592653589793;
-const decimalPlaces = 2;
-
-let roundedNum = Math.round(num * (10 ** decimalPlaces)) / (10 ** decimalPlaces);
-console.log(roundedNum); // 3.14
+Math.round(4.7);   // 5 (rounds to the nearest integer)
+Math.floor(4.7);   // 4 (rounds down)
+Math.ceil(4.1);    // 5 (rounds up)
+Math.abs(-10);     // 10 (absolute value)
+Math.max(10, 20);  // 20 (returns the largest of zero or more numbers)
+Math.min(10, 20);  // 10 (returns the smallest of zero or more numbers)
+Math.pow(2, 3);    // 8 (2 to the power of 3)
+Math.sqrt(81);     // 9 (square root)
 ```
 
+### Generating Random Numbers
+
+`Math.random()` returns a floating-point, pseudo-random number in the range `[0, 1)` (inclusive of 0, but not 1).
 
 ```javascript
-const num = 3.141592653589793;
-const roundedNum = Math.round(num);
-console.log(roundedNum); // 3
+let randomNumber = Math.random(); // e.g., 0.123456789
+
+// To get a random integer between 1 and 10 (inclusive):
+let randomInt = Math.floor(Math.random() * 10) + 1; // 1-10
+
+// For cryptographically secure random numbers (in browser/Node.js environments):
+// const crypto = require('crypto'); // Node.js
+// const randomBytes = crypto.getRandomValues(new Uint8Array(4));
+// const secureRandomNumber = randomBytes[0] / 256; // Number between 0 and 1
 ```
 
-## Convert string to number
+## Number Properties and Methods
+
+### Checking for Valid Numbers
+
+-   `isNaN()`: Checks if a value is `NaN` (Not a Number).
+-   `isFinite()`: Checks if a value is a finite number.
 
 ```javascript
-const str = "123.45";
-const num = parseFloat(str);
-console.log(num); // 123.45
+console.log(isNaN(123));     // false
+console.log(isNaN("hello")); // true
+console.log(isFinite(100));  // true
+console.log(isFinite(Infinity)); // false
 ```
 
-```javascript
-const str = "123";
-const num = parseInt(str);
-console.log(num); // 123
-```
+### Controlling Decimal Places
+
+-   `toFixed(digits)`: Formats a number using fixed-point notation. Returns a string.
+-   `toPrecision(precision)`: Formats a number to a specified length. Returns a string.
 
 ```javascript
-const str = "123.45";
-const num = Number(str);
-console.log(num); // 123.45
+let price = 123.456;
+console.log(price.toFixed(2));    // "123.46" (rounds)
+console.log(price.toPrecision(4)); // "123.5" (rounds)
 ```

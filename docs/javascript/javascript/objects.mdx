@@ -3,37 +3,169 @@ sidebar_label: Objects
 sidebar_position: 5
 ---
 
-# Objects
+# Objects in JavaScript
 
-## Check if a object exists in an array
+Objects are fundamental to JavaScript and are used to store collections of data and more complex entities. An object is a collection of **key-value pairs**, where keys (also called property names) are strings (or Symbols) and values can be any data type, including other objects or functions.
 
-```javascript
-const arr = [
-  { name: "John", age: 30 },
-  { name: "Jane", age: 25 },
-];
-const exists = arr.some(obj => obj.name === "John");
-console.log(exists); // true
-```
+## Creating Objects
 
-## Find an object in an array
+### Object Literal (Most Common)
+
+This is the simplest and most common way to create an object.
 
 ```javascript
-const arr = [
-  { name: "John", age: 30 },
-  { name: "Jane", age: 25 },
-];
-const found = arr.find(obj => obj.name === "John");
-console.log(found); // { name: "John", age: 30 }
+let person = {
+    firstName: "John",
+    lastName: "Doe",
+    age: 30,
+    isStudent: false,
+    hobbies: ["reading", "hiking"],
+    address: {
+        street: "123 Main St",
+        city: "Anytown"
+    },
+    greet: function() {
+        console.log(`Hello, my name is ${this.firstName}`);
+    }
+};
 ```
 
-## Find the index of an object in an array
+### Object Constructor
+
+You can also create an empty object using the `Object` constructor and then add properties.
 
 ```javascript
-const arr = [
-  { name: "John", age: 30 },
-  { name: "Jane", age: 25 },
-];
-const index = arr.findIndex(obj => obj.name === "John");
-console.log(index); // 0
+let car = new Object();
+car.make = "Toyota";
+car.model = "Camry";
+car.year = 2020;
 ```
+
+## Accessing Object Properties
+
+There are two main ways to access properties of an object:
+
+### Dot Notation (Preferred for known property names)
+
+```javascript
+console.log(person.firstName); // "John"
+console.log(person.address.city); // "Anytown"
+person.greet(); // "Hello, my name is John"
+```
+
+### Bracket Notation (Useful for dynamic property names or names with spaces/special characters)
+
+```javascript
+console.log(person["lastName"]); // "Doe"
+let propName = "age";
+console.log(person[propName]); // 30
+```
+
+## Modifying and Adding Properties
+
+Properties can be modified or added by assigning a new value.
+
+```javascript
+person.age = 31; // Modifying an existing property
+person.email = "john.doe@example.com"; // Adding a new property
+```
+
+## Deleting Properties
+
+Use the `delete` operator to remove a property from an object.
+
+```javascript
+delete person.isStudent;
+```
+
+## Iterating Over Object Properties
+
+### `for...in` Loop
+
+Iterates over enumerable string properties of an object. It also iterates over properties in the prototype chain, so it's often used with `hasOwnProperty()`.
+
+```javascript
+for (let key in person) {
+    if (person.hasOwnProperty(key)) {
+        console.log(`${key}: ${person[key]}`);
+    }
+}
+```
+
+### `Object.keys()`, `Object.values()`, `Object.entries()` (ES6+)
+
+These methods return arrays, allowing you to use array iteration methods (`forEach`, `map`, `filter`, etc.).
+
+-   `Object.keys(obj)`: Returns an array of a given object's own enumerable property names.
+-   `Object.values(obj)`: Returns an array of a given object's own enumerable property values.
+-   `Object.entries(obj)`: Returns an array of a given object's own enumerable string-keyed property `[key, value]` pairs.
+
+```javascript
+console.log(Object.keys(person));   // ["firstName", "lastName", "age", ...]
+console.log(Object.values(person)); // ["John", "Doe", 30, ...]
+
+for (let [key, value] of Object.entries(person)) {
+    console.log(`${key}: ${value}`);
+}
+```
+
+## Object Destructuring (ES6+)
+
+Destructuring assignment allows you to unpack values from arrays, or properties from objects, into distinct variables.
+
+```javascript
+const { firstName, age } = person;
+console.log(firstName); // "John"
+console.log(age);       // 30
+
+// With a different variable name
+const { lastName: surname } = person;
+console.log(surname); // "Doe"
+
+// With default values
+const { city = "Unknown" } = person;
+console.log(city); // "Unknown" (if person.city is undefined)
+```
+
+## The `this` Keyword
+
+In JavaScript, the value of `this` depends on how the function is called. When a function is a method of an object, `this` refers to the object that the method belongs to.
+
+```javascript
+const user = {
+    name: "Alice",
+    greet: function() {
+        console.log(`Hello, ${this.name}`); // `this` refers to `user`
+    }
+};
+user.greet(); // "Hello, Alice"
+
+const anotherUser = {
+    name: "Bob",
+    greet: person.greet // Borrowing the greet method
+};
+anotherUser.greet(); // "Hello, Bob" (this refers to anotherUser)
+```
+
+## Prototypes and Inheritance (Briefly)
+
+JavaScript objects have a special hidden property called `[[Prototype]]` (or `__proto__`). This is how JavaScript objects inherit features from one another. When you try to access a property or method on an object, if it's not found on the object itself, JavaScript looks up the prototype chain.
+
+```javascript
+const animal = {
+    eats: true,
+    walk() {
+        console.log("Animal walks");
+    }
+};
+
+const rabbit = {
+    jumps: true,
+    __proto__: animal // Set animal as prototype
+};
+
+rabbit.walk(); // "Animal walks" (inherited from animal)
+console.log(rabbit.eats); // true (inherited from animal)
+```
+
+This is a very brief introduction to prototypes. For more complex inheritance patterns, ES6 Classes provide a more familiar syntax over the prototype chain.

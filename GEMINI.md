@@ -38,3 +38,4 @@ sidebar_position: 3
 ---
 ```
 - Do not use numbering in headers (e.g., use `## My Header` instead of `## 1. My Header`).
+- For entry point files (e.g., `java.mdx`, `javascript.mdx`), ensure the "What's Next?" section lists topics in the correct `sidebar_position` order.

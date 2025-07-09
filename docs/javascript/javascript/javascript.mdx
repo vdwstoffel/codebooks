@@ -1,26 +1,59 @@
 ---
-sidebar_label: JavaScript
+sidebar_label: Introduction to JavaScript
 sidebar_position: 1
 ---
 
-# JavaScript
+# Introduction to JavaScript
 
 <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="200"/>
 </div>
 
-## Hello World
+JavaScript is a versatile, high-level, and interpreted programming language primarily known for enabling interactive web pages. Alongside HTML and CSS, it is one of the three core technologies of the World Wide Web. It can also be used for server-side development (Node.js), mobile apps, and desktop applications.
 
-```javascript
-console.log("Hello, World!");
+## Running JavaScript
+
+### In a Web Browser
+
+You can embed JavaScript directly into an HTML file using `<script>` tags.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First JS Page</title>
+</head>
+<body>
+    <script>
+        console.log("Hello from the browser console!");
+        alert("Hello from an alert box!");
+    </script>
+</body>
+</html>
 ```
 
-## Hello world using node
+### Using Node.js
 
-```javascript
-console.log("Hello, World!");
-```
+Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. It allows you to run JavaScript code outside of a web browser, typically for server-side applications or command-line tools.
 
-```bash
-node hello.js
-```
+1.  **Create a file** (e.g., `hello.js`):
+
+    ```javascript
+    console.log("Hello from Node.js!");
+    ```
+
+2.  **Run from your terminal**:
+
+    ```bash
+    node hello.js
+    ```
+
+## What's Next?
+
+Explore the core features of JavaScript in the following sections:
+
+-   **[Strings](./strings.mdx):** Manipulating text.
+-   **[Numbers](./numbers.mdx):** Performing numerical operations.
+-   **[Arrays](./arrays.mdx):** Working with ordered lists of data.
+-   **[Objects](./objects.mdx):** Understanding key-value pairs and object-oriented concepts.
+-   **[Dates](./dates.mdx):** Handling date and time.
