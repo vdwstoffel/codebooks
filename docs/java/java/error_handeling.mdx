@@ -14,7 +14,7 @@ In Java, all exceptions are subclasses of the `Throwable` class.
 -   **Checked Exceptions:** These are exceptions that are checked at compile-time (e.g., `IOException`, `FileNotFoundException`). You **must** handle them using a `try-catch` block or declare them with the `throws` keyword.
 -   **Unchecked Exceptions (Runtime Exceptions):** These are exceptions that occur at runtime (e.g., `NullPointerException`, `ArrayIndexOutOfBoundsException`). The compiler does not require you to handle them, but it's often good practice to do so.
 
-## 1. The `try-catch` Block
+## The `try-catch` Block
 
 This is the fundamental way to handle exceptions. You place code that might throw an exception inside the `try` block and the handling logic inside the `catch` block.
 
@@ -32,7 +32,7 @@ try {
 // The program continues to run after the catch block.
 ```
 
-## 2. The `finally` Block
+## The `finally` Block
 
 The `finally` block is optional and is always executed after the `try` and `catch` blocks, regardless of whether an exception was thrown or caught. It's typically used for cleanup code, like closing files or database connections.
 
@@ -47,7 +47,7 @@ try {
 }
 ```
 
-## 3. The `try-with-resources` Statement
+## The `try-with-resources` Statement
 
 Introduced in Java 7, this is the modern, preferred way to handle resources that need to be closed (like file streams or database connections). It automatically closes the resources for you, making the code cleaner and safer than using a `finally` block for cleanup.
 
@@ -65,7 +65,7 @@ try (Scanner scanner = new Scanner(new FileInputStream("greeting.txt"))) {
 }
 ```
 
-## 4. The `throws` and `throw` Keywords
+## The `throws` and `throw` Keywords
 
 ### `throws`
 The `throws` keyword is used in a method signature to declare that the method might throw one or more checked exceptions. It delegates the responsibility of handling the exception to the caller of the method.

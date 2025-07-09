@@ -1,195 +1,157 @@
 ---
-sidebar_label: "IO"
+sidebar_label: "I/O (Input/Output)"
+sidebar_position: 11
 ---
 
-# Input and Output
+# I/O (Input/Output) in Java
+
+Java provides a rich set of APIs for handling Input and Output (I/O). This includes reading from and writing to files, as well as handling user input from the console.
+
+## Reading from the Console (User Input)
+
+The standard way to read user input is with the `Scanner` class from the `java.util` package.
+
+### Basic Usage
+
+```java
+import java.util.Scanner;
+
+// Create a Scanner object linked to the console
+Scanner scanner = new Scanner(System.in);
+
+System.out.print("Enter your name: ");
+String name = scanner.nextLine(); // Reads a full line of text
+
+System.out.print("Enter your age: ");
+int age = scanner.nextInt(); // Reads an integer
+
+System.out.println("Hello, " + name + "! You are " + age + " years old.");
+
+// Always close the scanner when you're done
+scanner.close();
+```
+
+### The `nextLine()` Trap
+
+A common pitfall occurs when you read a number (`nextInt()`, `nextDouble()`, etc.) and then try to read a line of text (`nextLine()`). The numeric methods read the number but leave the newline character (`\n`) in the input buffer. The subsequent `nextLine()` call consumes this leftover newline and doesn't wait for user input.
+
+**Solution:** Add an extra `scanner.nextLine()` after the numeric input to consume the leftover newline.
+
+```java
+Scanner scanner = new Scanner(System.in);
+
+System.out.print("Enter age: ");
+int age = scanner.nextInt();
+
+// Add this to consume the leftover newline
+scanner.nextLine(); 
+
+System.out.print("Enter your city: ");
+String city = scanner.nextLine(); // This now works correctly
+
+scanner.close();
+```
 
 ## Working with Files
 
-### Buffered
+Java offers several ways to work with files. The modern approach (Java 7+) uses the `java.nio.file` package (NIO.2), which is generally preferred for its simplicity and power.
 
-- Reading a File
+### Reading a File (Modern `java.nio`)
+
+The `Files` class provides simple methods for reading all content from a file at once.
+
+#### Reading All Lines into a List
 
 ```java
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.util.List;
 
-
-
- try (BufferedReader reader = new BufferedReader(new FileReader("./example.txt"))) {
-    String line = "";
-    String nextLine;
-    while ((nextLine = reader.readLine()) != null) {
-        line = line + nextLine + "\n";
+try {
+    List<String> lines = Files.readAllLines(Paths.get("example.txt"));
+    for (String line : lines) {
+        System.out.println(line);
     }
-    System.out.println(line);
 } catch (IOException e) {
-    System.out.println("Error " + e.getMessage());
+    System.err.println("Error reading file: " + e.getMessage());
 }
 ```
 
-- Writing to a File
+#### Reading the Entire File into a String
 
-:::info
-To append to a file use `new Filewriter("path.txt", true)`
-:::
+```java
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+
+try {
+    String content = Files.readString(Paths.get("example.txt"));
+    System.out.println(content);
+} catch (IOException e) {
+    System.err.println("Error reading file: " + e.getMessage());
+}
+```
+
+### Writing to a File (Modern `java.nio`)
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.io.IOException;
+
+String content = "Hello, world!\nThis is a new line.";
+
+try {
+    // This will create the file if it doesn't exist, or overwrite it if it does.
+    Files.writeString(Paths.get("output.txt"), content);
+
+    // To append to an existing file:
+    // Files.writeString(Paths.get("output.txt"), "\nMore content", StandardOpenOption.APPEND);
+} catch (IOException e) {
+    System.err.println("Error writing to file: " + e.getMessage());
+}
+```
+
+### Traditional I/O (Using Streams)
+
+For more fine-grained control, especially with large files, the traditional stream-based approach using `BufferedReader` and `BufferedWriter` is very efficient.
+
+#### Reading with `BufferedReader`
+
+This approach reads the file line by line, which is memory-efficient for large files.
+
+```java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+// try-with-resources ensures the reader is automatically closed
+try (BufferedReader reader = new BufferedReader(new FileReader("example.txt"))) {
+    String line;
+    while ((line = reader.readLine()) != null) {
+        System.out.println(line);
+    }
+} catch (IOException e) {
+    System.err.println("Error: " + e.getMessage());
+}
+```
+
+#### Writing with `BufferedWriter`
 
 ```java
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException
+import java.io.IOException;
 
-String OutputContent = "This is an example of text output to a file\nGoodbye From Java!";
+String text = "This is a line of text.";
 
-try (BufferedWriter writer = new BufferedWriter(new FileWriter("./output.txt"))) {
-    writer.write(OutputContent);
-    writer.newLine(); // adds newline
+// To append, use new FileWriter("output.txt", true)
+try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+    writer.write(text);
+    writer.newLine(); // Writes a platform-independent newline
 } catch (IOException e) {
     System.err.println("Error: " + e.getMessage());
 }
-```
-
-### Files
-
-- Reading a File
-
-```java
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.IOException;
-
-try {
-    String content = Files.readString(Paths.get("./example.txt"));
-    System.out.println(content);
-} catch (IOException e) {
-    System.err.println("Error: " + e.getMessage());
-}
-```
-
-- Writing to a File
-
-```java
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.IOException;
-
-String OutputContent = "This is an example of text output to a file\nGoodbye From Java!";
-
-try {
-    Files.writeString(Paths.get("output.txt"), OutputContent);
-} catch (IOException e) {
-    System.err.println("Err: " + e.getMessage());
-}
-```
-
-### Scanner
-
-- Reading a File
-
-```java
-import java.util.Scanner;
-import java.io.FileReader;
-import java.io.IOException;
-
-try (Scanner scanner = new Scanner(new FileReader("./example.txt"))) {
-    String content = "";
-    while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        content = content + line + "\n";
-    }
-    System.out.println(content);
-} catch (IOException e) {
-    System.err.println("Error: " + e.getMessage());
-}
-```
-
-## User Input
-
-### String Input
-
-```java
-import java.util.Scanner;
-
-Scanner scanner = new Scanner(System.in);
-System.out.println("Enter your name");
-String name = scanner.nextLine();
-
-if (name.isBlank() || name == null) {
-    System.exit(1);
-}
-
-System.out.println("Hello " + name);
-scanner.close();
-```
-
-### Integer Input
-
-```java
-import java.util.Scanner;
-
-Scanner scanner = new Scanner(System.in);
-System.out.println("Enter age: ");
-
-if (!scanner.hasNextInt()) {
-    scanner.close();
-    throw new IllegalArgumentException("Enter a int");
-}
-
-int age = scanner.nextInt();
-System.out.println("You are " + age);
-scanner.close();
-```
-
-### Double Input
-
-```java
-import java.util.Scanner;
-
-Scanner scanner = new Scanner(System.in);
-System.out.println("Enter a double: ");
-
-if (!scanner.hasNextDouble()) {
-    scanner.close();
-    throw new IllegalArgumentException("Enter a double");
-}
-
-double number = scanner.nextDouble();
-System.out.println("You entered: " + number);
-scanner.close();
-```
-
-### NextLine Trap
-
-When using `Scanner`, a common issue known as the "nextLine trap" occurs after using methods like `nextInt()` or `nextDouble()`. These methods read the number but leave the newline character (`\n`) in the input buffer. When `nextLine()` is called afterwards, it reads this leftover newline character instead of waiting for user input.
-
-To fix this, you need to add an extra `nextLine()` call after `nextInt()` or similar methods to consume the leftover newline character. The example below demonstrates both the problem and the solution.
-
-```java
-import java.util.Scanner;
-
-Scanner scanner = new Scanner(System.in);
-
-// PROBLEMATIC CODE
-System.out.print("Enter your age: ");
-int age = scanner.nextInt();        // This leaves a newline character \n in the buffer
-
-System.out.print("Enter your name: ");
-String name = scanner.nextLine();    // This will be skipped because it reads the leftover \n
-
-System.out.println("Age: " + age);
-System.out.println("Name: " + name); // Name will be empty!
-
-// FIXED VERSION
-System.out.print("Enter your age: ");
-age = scanner.nextInt();
-scanner.nextLine();                  // Add this to consume the leftover newline
-
-System.out.print("Enter your name: ");
-name = scanner.nextLine();
-
-System.out.println("Age: " + age);
-System.out.println("Name: " + name); // Now it works correctly
-
-scanner.close();
 ```

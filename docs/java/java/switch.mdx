@@ -1,4 +1,15 @@
-# Switch
+---
+sidebar_label: "Switch"
+sidebar_position: 6
+---
+
+# Switch Statement
+
+The `switch` statement is a control flow statement that allows a variable to be tested for equality against a list of values. Each value is called a case, and the variable being switched on is checked for each case.
+
+## Basic Switch
+
+The basic `switch` statement is simple to use but has some drawbacks, such as the need for `break` statements to prevent fall-through.
 
 ```java
 int day = 3;
@@ -18,7 +29,9 @@ switch (day) {
 }
 ```
 
-## Fall-through
+### Fall-through
+
+Without a `break` statement, the `switch` will continue to execute the code in the following cases until a `break` is encountered. This is known as fall-through.
 
 ```java
 int day = 3;
@@ -40,9 +53,58 @@ switch (day) {
 }
 ```
 
+## Using Switch with Strings
+
+Since Java 7, you can use `String` objects in the `switch` statement.
+
+```java
+String day = "Wednesday";
+
+switch (day) {
+    case "Monday":
+        System.out.println("Start of the work week");
+        break;
+    case "Wednesday":
+        System.out.println("Midweek"); // "Midweek"
+        break;
+    case "Friday":
+        System.out.println("End of the work week");
+        break;
+    default:
+        System.out.println("Some other day");
+}
+```
+
+## Using Switch with Enums
+
+`switch` statements work well with `enum` types, providing a clean way to handle different enum constants.
+
+```java
+public enum Day {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
+
+Day today = Day.WEDNESDAY;
+
+switch (today) {
+    case MONDAY:
+        System.out.println("Mondays are tough.");
+        break;
+    case WEDNESDAY:
+        System.out.println("Halfway through the week!"); // "Halfway through the week!"
+        break;
+    case SATURDAY:
+    case SUNDAY:
+        System.out.println("Weekends are the best!");
+        break;
+    default:
+        System.out.println("Some other day.");
+}
+```
+
 ## Enhanced Switch and Switch Expressions (Java 14+)
 
-Java 14 introduced enhanced switch statements and switch expressions, offering a more concise and readable syntax.
+Java 14 introduced enhanced `switch` statements and `switch` expressions, offering a more concise and readable syntax.
 
 ### Enhanced Switch Statement
 
@@ -83,4 +145,25 @@ String dayName = switch (day) {
     default -> "Unknown";
 };
 System.out.println(dayName); // "Wednesday"
+```
+
+## When to Use Switch vs. If-Else
+
+- **Use `switch`** when you have a single variable to compare against multiple, distinct, constant values (integers, enums, or strings). It's often more readable than a long chain of `if-else if` statements.
+- **Use `if-else`** for more complex conditions, such as checking ranges, multiple variables, or conditions that are not based on a single value.
+
+### Example: Choosing `if-else`
+
+```java
+int score = 85;
+
+if (score >= 90) {
+    System.out.println("A");
+} else if (score >= 80) {
+    System.out.println("B"); // "B"
+} else if (score >= 70) {
+    System.out.println("C");
+} else {
+    System.out.println("D");
+}
 ```

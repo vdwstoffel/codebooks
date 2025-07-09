@@ -30,3 +30,11 @@ All examples are in the `docs` folder, separated by language and then by concept
 code from other technologies or frameworks unless specifically instructed to do so by the user. 
 - In code examples, show the output of a variable or expression as a comment (e.g., `// "Hello"`) on the same line, rather than using a separate print statement.
 - When creating or updating a topic, ensure the main introduction file for that language or technology (e.g., `java.mdx` for Java topics) is updated with a link to the new or modified file.
+- When adding or improving a page, always add the `sidebar_label` and `sidebar_position` to the top of the file. For example:
+```mdx
+---
+sidebar_label: 'My New Page'
+sidebar_position: 3
+---
+```
+- Do not use numbering in headers (e.g., use `## My Header` instead of `## 1. My Header`).

@@ -1,69 +1,158 @@
 ---
 sidebar_label: "Interfaces"
+sidebar_position: 10
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Interfaces
+# Interfaces in Java
 
-A Java interface is a reference type that defines a set of abstract methods that a class can implement, allowing for a form of multiple inheritance and enabling different classes to be used interchangeably if they implement the same interface.
+An **interface** in Java is a fully abstract blueprint of a class. It defines a contract of methods that an implementing class must provide. Interfaces are a core concept for achieving abstraction and polymorphism.
 
-## Declaring an Interface
+Key properties:
+- They can only contain `public static final` fields (constants).
+- They can contain `abstract`, `default`, and `static` methods.
+- A class can **implement** multiple interfaces, which is how Java achieves a form of multiple inheritance.
+
+## Declaring and Implementing an Interface
+
+You use the `interface` keyword to declare an interface and the `implements` keyword for a class to use it.
 
 <Tabs>
+<TabItem value="Interface" label="Drawable.java">
 
-<TabItem value="Animal">
-
-```java title="Animal.java"
-public interface Animal {
-    void makeSound();
+```java title="Drawable.java"
+// The contract
+public interface Drawable {
+    // An abstract method (no body)
+    void draw();
 }
 ```
 
 </TabItem>
-<TabItem value="Cat">
+<TabItem value="Implementation1" label="Circle.java">
 
-```java title="Cat.java"
-public class Cat implements Animal {
-
+```java title="Circle.java"
+// A class that implements the contract
+public class Circle implements Drawable {
     @Override
-    public void makeSound() {
-        System.out.println("Meow");
+    public void draw() {
+        System.out.println("Drawing a circle");
     }
 }
 ```
 
 </TabItem>
-<TabItem value="Dog">
+<TabItem value="Implementation2" label="Rectangle.java">
 
-```java title="Dog.java"
-public class Dog implements Animal {
-
+```java title="Rectangle.java"
+// Another class that implements the contract
+public class Rectangle implements Drawable {
     @Override
-    public void makeSound() {
-        System.out.println("Woof");
+    public void draw() {
+        System.out.println("Drawing a rectangle");
     }
 }
 ```
 
 </TabItem>
-<TabItem value="Main">
+<TabItem value="Main" label="Main.java">
 
 ```java title="Main.java"
 public class Main {
-
     public static void main(String[] args) {
+        Drawable circle = new Circle();
+        Drawable rectangle = new Rectangle();
         
-        Animal cat = new Cat();
-        Animal dog = new Dog();
-        
-        cat.makeSound();
-        dog.makeSound();
+        circle.draw();    // Outputs: Drawing a circle
+        rectangle.draw(); // Outputs: Drawing a rectangle
     }
 }
 ```
 
 </TabItem>
-
 </Tabs>
+
+## `default` Methods (Java 8+)
+
+Before Java 8, adding a new method to an interface would break all existing classes that implemented it. **Default methods** solve this by providing a default implementation directly in the interface.
+
+```java
+public interface Vehicle {
+    void start();
+    
+    // A default method
+    default void honk() {
+        System.out.println("Beep beep!");
+    }
+}
+
+public class Car implements Vehicle {
+    @Override
+    public void start() {
+        System.out.println("Car started");
+    }
+    // No need to implement honk(), it's inherited.
+}
+
+// Usage
+Car myCar = new Car();
+myCar.start(); // "Car started"
+myCar.honk();  // "Beep beep!"
+```
+
+## `static` Methods (Java 8+)
+
+Interfaces can also have `static` methods. These methods belong to the interface itself, not to any instance of an implementing class. They are often used for utility functions related to the interface.
+
+```java
+public interface MathConstants {
+    static double getPi() {
+        return 3.14159;
+    }
+}
+
+// You call it directly on the interface
+double pi = MathConstants.getPi();
+```
+
+## `private` Methods (Java 9+)
+
+Java 9 introduced `private` methods in interfaces. Their main purpose is to share code between `default` methods within the same interface, helping to avoid code duplication while keeping the helper method from being exposed publicly.
+
+```java
+public interface Order {
+    void process();
+    
+    default void validate() {
+        // ... complex validation logic
+        log("Validation successful");
+    }
+    
+    default void ship() {
+        // ... complex shipping logic
+        log("Order shipped");
+    }
+    
+    // Private helper method
+    private void log(String message) {
+        System.out.println("[LOG] " + message);
+    }
+}
+```
+
+## Marker Interfaces
+
+A marker interface is an empty interface with no fields or methods. Its purpose is to "mark" a class as having a certain capability. A well-known example is `java.io.Serializable`. If a class implements `Serializable`, the JVM knows it can serialize its instances.
+
+```java
+public interface Serializable { 
+    // No methods or fields
+}
+
+public class MyData implements Serializable {
+    private String data;
+    // ...
+}
+```

@@ -1,64 +1,132 @@
 ---
 sidebar_label: "Packages"
+sidebar_position: 12
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Packages
+# Packages in Java
 
-- `Package` create a namespace for the classes, based in the directory structure. Each subfolder should be included
-- `import` keyword is used to include the classes from the package. Each subfolder should be included, followed by the class name
+Packages are a fundamental mechanism in Java for organizing classes and interfaces into logical groups. They provide a way to prevent naming conflicts, control access, and make code easier to maintain and reuse.
 
-```sh
-.
-├── Main.java
-└── model
-    └── User.java
-```
+## Package Declaration
 
-<Tabs>
-
-<TabItem value="User.java">
+Every Java source file can start with a `package` declaration. This statement must be the first line of code (excluding comments and whitespace) in a Java source file.
 
 ```java
-// package declaration in the folder from the root
-// highlight-next-line
-package model;  
+// Declares that this class belongs to the 'com.example.myapp.model' package
+package com.example.myapp.model;
 
 public class User {
-
-    private String name;
-
-    public User(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return this.name;
-    }
+    // ...
 }
 ```
 
-</TabItem>
+-   **Namespace:** Packages create a unique namespace for classes. Two classes with the same name can exist in different packages.
+-   **Directory Structure:** The package name directly corresponds to the directory structure where the `.java` and `.class` files are stored. For example, `com.example.myapp.model` implies a directory structure like `com/example/myapp/model/`.
 
-<TabItem value="Main.java">
+## Importing Packages and Classes
+
+To use classes from other packages, you need to `import` them. The `import` statement tells the compiler where to find the classes you are referring to.
+
+### Importing a Single Class
 
 ```java
-// import the User class from the model package
-// highlight-next-line
-import model.User;  
+// Import a specific class from a package
+import java.util.ArrayList;
 
-public class Main {
+public class MyClass {
+    ArrayList<String> list = new ArrayList<>();
+}
+```
 
+### Importing All Classes from a Package
+
+You can use the `*` wildcard to import all classes within a specific package. However, this does not import classes from sub-packages.
+
+```java
+// Import all classes from the 'java.util' package
+import java.util.*;
+
+public class MyClass {
+    ArrayList<String> list = new ArrayList<>();
+    HashMap<String, String> map = new HashMap<>();
+}
+```
+
+### Static Import (Java 5+)
+
+`static import` allows you to import static members (fields and methods) of a class directly, so you don't have to qualify them with the class name.
+
+```java
+import static java.lang.Math.PI;
+import static java.lang.Math.sqrt;
+
+public class Calculator {
     public static void main(String[] args) {
-        User user = new User("John");
-        String username = user.getName();
-        System.out.println(username);
+        double circumference = 2 * PI * 5; // No need for Math.PI
+        double result = sqrt(25);         // No need for Math.sqrt
     }
 }
 ```
 
-</TabItem>
+## Package Naming Conventions
 
-</Tabs>
+-   **Lowercase:** Package names should be all lowercase to avoid conflict with class names.
+-   **Reverse Domain Name:** Companies use their reversed internet domain name to ensure unique package names (e.g., `com.example.project`).
+-   **Hierarchical:** Packages are hierarchical, with dots (`.`) separating components.
+
+## Access Modifiers and Packages
+
+Access modifiers (`public`, `protected`, `default` (no keyword), `private`) control the visibility of classes, methods, and fields. Packages play a crucial role in `default` (package-private) access.
+
+| Modifier   | Class | Package | Subclass (same package) | Subclass (different package) | World |
+| :--------- | :---- | :------ | :---------------------- | :--------------------------- | :---- |
+| `private`  | Y     | N       | N                       | N                            | N     |
+| `default`  | Y     | Y       | Y                       | N                            | N     |
+| `protected`| Y     | Y       | Y                       | Y                            | N     |
+| `public`   | Y     | Y       | Y                       | Y                            | Y     |
+
+-   **`default` (Package-Private):** If no access modifier is specified, the member is accessible only within its own package.
+
+## Built-in Java Packages
+
+Java's Standard Library is organized into numerous packages. Some of the most commonly used include:
+
+-   **`java.lang`**: Fundamental classes (e.g., `Object`, `String`, `Math`, `System`). **Automatically imported** into every Java program.
+-   **`java.util`**: Utility classes (e.g., `ArrayList`, `HashMap`, `Scanner`, `Date`).
+-   **`java.io`**: Input/Output operations (e.g., `File`, `InputStream`, `OutputStream`).
+-   **`java.nio`**: New I/O, providing more efficient ways to handle I/O operations.
+-   **`java.net`**: Networking classes (e.g., `Socket`, `URL`).
+-   **`java.time`**: Modern Date and Time API (Java 8+).
+-   **`java.sql`**: JDBC API for database connectivity.
+
+## JAR Files and Modules (Brief Overview)
+
+### JAR (Java Archive) Files
+
+JAR files are used to aggregate many Java class files, associated metadata, and resources (text, images, etc.) into a single file for distribution. They are essentially ZIP files with a `.jar` extension.
+
+```bash
+# Create a JAR file from compiled classes in the 'bin' directory
+jar cvf myapp.jar -C bin .
+
+# Run a JAR file (if it has a Main-Class entry in its manifest)
+java -jar myapp.jar
+```
+
+### Java Platform Module System (JPMS - Java 9+)
+
+Introduced in Java 9, the Module System (Project Jigsaw) provides a higher level of aggregation than JARs. It allows you to package your application into modules, explicitly declaring dependencies and exported packages. This improves application reliability, security, and performance.
+
+-   **`module-info.java`**: The module descriptor file, where you declare module dependencies (`requires`) and exported packages (`exports`).
+
+```java title="module-info.java"
+module com.example.myapp {
+    requires java.sql; // This module depends on java.sql
+    exports com.example.myapp.api; // Export this package to other modules
+}
+```
+
+-   **Modular JARs**: JAR files that contain a `module-info.class` file.
