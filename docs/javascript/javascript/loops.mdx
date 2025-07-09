@@ -1,0 +1,115 @@
+---
+sidebar_label: Loops
+sidebar_position: 6
+---
+
+# Loops in JavaScript
+
+Loops are fundamental control structures that allow you to repeatedly execute a block of code. JavaScript provides several types of loops to handle different iteration scenarios.
+
+## The `for` Loop
+
+The `for` loop is commonly used when you know the number of iterations beforehand. It consists of three optional parts: initialization, condition, and final expression.
+
+```javascript
+for (let i = 0; i < 5; i++) {
+  console.log(`For loop iteration: ${i}`);
+}
+// Output:
+// For loop iteration: 0
+// For loop iteration: 1
+// For loop iteration: 2
+// For loop iteration: 3
+// For loop iteration: 4
+```
+
+## The `while` Loop
+
+The `while` loop executes a block of code as long as a specified condition evaluates to `true`. It's suitable when the number of iterations is not known in advance.
+
+```javascript
+let count = 0;
+while (count < 3) {
+  console.log(`While loop iteration: ${count}`);
+  count++;
+}
+// Output:
+// While loop iteration: 0
+// While loop iteration: 1
+// While loop iteration: 2
+```
+
+## The `do...while` Loop
+
+The `do...while` loop is similar to the `while` loop, but it guarantees that the code block is executed at least once, as the condition is evaluated *after* the block is executed.
+
+```javascript
+let i = 0;
+do {
+  console.log(`Do...while loop iteration: ${i}`);
+  i++;
+} while (i < 0); // Condition is false, but loop runs once
+// Output:
+// Do...while loop iteration: 0
+```
+
+## The `for...of` Loop (ES6+)
+
+The `for...of` loop iterates over iterable objects (like Arrays, Strings, Maps, Sets, NodeLists, etc.), providing a simple way to access the values of the elements.
+
+```javascript
+const fruits = ["apple", "banana", "cherry"];
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+// Output:
+// apple
+// banana
+// cherry
+
+const greeting = "Hello";
+for (const char of greeting) {
+  console.log(char);
+}
+// Output:
+// H
+// e
+// l
+// l
+// o
+```
+
+## The `for...in` Loop
+
+The `for...in` loop iterates over the enumerable properties of an object. It is generally not recommended for iterating over arrays because it can iterate over inherited properties and the order of iteration is not guaranteed.
+
+```javascript
+const person = {
+  name: "Alice",
+  age: 30,
+  city: "New York"
+};
+
+for (const key in person) {
+  console.log(`${key}: ${person[key]}`);
+}
+// Output:
+// name: Alice
+// age: 30
+// city: New York
+```
+
+## `forEach()` Method (for Arrays)
+
+The `forEach()` method is an array method that executes a provided function once for each array element. It's a clean and readable way to iterate over arrays.
+
+```javascript
+const numbers = [10, 20, 30];
+numbers.forEach(function(number, index) {
+  console.log(`Index: ${index}, Value: ${number}`);
+});
+// Output:
+// Index: 0, Value: 10
+// Index: 1, Value: 20
+// Index: 2, Value: 30
+```
