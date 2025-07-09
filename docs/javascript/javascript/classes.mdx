@@ -1,0 +1,178 @@
+---
+sidebar_label: Classes
+sidebar_position: 5.1
+---
+
+# Classes in JavaScript
+
+Introduced in ECMAScript 2015 (ES6), JavaScript classes are a syntactic sugar over JavaScript's existing prototype-based inheritance. They provide a cleaner and more familiar object-oriented syntax for creating objects and handling inheritance, making it easier for developers coming from class-based languages like Java or C++.
+
+## Defining a Class
+
+A class is defined using the `class` keyword, followed by the class name. Class names are typically capitalized.
+
+```javascript
+class MyClass {
+  // class body
+}
+```
+
+## The `constructor` Method
+
+The `constructor` is a special method for creating and initializing an object created with a class. It is executed automatically when a new object is instantiated.
+
+```javascript
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+const person1 = new Person("Alice", 30);
+console.log(person1.name); // "Alice"
+console.log(person1.age);  // 30
+```
+
+## Methods
+
+Methods are functions defined inside the class that operate on the object's data.
+
+```javascript
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet() {
+    console.log(`Hello, my name is ${this.name} and I am ${this.age} years old.`);
+  }
+
+  getBirthYear() {
+    const currentYear = new Date().getFullYear();
+    return currentYear - this.age;
+  }
+}
+
+const person2 = new Person("Bob", 25);
+person2.greet();         // "Hello, my name is Bob and I am 25 years old."
+console.log(person2.getBirthYear()); // e.g., 1999
+```
+
+## Inheritance (`extends` and `super`)
+
+Classes can inherit from other classes using the `extends` keyword. This allows a subclass to inherit properties and methods from a superclass.
+
+-   **`extends`**: Used to create a subclass.
+-   **`super()`**: Used in the subclass's constructor to call the superclass's constructor. It must be called before `this` is used in the subclass constructor.
+
+```javascript
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(`${this.name} makes a sound.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name); // Call the parent class constructor
+    this.breed = breed;
+  }
+
+  speak() {
+    console.log(`${this.name} barks.`); // Method overriding
+  }
+
+  fetch() {
+    console.log(`${this.name} fetches the ball.`);
+  }
+}
+
+const myDog = new Dog("Buddy", "Golden Retriever");
+myDog.speak();  // "Buddy barks." (overridden method)
+myDog.fetch();  // "Buddy fetches the ball."
+console.log(myDog.name);  // "Buddy" (inherited property)
+```
+
+## Static Methods
+
+Static methods are methods that belong to the class itself, not to any specific instance of the class. They are called directly on the class name.
+
+```javascript
+class Calculator {
+  static add(a, b) {
+    return a + b;
+  }
+
+  static subtract(a, b) {
+    return a - b;
+  }
+}
+
+console.log(Calculator.add(5, 3));      // 8
+console.log(Calculator.subtract(10, 4)); // 6
+```
+
+## Getters and Setters
+
+Getters and setters are special methods that allow you to define object properties that are computed when accessed (getters) or that perform actions when set (setters).
+
+```javascript
+class Circle {
+  constructor(radius) {
+    this._radius = radius; // Use a convention like _ for internal properties
+  }
+
+  get radius() {
+    console.log("Getting radius");
+    return this._radius;
+  }
+
+  set radius(newRadius) {
+    if (newRadius > 0) {
+      this._radius = newRadius;
+      console.log("Radius set");
+    } else {
+      console.error("Radius must be positive");
+    }
+  }
+
+  get area() {
+    return Math.PI * this._radius * this._radius;
+  }
+}
+
+const myCircle = new Circle(10);
+console.log(myCircle.radius); // "Getting radius" then 10
+myCircle.radius = 15;        // "Radius set"
+console.log(myCircle.area);   // e.g., 706.858...
+myCircle.radius = -5;        // "Radius must be positive"
+```
+
+## `private` Class Fields (ES2022+)
+
+Private class fields are defined using a `#` prefix. They are truly private and cannot be accessed from outside the class.
+
+```javascript
+class Counter {
+  #count = 0; // Private field
+
+  increment() {
+    this.#count++;
+  }
+
+  get count() {
+    return this.#count;
+  }
+}
+
+const counter = new Counter();
+counter.increment();
+console.log(counter.count); // 1
+// console.log(counter.#count); // SyntaxError: Private field '#count' must be declared in an enclosing class
+```
