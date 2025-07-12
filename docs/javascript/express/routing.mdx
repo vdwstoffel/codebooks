@@ -3,100 +3,197 @@ sidebar_label: "Routing"
 sidebar_position: 2
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
-# Routing
+# Express.js Routing
 
-## Adding a default error route
+Routing is the process of determining how an application responds to a client request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, PUT, DELETE, etc.).
 
-```js
-import express from "express";
+Express.js provides a robust routing mechanism that allows you to define routes for different HTTP methods and URL patterns.
 
-const app = express();
+## Basic Routing
 
-app.get("/", (req, res) => {
-  res.status(200).json({ status: "success", message: "Hello World" });
-});
+At its simplest, routing involves associating an HTTP method and a path with a callback function that executes when a request matches the route.
 
-app.all("*", (req, res) => {
-  res
-    .status(404)
-    .json({ status: "failure", message: `Cant find ${req.originalUrl}` });
-});
-
-export default app;
-```
-
-<BrowserWindow url="http://localhost:3000/doesnotexist">
-  <p>{'{"status" : "failure", "message" : "Cant find /doesnotexist"}'}</p>
-</BrowserWindow>
-
-## Get dynamic route parameters
-
-```js
-import express from "express";
+```javascript title="app.js"
+import express from 'express';
 
 const app = express();
 
-app.get("/:userName", (req, res) => {
-  const username = req.params.userName;
-  res.status(200).json({ status: "success", message: `Hello ${username}` });
+// Route for GET requests to the root URL
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Hello from the root route!' });
+});
+
+// Route for POST requests to /data
+app.post('/data', (req, res) => {
+  res.status(201).json({ message: 'Data received!' });
 });
 
 export default app;
 ```
 
-<BrowserWindow url="http://localhost:3000/John">
-  <p>{'{"status":"success","message":"Hello John"}'}</p>
-</BrowserWindow>
+## Route Parameters
 
-## How to accept incoming json data
+Route parameters are named URL segments that are used to capture the values specified at their position in the URL. The captured values are populated in the `req.params` object.
 
-```js
-import express from "express";
+### Example: Getting a User by ID
+
+```javascript title="app.js"
+import express from 'express';
 
 const app = express();
-// highlight-next-line
+
+app.get('/users/:id', (req, res) => {
+  const userId = req.params.id; // Access the 'id' parameter
+  res.status(200).json({ message: `Fetching user with ID: ${userId}` });
+});
+
+export default app;
+```
+
+<BrowserWindow url="http://localhost:3000/users/123">
+  <p>{'{"message":"Fetching user with ID: 123"}'}</p>
+</BrowserWindow>
+
+## Query Parameters
+
+Query parameters are optional key-value pairs that appear after the `?` in the URL. They are typically used for filtering, sorting, or pagination. The captured values are populated in the `req.query` object.
+
+### Example: Filtering Products
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+app.get('/products', (req, res) => {
+  const category = req.query.category; // Access the 'category' query parameter
+  const sortBy = req.query.sortBy;     // Access the 'sortBy' query parameter
+
+  if (category && sortBy) {
+    res.status(200).json({ message: `Filtering products by category: ${category} and sorting by: ${sortBy}` });
+  } else if (category) {
+    res.status(200).json({ message: `Filtering products by category: ${category}` });
+  } else {
+    res.status(200).json({ message: 'Fetching all products' });
+  }
+});
+
+export default app;
+```
+
+<BrowserWindow url="http://localhost:3000/products?category=electronics&sortBy=price">
+  <p>{'{"message":"Filtering products by category: electronics and sorting by: price"}'}</p>
+</BrowserWindow>
+
+## Handling JSON Data
+
+To accept incoming JSON data in `POST` or `PUT` requests, you need to use Express's built-in `express.json()` middleware. This middleware parses the JSON payload and makes it available on `req.body`.
+
+### Example: Accepting JSON Payload
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+// Middleware to parse JSON request bodies
 app.use(express.json());
 
-app.post("/", (req, res) => {
-  const { name } = req.body;
-  res.status(200).json({ status: "success", message: `Hello ${name}` });
+app.post('/submit-data', (req, res) => {
+  const { name, email } = req.body; // Access parsed JSON data
+  res.status(200).json({ message: `Received data: Name - ${name}, Email - ${email}` });
 });
 
 export default app;
 ```
 
+**Request (using curl):**
 ```bash
-curl -X POST http://localhost:3000/ -d '{"name": "John"}' -H "Content-Type: application/json"
+curl -X POST -H "Content-Type: application/json" -d '{"name":"Alice", "email":"alice@example.com"}' http://localhost:3000/submit-data
+```
+**Response:** `{"message":"Received data: Name - Alice, Email - alice@example.com"}`
+
+## Modular Routing with `express.Router()`
+
+For larger applications, it's best practice to organize your routes into separate modules using `express.Router()`. This keeps your `app.js` file clean and makes your routes more manageable.
+
+### Example: User Routes Module
+
+<Tabs>
+<TabItem value="userRoutes.js" label="userRoutes.js">
+
+```javascript title="userRoutes.js"
+import { Router } from 'express';
+
+const router = Router();
+
+// Define routes specific to users
+router.get('/', (req, res) => {
+  res.status(200).json({ message: 'Get all users' });
+});
+
+router.post('/', (req, res) => {
+  res.status(201).json({ message: 'Create a new user' });
+});
+
+router.get('/:id', (req, res) => {
+  const userId = req.params.id;
+  res.status(200).json({ message: `Get user with ID: ${userId}` });
+});
+
+export default router;
 ```
 
-<BrowserWindow url="http://localhost:3000/John">
-  <p>{'{"status":"success","message":"Hello John"}'}</p>
-</BrowserWindow>
+</TabItem>
+<TabItem value="app.js" label="app.js">
 
-## How to parse query parameters
-
-```js
-import express from "express";
+```javascript title="app.js"
+import express from 'express';
+import userRoutes from './userRoutes.js'; // Import the user routes
 
 const app = express();
 
-app.get("/", (req, res) => {
-  console.log(req.query); // { name: 'John', age: '42' }
-  const { name, age } = req.query;
-  res
-    .status(200)
-    .json({ status: "success", message: `Hello ${name} who is ${age}` });
+// Mount the user routes under the /api/users path
+app.use('/api/users', userRoutes);
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the API!');
 });
 
 export default app;
 ```
 
-```bash
-curl -X GET http://192.168.129.11:3000/\?name\="John"\&age\=4
+</TabItem>
+</Tabs>
+
+## Default Error Route (`app.all`)
+
+You can use `app.all()` to handle all HTTP methods for a given path. It's commonly used to catch requests to undefined routes and send a 404 Not Found response.
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Hello World' });
+});
+
+// Catch-all route for any undefined routes
+app.all('*', (req, res) => {
+  res.status(404).json({
+    status: 'failure',
+    message: `Can't find ${req.originalUrl} on this server!`,
+  });
+});
+
+export default app;
 ```
 
-<BrowserWindow url="http://localhost:3000/John">
-  <p>{'{"status":"success","message":"Hello John who is 42"}'}</p>
+<BrowserWindow url="http://localhost:3000/non-existent-route">
+  <p>{'{"status":"failure","message":"Can\'int find /non-existent-route on this server!"}'}</p>
 </BrowserWindow>
