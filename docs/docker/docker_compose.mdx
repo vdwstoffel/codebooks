@@ -3,56 +3,140 @@ sidebar_label: "Docker Compose"
 sidebar_position: 3
 ---
 
-# Docker Compose
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-```yaml
-version: "3.8" # Define the Docker Compose file format version
+# Docker Compose: Orchestrating Multi-Container Applications
 
-services:
-  app: # Name of the service
-    image: <your-app-image> # Replace with your Docker image name
-    container_name: app-container # Name of the container
+Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services, making it easy to spin up, manage, and tear down complex applications with a single command.
+
+## Why Use Docker Compose?
+
+-   **Simplified Configuration:** Define your entire application stack (web service, database, cache, etc.) in a single `docker-compose.yml` file.
+-   **Reproducible Environments:** Ensure consistent development, testing, and production environments.
+-   **Easy Management:** Start, stop, and rebuild all services with simple commands.
+-   **Service Discovery:** Services within a Compose network can communicate with each other using their service names.
+
+## The `docker-compose.yml` File
+
+The `docker-compose.yml` file is the heart of your Compose application. It typically defines:
+
+-   **`version`**: The Compose file format version (e.g., `3.8`).
+-   **`services`**: Defines the individual services (containers) that make up your application.
+-   **`networks`**: Defines custom networks, allowing services to communicate with each other.
+-   **`volumes`**: Defines named volumes for persistent data storage.
+
+### Common Service Directives
+
+Within the `services` section, you can define various configurations for each service:
+
+-   **`image`**: Specifies the Docker image to use (e.g., `nginx:latest`, `mysql:8.0`).
+-   **`build`**: Specifies the path to the Dockerfile and build context if you're building a custom image.
+    ```yaml
+    build:
+      context: ./my-app
+      dockerfile: Dockerfile.dev
+    ```
+-   **`container_name`**: Assigns a specific name to the container.
+-   **`ports`**: Maps host ports to container ports.
+    ```yaml
     ports:
-      - "8080:8080" # Map host port 8080 to container port 8080
-    environment: # Environment variables
-      - DB_HOST=db
-      - DB_PORT=3306
-
-  db: # Name of the database service
-    image: mysql:8.0 # Use the official MySQL image
-    container_name: db-container # Name of the database container
-    ports:
-      - "3306:3306" # Map host port 3306 to container port 3306
-    environment: # Environment variables for database setup
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=exampledb
-      - MYSQL_USER=exampleuser
-      - MYSQL_PASSWORD=examplepassword
+      - "80:80" # Host_Port:Container_Port
+    ```
+-   **`environment`**: Sets environment variables inside the container.
+    ```yaml
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://user:password@db:5432/mydb
+    ```
+-   **`volumes`**: Mounts host paths or named volumes into the container for data persistence or code synchronization.
+    ```yaml
     volumes:
-      - db-data:/var/lib/mysql # Persistent storage for MySQL data
+      - ./app:/usr/src/app # Mount current directory to container
+      - mydata:/var/lib/mysql # Mount named volume
+    ```
+-   **`depends_on`**: Expresses dependency between services. Services will be started in dependency order.
+    ```yaml
+    depends_on:
+      - db
+      - redis
+    ```
 
-volumes:
-  db-data: # Define named volume for the database
+## Basic Example: Web Application with Database
 
-```
-
-## Commands
-
-```bash
-docker compose up -d --build
-```
-
-```bash
-docker compose down
-```
-
-## Node/Postgresql
+Here's a common setup for a web application (`app`) that connects to a database (`db`).
 
 ```yaml title="docker-compose.yml"
+version: "3.8"
+
+services:
+  app:
+    image: your-app-image # Replace with your application's Docker image
+    container_name: my-web-app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: my-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepassword
+    volumes:
+      - db-data:/var/lib/mysql # Persistent storage for database data
+
+volumes:
+  db-data: # Define the named volume
+```
+
+## Docker Compose Commands
+
+-   **`docker compose up`**: Builds, (re)creates, starts, and attaches to containers for all services.
+    -   `-d`: Run containers in detached mode (in the background).
+    -   `--build`: Build images before starting containers.
+    ```bash
+    docker compose up -d --build
+    ```
+
+-   **`docker compose down`**: Stops and removes containers, networks, and volumes defined in the Compose file.
+    ```bash
+    docker compose down
+    ```
+
+-   **`docker compose ps`**: Lists all services and their status.
+    ```bash
+    docker compose ps
+    ```
+
+-   **`docker compose logs [service_name]`**: Displays log output from services.
+    ```bash
+    docker compose logs app
+    ```
+
+-   **`docker compose exec [service_name] [command]`**: Executes a command in a running container.
+    ```bash
+    docker compose exec db bash
+    ```
+
+## Example: Node.js Application with PostgreSQL
+
+This example demonstrates a Node.js backend connected to a PostgreSQL database.
+
+<Tabs>
+<TabItem value="docker-compose.yml" label="docker-compose.yml">
+
+```yaml
 services:
   database:
     image: postgres:latest
-    container_name: compose_example_postgresql
+    container_name: my_postgresql_db
     restart: always
     volumes:
       - postgresdata:/var/lib/postgresql/data
@@ -64,16 +148,15 @@ services:
       POSTGRES_DB: myDbName
 
   node_app:
-    image: node_app:dev
     build:
-      context: ./node_app
-      dockerfile: ./docker/Dockerfile
-    container_name: compose_example_server
+      context: ./node_app # Assuming Dockerfile is in ./node_app
+      dockerfile: ./node_app/docker/Dockerfile # Path to your Dockerfile
+    container_name: my_node_app_server
     ports:
       - "3000:3000"
     volumes:
-      - ./node_app/src/:/app/src
-      - ./node_app/node_modules:/app/node_modules/
+      - ./node_app/src/:/app/src # Live code reloading
+      - ./node_app/node_modules:/app/node_modules/ # Ensure node_modules is consistent
     depends_on:
       - database
 
@@ -81,13 +164,34 @@ volumes:
   postgresdata:
 ```
 
-## PostgreSQL/PGAdmin
+</TabItem>
+<TabItem value="node_app/docker/Dockerfile" label="node_app/docker/Dockerfile">
 
-```yaml title="docker-compose.yml"
+```Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD [ "npm", "start" ]
+```
+
+</TabItem>
+</Tabs>
+
+## Example: PostgreSQL with PGAdmin
+
+This setup provides a PostgreSQL database alongside PGAdmin for database management.
+
+<Tabs>
+<TabItem value="docker-compose.yml" label="docker-compose.yml">
+
+```yaml
 services:
   database:
     image: postgres:latest
-    container_name: compose_example_postgresql
+    container_name: my_pg_database
     restart: always
     volumes:
       - postgresdata:/var/lib/postgresql/data
@@ -100,16 +204,29 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: compose_example_pgadmin
+    container_name: my_pgadmin
     ports:
       - "8080:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: my@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: myPassword
+      PGADMIN_DEFAULT_EMAIL: user@example.com
+      PGADMIN_DEFAULT_PASSWORD: mySecurePassword
     volumes:
       - pgadmindata:/var/lib/pgadmin
+    depends_on:
+      - database
 
 volumes:
   postgresdata:
   pgadmindata:
 ```
+
+</TabItem>
+</Tabs>
+
+## Best Practices for Docker Compose
+
+-   **Version Control:** Always keep your `docker-compose.yml` file under version control.
+-   **Environment Variables:** Use environment variables for sensitive information (passwords, API keys) and configuration that changes between environments.
+-   **Named Volumes:** Prefer named volumes for persistent data over bind mounts in production.
+-   **Health Checks:** Add `healthcheck` directives to services to ensure they are truly ready before dependent services start.
+-   **Separate Development/Production:** Use multiple Compose files (e.g., `docker-compose.yml` for production, `docker-compose.override.yml` for development) to manage environment-specific configurations.

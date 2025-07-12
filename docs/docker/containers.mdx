@@ -3,23 +3,121 @@ sidebar_label: Containers
 sidebar_position: 3
 ---
 
-# Containers
+# Docker Containers: Running Your Applications
 
-Docker containers are lightweight, standalone, and executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries, and settings. Containers isolate software from its environment and ensure that it works uniformly despite differences for instance between development and staging.
+Docker containers are lightweight, standalone, and executable packages that encapsulate an application and everything it needs to run: code, runtime, system tools, libraries, and settings. They provide a consistent and isolated environment, ensuring that your application works uniformly regardless of where it's deployed.
 
-## How to run a container
+## Container vs. Image
 
+It's crucial to understand the distinction between an **image** and a **container**:
 
-| flag       | description                              | example                                                             |
-| ---------- | ---------------------------------------- | ------------------------------------------------------------------- |
-| `-d`       | runs the container in detached mode      | `docker run -d containerImageName`                                  |
-| `-p`       | maps the container port to the host port | `docker run -p 3000:8000 containerImageName`                        |
-| `--rm`     | removes the container when it stops      | `docker run --rm containerImageName`                                |
-| `--name`   | assigns a name to the container          | `docker run --name my-container containerImageName`                 |
-| `-e`       | sets environment variables               | `docker run -e NODE_ENV=production containerImageName`              |
-| `--volume` | mounts a volume                          | `docker run --volume /host/path:/container/path containerImageName` |
-| `-it`      | runs the container in interactive mode   | `docker run -it containerImageName`                                 |
+-   **Docker Image:** A read-only template with instructions for creating a Docker container. It's like a blueprint or a class.
+-   **Docker Container:** A runnable instance of a Docker image. It's like an object created from a class. You can create, start, stop, move, or delete a container.
+
+## Running a Container: `docker run`
+
+The `docker run` command is used to create and start a new container from a Docker image. It's one of the most frequently used Docker commands.
 
 ```bash
-docker run -d -p 3000:8000 containerImageName:my-tag
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 ```
+
+Here are some common `docker run` options:
+
+-   **`-d` (Detached mode):** Runs the container in the background.
+    ```bash
+    docker run -d my-image
+    ```
+
+-   **`-p <host_port>:<container_port>` (Port mapping):** Maps a port on your host machine to a port inside the container.
+    ```bash
+    docker run -p 80:8080 my-web-app
+    ```
+
+-   **`--name <container_name>` (Name):** Assigns a custom name to your container, making it easier to reference.
+    ```bash
+    docker run --name my-app-instance my-app
+    ```
+
+-   **`--rm` (Remove):** Automatically removes the container when it exits. Useful for temporary containers.
+    ```bash
+    docker run --rm my-temp-container
+    ```
+
+-   **`-e <KEY=VALUE>` (Environment variables):** Sets environment variables inside the container.
+    ```bash
+    docker run -e NODE_ENV=production my-node-app
+    ```
+
+-   **`-v <host_path>:<container_path>` (Volume mounting):** Mounts a host directory or file into the container. Useful for persistent data or live development.
+    ```bash
+    docker run -v /path/on/host:/path/in/container my-app
+    ```
+
+-   **`-it` (Interactive TTY):** Runs the container in interactive mode and allocates a pseudo-TTY. Often used for shell access.
+    ```bash
+    docker run -it ubuntu bash
+    ```
+
+## Container Lifecycle
+
+Docker containers go through various states:
+
+-   **Created:** The container has been created but not started.
+-   **Running:** The container is executing its processes.
+-   **Paused:** The container's processes have been suspended.
+-   **Stopped:** The container's processes have been gracefully shut down.
+-   **Deleted:** The container has been removed from the Docker host.
+
+## Managing Containers
+
+Here are essential commands for managing your running and stopped containers:
+
+-   **List Running Containers:**
+    ```bash
+    docker ps
+    ```
+
+-   **List All Containers (including stopped):**
+    ```bash
+    docker ps -a
+    ```
+
+-   **Stop a Container:** Gracefully stops a running container.
+    ```bash
+    docker stop my-container
+    ```
+
+-   **Start a Container:** Starts a stopped container.
+    ```bash
+    docker start my-container
+    ```
+
+-   **Restart a Container:** Stops and then starts a container.
+    ```bash
+    docker restart my-container
+    ```
+
+-   **Remove a Container:** Deletes a stopped container. Use `-f` to force removal of a running container.
+    ```bash
+    docker rm my-container
+    # Force remove
+    docker rm -f my-running-container
+    ```
+
+-   **View Container Logs:** Shows the output from a container's `STDOUT` and `STDERR`.
+    ```bash
+    docker logs my-container
+    ```
+
+-   **Execute Command in Running Container:** Runs a command inside a running container.
+    ```bash
+    docker exec -it my-container bash
+    ```
+
+## Best Practices for Containers
+
+-   **Keep Containers Ephemeral:** Design containers so they can be stopped and destroyed, then rebuilt and replaced with a minimal setup and configuration.
+-   **One Process Per Container:** Ideally, each container should run only one concern. This promotes modularity and easier scaling.
+-   **Use Volumes for Persistent Data:** Don't store important data inside the container's writable layer. Use Docker volumes to persist data.
+-   **Minimize Image Size:** Smaller images are faster to build, pull, and push. Use multi-stage builds and alpine-based images where possible.

@@ -6,92 +6,155 @@ sidebar_position: 2
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Images
+# Docker Images: Building Blocks of Containers
 
-Docker Images are the building blocks of a Docker container. They are created with the build command, and they are used to create containers.
+Docker Images are read-only templates that contain a set of instructions for creating a Docker container. They are the fundamental building blocks of Dockerized applications, encapsulating everything needed to run a piece of software, including the code, runtime, system tools, libraries, and settings.
 
-## How to create an image
+## What is a Dockerfile?
 
-```dockerfile title="dockerfile"
-FROM node:latest
+A `Dockerfile` is a plain text file that contains a series of instructions. Each instruction creates a layer in the Docker image. These layers are cached, which speeds up subsequent builds.
 
-WORKDIR /app
+Here are some common Dockerfile instructions:
 
-COPY package*.json .
+-   **`FROM`**: Specifies the base image (e.g., `ubuntu:latest`, `node:18-alpine`).
+-   **`WORKDIR`**: Sets the working directory for any `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, or `ADD` instructions that follow it.
+-   **`COPY`**: Copies new files or directories from `<src>` and adds them to the filesystem of the container at the path `<dest>`.
+-   **`RUN`**: Executes commands in a new layer on top of the current image and commits the results. Used for installing packages, compiling code, etc.
+-   **`EXPOSE`**: Informs Docker that the container listens on the specified network ports at runtime. It does not actually publish the port.
+-   **`CMD`**: Provides defaults for an executing container. There can only be one `CMD` instruction in a Dockerfile. If you specify multiple `CMD`s, only the last `CMD` will be honored.
+-   **`ENTRYPOINT`**: Configures a container that will run as an executable. It allows you to configure a container that will run as an executable.
 
-RUN npm install
+## Building a Docker Image
 
-COPY . .
-
-EXPOSE 3000
-
-CMD [ "npm", "run", "start" ]
-```
+To build an image from a Dockerfile, you use the `docker build` command. The `-t` flag tags your image with a name and optionally a tag (version).
 
 ```bash
-docker build -t node-docker-demo:dev .
+docker build -t my-app:1.0 .
 ```
 
-## How to create a image for a node application
+-   `my-app`: The name of your image.
+-   `1.0`: The tag (version) of your image. If omitted, Docker uses `latest` by default.
+-   `.`: The build context, which is the path to the directory containing your Dockerfile and application code.
+
+## Dockerfile Best Practices
+
+-   **Use Specific Base Images:** Avoid `latest` tags for production. Use specific versions (e.g., `node:18-alpine`).
+-   **Leverage Build Cache:** Place frequently changing instructions (like `COPY . .`) after less frequently changing ones (like `RUN npm install`).
+-   **Minimize Layers:** Combine multiple `RUN` commands using `&&` to reduce the number of layers.
+-   **Use `.dockerignore`:** Exclude unnecessary files and directories (like `node_modules`, `.git`) from the build context to speed up builds and reduce image size.
+-   **Multi-Stage Builds:** Use multi-stage builds to create smaller, more secure images by separating build-time dependencies from runtime dependencies.
+
+## Docker Image Management
+
+Here are some common commands for managing your Docker images:
+
+-   **List Images:**
+    ```bash
+    docker images
+    ```
+
+-   **Inspect an Image:** Get detailed information about an image.
+    ```bash
+    docker inspect my-app:1.0
+    ```
+
+-   **Remove an Image:** Delete an image from your local system. You must remove all containers using the image first.
+    ```bash
+    docker rmi my-app:1.0
+    ```
+
+-   **Remove Dangling Images:** Images that are not tagged and are not used by any container.
+    ```bash
+    docker images prune
+    ```
+
+## Skeleton Dockerfile
+
+This is a generic Dockerfile template that you can adapt for most applications. Remember to replace placeholder values and uncomment/modify sections as needed for your specific project.
+
+```dockerfile title="Dockerfile.skeleton"
+# Stage 1: Build Stage (if your application requires compilation)
+# Use a base image with build tools (e.g., Node.js, Java JDK, Python with build essentials)
+# FROM <base_image_with_build_tools> AS builder
+
+# Set the working directory inside the container
+# WORKDIR /app
+
+# Copy package/dependency definition files (e.g., package.json, pom.xml, requirements.txt)
+# This step is crucial for leveraging Docker's build cache.
+# COPY <dependency_file(s)> ./
+
+# Install build dependencies
+# RUN <install_command>
+
+# Copy the rest of your application source code
+# COPY . .
+
+# Build your application (e.g., npm run build, mvn package, python setup.py install)
+# RUN <build_command>
+
+# Stage 2: Runtime Stage (for the final, smaller image)
+# Use a lightweight base image for the runtime environment
+FROM <base_image_for_runtime>
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy only the necessary build artifacts from the builder stage (if using multi-stage build)
+# COPY --from=builder /app/<build_output_directory> ./
+
+# If not using a multi-stage build, copy your application code directly
+# COPY . .
+
+# Expose the port(s) your application listens on
+# EXPOSE <port_number>
+
+# Define environment variables (optional)
+# ENV <KEY>=<VALUE>
+
+# Command to run your application when the container starts
+# Use the exec form (CMD ["executable", "param1", "param2"]) for better signal handling
+CMD ["<executable>", "<param1>", "<param2>"]
+
+# Alternatively, use ENTRYPOINT for a fixed command and CMD for default arguments
+# ENTRYPOINT ["<executable>"]
+# CMD ["<default_param1>", "<default_param2>"]
+```
+
+## Example 
+
+### Node.js Application
+
+This example demonstrates how to Dockerize a simple Node.js application.
 
 <Tabs>
-
-<TabItem value="Dockerfile">
+<TabItem value="Dockerfile" label="Dockerfile">
 
 ```Dockerfile
-FROM node:latest
+# Use a specific Node.js version as the base image
+FROM node:18-alpine
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY package*.json .
+# Copy package.json and package-lock.json to leverage Docker cache
+COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
+# Copy the rest of the application code
 COPY . .
 
+# Expose the port your app runs on
 EXPOSE 3000
 
-CMD [ "npm", "run", "start" ]
+# Command to run the application
+CMD [ "node", "app.js" ]
 ```
 
 </TabItem>
-
-<TabItem value="Commands">
-
-- Build Image
-
-```bash
-docker build -t node-docker-demo:dev .
-```
-
-- Run Container
-
-```bash
-docker run -d -p 9999:3000 --name node-demo node-docker-demo:dev
-curl -X GET http://localhost:9999
-```
-
-- Stop Container
-
-```bash
-docker stop node-demo
-```
-
-- Check container logs
-
-```bash
-docker logs node-demo
-```
-
-- Remove Container
-
-```bash
-docker rm node-demo
-```
-
-</TabItem>
-
-<TabItem value="app.js">
+<TabItem value="app.js" label="app.js">
 
 ```js
 import express from "express";
@@ -99,50 +162,88 @@ import express from "express";
 const app = express();
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello from docker" });
+  res.status(200).json({ message: "Hello from Docker!" });
 });
 
-app.listen(3000);
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
 ```
 
 </TabItem>
+<TabItem value="Commands" label="Commands">
 
+-   **Build Image:**
+    ```bash
+    docker build -t node-docker-demo:dev .
+    ```
+
+-   **Run Container:**
+    ```bash
+    docker run -d -p 9999:3000 --name node-demo node-docker-demo:dev
+    # Test the running container
+    curl -X GET http://localhost:9999
+    ```
+
+-   **Stop Container:**
+    ```bash
+    docker stop node-demo
+    ```
+
+-   **Check Container Logs:**
+    ```bash
+    docker logs node-demo
+    ```
+
+-   **Remove Container:**
+    ```bash
+    docker rm node-demo
+    ```
+
+</TabItem>
 </Tabs>
 
-## Springboot app with hot reload
+### Spring Boot Application with Hot Reload
+
+This example shows a setup for a Spring Boot application with hot-reloading capabilities during development.
 
 <Tabs>
-
-<TabItem value="Script">
-
-```bash title="docker_run.sh"
-
-#!/bin/bash
-dos2unix mvnw
-./mvnw clean spring-boot:run &
-while true; do
-inotifywait -e modify,create,delete,move -r ./src/ && ./mvnw compile
-done
-```
-
-</TabItem>
-
-<TabItem value="Dockerfile">
+<TabItem value="Dockerfile" label="Dockerfile">
 
 ```dockerfile title="Dockerfile"
 FROM amazoncorretto:24.0.0-alpine3.21
 
 WORKDIR /app
 
+# Copy the Maven wrapper and project files
 COPY . .
 
+# Install inotify-tools for file watching
 RUN apk add --no-cache inotify-tools
 
 EXPOSE 7001
 
+# Run the custom script for hot reload
 CMD [ "sh", "docker_run.sh" ]
 ```
 
 </TabItem>
+<TabItem value="docker_run.sh" label="docker_run.sh">
 
+```bash title="docker_run.sh"
+#!/bin/bash
+
+# Convert mvnw to Unix format (important for Windows users)
+dos2unix mvnw
+
+# Run Spring Boot in the background
+./mvnw clean spring-boot:run &
+
+# Watch for changes in src/ and recompile
+while true; do
+  inotifywait -e modify,create,delete,move -r ./src/ && ./mvnw compile
+done
+```
+
+</TabItem>
 </Tabs>
