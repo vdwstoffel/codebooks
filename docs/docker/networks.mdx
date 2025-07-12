@@ -1,0 +1,120 @@
+---
+sidebar_label: Networks
+sidebar_position: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Docker Networks: Enabling Container Communication
+
+Docker networking allows containers to communicate with each other and with the outside world. Docker provides several network drivers, each suited for different use cases.
+
+## Why Docker Networks?
+
+-   **Isolation:** Networks provide isolation between groups of containers.
+-   **Communication:** Enable seamless communication between containers, even across different hosts.
+-   **Service Discovery:** Containers can find each other by name within a network.
+-   **Security:** Control which containers can communicate with each other.
+
+## Common Network Drivers
+
+Docker offers several built-in network drivers:
+
+-   **`bridge` (Default):** The default network driver. Containers on the same bridge network can communicate with each other. Containers not on the bridge network cannot communicate with each other.
+-   **`host`:** Removes network isolation between the container and the Docker host. The container shares the host's network stack.
+-   **`none`:** Disables all networking for the container. Only the loopback interface is available.
+-   **`overlay`:** Creates a distributed network among multiple Docker daemon hosts. Used for swarm services.
+-   **`macvlan`:** Assigns a MAC address to a container, making it appear as a physical device on your network.
+
+## Creating Custom Networks
+
+It's a best practice to create custom bridge networks for your applications. This provides better isolation and enables automatic service discovery by container name.
+
+**Create a Custom Bridge Network:**
+
+```bash
+docker network create my_app_network
+```
+
+**List Networks:**
+
+```bash
+docker network ls
+```
+
+**Inspect a Network:**
+
+```bash
+docker network inspect my_app_network
+```
+
+## Connecting Containers to a Network
+
+### During Container Creation
+
+You can connect a container to a custom network when you run it using the `--network` flag.
+
+```bash
+docker run -d --name web_server --network my_app_network nginx
+docker run -d --name api_server --network my_app_network my_api_image
+```
+
+Containers `web_server` and `api_server` can now communicate with each other using their names (e.g., `web_server` can reach `api_server` at `http://api_server`).
+
+### Connecting an Existing Container
+
+You can connect a running container to a network using `docker network connect`.
+
+```bash
+docker network connect my_app_network existing_container_name
+```
+
+### Disconnecting a Container
+
+```bash
+docker network disconnect my_app_network my_container_name
+```
+
+## Example: Web Application with Database on a Custom Network
+
+This example demonstrates how to set up a web application and a database on a custom bridge network using `docker run` commands.
+
+<Tabs>
+<TabItem value="Commands" label="Commands">
+
+-   **Create a custom network:**
+    ```bash
+    docker network create my_web_db_network
+    ```
+
+-   **Run the database container on the network:**
+    ```bash
+    docker run -d --name my_db --network my_web_db_network \
+      -e POSTGRES_DB=mydb \
+      -e POSTGRES_USER=user \
+      -e POSTGRES_PASSWORD=password \
+      postgres:13
+    ```
+
+-   **Run the web application container on the network:**
+    ```bash
+    docker run -d --name my_web_app --network my_web_db_network \
+      -p 80:80 \
+      nginx
+    ```
+
+-   **Verify communication (from web_app to db):**
+    ```bash
+    docker exec my_web_app ping -c 3 my_db
+    ```
+
+-   **Clean up:**
+    ```bash
+    docker stop my_web_app my_db
+    docker rm my_web_app my_db
+    docker network rm my_web_db_network
+    ```
+
+</TabItem>
+</Tabs>
