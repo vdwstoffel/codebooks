@@ -3,18 +3,81 @@ sidebar_label: "UPDATE"
 sidebar_position: 4
 ---
 
-# Update
+# UPDATE Statement
 
-## Update a record
+The `UPDATE` statement is used to modify existing records in a table. It allows you to change the data in one or more columns for records that match a specified condition.
+
+## Basic Syntax
+
+The basic structure of an `UPDATE` query is as follows:
 
 ```sql
-UPDATE "users"
-SET "name" = 'John Strong'
-WHERE "name" = 'John Doe';
+UPDATE table_name
+SET
+  column1 = value1,
+  column2 = value2,
+  ...
+WHERE
+  condition;
 ```
 
+- `UPDATE table_name`: Specifies the table you want to modify.
+- `SET column1 = value1, ...`: Lists the columns to update and their new values.
+- `WHERE condition`: Determines which records to update. If you omit the `WHERE` clause, **all records in the table will be updated!**
+
+:::danger Be Careful
+Always use a `WHERE` clause with your `UPDATE` statements. Forgetting it can lead to unintended data loss by modifying every row in the table.
+:::
+
+---
+
+## Updating a Single Record
+
+To update a specific record, use a `WHERE` clause that uniquely identifies that record, typically using a primary key or another unique identifier.
+
 ```sql
+-- Update a user's name based on their original name
 UPDATE "users"
-SET "subscribed" = 'true'
-WHERE "name" = 'Sally Smith';
+SET
+  "name" = 'John Strong'
+WHERE
+  "name" = 'John Doe';
+```
+
+## Updating Multiple Columns
+
+You can update multiple columns at once by separating the column-value pairs with a comma in the `SET` clause.
+
+```sql
+-- Update a user's subscription status and age
+UPDATE "users"
+SET
+  "subscribed" = true,
+  "age" = 35
+WHERE
+  "email" = 'sally@hotmail.com';
+```
+
+## Updating Multiple Records
+
+You can update multiple records that meet a specific condition by using a broader `WHERE` clause.
+
+```sql
+-- Unsubscribe all users over 40
+UPDATE "users"
+SET
+  "subscribed" = false
+WHERE
+  "age" > 40;
+```
+
+## Updating All Records
+
+If you need to apply a change to every record in a table, you can omit the `WHERE` clause. **Use this with extreme caution.**
+
+```sql
+-- WARNING: This will update every record in the table.
+UPDATE "users"
+SET
+  "subscribed" = true;
 ```

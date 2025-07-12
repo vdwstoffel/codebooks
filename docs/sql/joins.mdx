@@ -1,11 +1,30 @@
 ---
-sidebar_label: Joins
+sidebar_label: "Joins"
 sidebar_position: 7
 ---
 
-# Joins
+# SQL Joins
 
-SQL JOINs are used to combine rows from two or more tables, based on a related column between them.
+SQL JOINs are used to combine rows from two or more tables based on a related column between them. They are fundamental for querying data from a relational database where data is normalized across multiple tables.
+
+## Table Aliases
+
+Before diving into the different types of joins, it's helpful to understand table aliases. Aliases provide a temporary, shorter name for tables, making queries more concise and readable, especially in complex joins.
+
+```sql
+SELECT
+  c.name,
+  o.product
+FROM Customers AS c
+INNER JOIN Orders AS o
+  ON c.id = o.cust_id;
+```
+
+In this example, `c` is an alias for `Customers` and `o` is an alias for `Orders`.
+
+---
+
+## Example Tables
 
 Let's use two simple tables for our examples: `Customers` and `Orders`.
 
@@ -34,14 +53,17 @@ Let's use two simple tables for our examples: `Customers` and `Orders`.
 
 An `INNER JOIN` returns only the rows that have matching values in both tables. It's the most common type of join.
 
-**Concept:** Only customers who have placed orders AND orders that belong to an existing customer will be included.
+**Concept:** Retrieves records where the key exists in both the `Customers` and `Orders` tables.
 
 **SQL Query:**
 
 ```sql
-SELECT Customers.name, Orders.product
-FROM Customers
-INNER JOIN Orders ON Customers.id = Orders.cust_id;
+SELECT
+  c.name,
+  o.product
+FROM Customers AS c
+INNER JOIN Orders AS o
+  ON c.id = o.cust_id;
 ```
 
 **Result:**
@@ -57,16 +79,19 @@ INNER JOIN Orders ON Customers.id = Orders.cust_id;
 
 ## LEFT JOIN (or LEFT OUTER JOIN)
 
-A `LEFT JOIN` returns all rows from the left table (first table in `FROM` clause), and the matching rows from the right table. If there's no match in the right table, `NULL` values are returned for columns from the right table.
+A `LEFT JOIN` returns all rows from the left table (`Customers`) and the matching rows from the right table (`Orders`). If there's no match, `NULL` is returned for columns from the right table.
 
-**Concept:** All customers will be listed. If a customer has placed an order, their order details will be shown. If a customer has not placed any orders, the `product` column will show `NULL`.
+**Concept:** Get all customers, and the orders they've placed, if any.
 
 **SQL Query:**
 
 ```sql
-SELECT Customers.name, Orders.product
-FROM Customers
-LEFT JOIN Orders ON Customers.id = Orders.cust_id;
+SELECT
+  c.name,
+  o.product
+FROM Customers AS c
+LEFT JOIN Orders AS o
+  ON c.id = o.cust_id;
 ```
 
 **Result:**
@@ -83,16 +108,19 @@ LEFT JOIN Orders ON Customers.id = Orders.cust_id;
 
 ## RIGHT JOIN (or RIGHT OUTER JOIN)
 
-A `RIGHT JOIN` returns all rows from the right table (second table in `FROM` clause), and the matching rows from the left table. If there's no match in the left table, `NULL` values are returned for columns from the left table.
+A `RIGHT JOIN` returns all rows from the right table (`Orders`) and the matching rows from the left table (`Customers`). If there's no match, `NULL` is returned for columns from the left table.
 
-**Concept:** All orders will be listed. If an order belongs to an existing customer, their name will be shown. If an order does not belong to an existing customer (e.g., `cust_id` 5 in our `Orders` table), the `name` column will show `NULL`.
+**Concept:** Get all orders, and the customer who placed them, if the customer exists.
 
 **SQL Query:**
 
 ```sql
-SELECT Customers.name, Orders.product
-FROM Customers
-RIGHT JOIN Orders ON Customers.id = Orders.cust_id;
+SELECT
+  c.name,
+  o.product
+FROM Customers AS c
+RIGHT JOIN Orders AS o
+  ON c.id = o.cust_id;
 ```
 
 **Result:**
@@ -107,18 +135,21 @@ RIGHT JOIN Orders ON Customers.id = Orders.cust_id;
 
 ---
 
-## FULL OUTER JOIN (or FULL JOIN)
+## FULL OUTER JOIN
 
-A `FULL OUTER JOIN` returns all rows when there is a match in either the left or the right table. It returns all rows from both tables, with `NULL` values for columns where there is no match.
+A `FULL OUTER JOIN` returns all rows when there is a match in either the left or the right table. It's a combination of `LEFT JOIN` and `RIGHT JOIN`.
 
-**Concept:** This join combines the results of both `LEFT JOIN` and `RIGHT JOIN`. It will list all customers and all orders. If a customer has no orders, the order details will be `NULL`. If an order has no matching customer, the customer details will be `NULL`.
+**Concept:** Get all customers and all orders, linking them where possible.
 
 **SQL Query:**
 
 ```sql
-SELECT Customers.name, Orders.product
-FROM Customers
-FULL OUTER JOIN Orders ON Customers.id = Orders.cust_id;
+SELECT
+  c.name,
+  o.product
+FROM Customers AS c
+FULL OUTER JOIN Orders AS o
+  ON c.id = o.cust_id;
 ```
 
 **Result:**
@@ -131,3 +162,41 @@ FULL OUTER JOIN Orders ON Customers.id = Orders.cust_id;
 | Charlie | Mouse    |
 | David   | NULL     |
 | NULL    | Keyboard |
+
+---
+
+## SELF JOIN
+
+A `SELF JOIN` is a regular join, but the table is joined with itself. This is useful for querying hierarchical data or comparing rows within the same table.
+
+Let's use an `Employees` table for this example:
+
+**Employees Table:**
+
+| id | name    | manager_id |
+|----|---------|------------|
+| 1  | John    | 3          |
+| 2  | Jane    | 3          |
+| 3  | Mike    | NULL       |
+| 4  | Sarah   | 1          |
+
+**Concept:** Find the manager for each employee.
+
+```sql
+SELECT
+  e.name AS employee_name,
+  m.name AS manager_name
+FROM Employees AS e
+LEFT JOIN Employees AS m
+  ON e.manager_id = m.id;
+```
+
+**Result:**
+
+| employee_name | manager_name |
+|---------------|--------------|
+| John          | Mike         |
+| Jane          | Mike         |
+| Mike          | NULL         |
+| Sarah         | John         |
+```

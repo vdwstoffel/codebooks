@@ -3,6 +3,9 @@ sidebar_label: "Classes & Objects"
 sidebar_position: 8
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Classes and Objects in Java
 
 Classes are the cornerstone of Object-Oriented Programming (OOP) in Java. A **class** is a blueprint for creating **objects**. An object is an instance of a class, with its own state and behavior.
@@ -151,3 +154,133 @@ Counter c2 = new Counter();
 
 Counter.printCount(); // Instances created: 2
 ```
+
+## Inheritance
+
+Inheritance is a core OOP principle that allows a class (**subclass**) to inherit the properties and methods of another class (**superclass**). This fosters code reuse and creates a logical hierarchy.
+
+### Base Superclass: `Animal`
+
+Let's start with a general `Animal` class.
+
+```java title="Animal.java"
+public class Animal {
+    private String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void eat() {
+        System.out.println(name + " is eating.");
+    }
+
+    // This method is designed to be overridden
+    public void makeSound() {
+        System.out.println("Some generic animal sound");
+    }
+}
+```
+
+### Subclass: `Dog`
+
+The `Dog` class **extends** `Animal`, inheriting its features.
+
+```java title="Dog.java"
+public class Dog extends Animal {
+    public Dog(String name) {
+        // `super(name)` calls the constructor of the superclass (Animal)
+        super(name);
+    }
+
+    // Method Overriding: Provide a specific implementation for Dog
+    @Override
+    public void makeSound() {
+        System.out.println("Woof!");
+    }
+
+    // Dog-specific method
+    public void bark() {
+        System.out.println(getName() + " barks loudly.");
+    }
+}
+```
+
+### Using the Subclass
+
+```java title="Main.java"
+public class Main {
+    public static void main(String[] args) {
+        Dog myDog = new Dog("Buddy");
+
+        myDog.eat();        // Inherited from Animal
+        myDog.makeSound();  // Overridden in Dog
+        myDog.bark();       // Specific to Dog
+    }
+}
+```
+
+### Abstract Classes
+
+An **abstract class** cannot be instantiated. It serves as a blueprint for other classes and can have **abstract methods** (methods without a body) that subclasses *must* implement.
+
+```java title="Shape.java"
+abstract class Shape {
+    // Abstract method - subclasses must provide an implementation
+    public abstract double getArea();
+
+    // Regular method
+    public void printDescription() {
+        System.out.println("This is a shape.");
+    }
+}
+```
+
+### Concrete Subclass: `Circle`
+
+A **concrete class** is a regular class that implements all abstract methods from its superclass.
+
+```java title="Circle.java"
+class Circle extends Shape {
+    private double radius;
+
+    public Circle(double radius) {
+        this.radius = radius;
+    }
+
+    // Implementing the abstract method
+    @Override
+    public double getArea() {
+        return Math.PI * radius * radius;
+    }
+}
+```
+
+### The `final` Keyword
+
+The `final` keyword restricts inheritance:
+
+<Tabs>
+<TabItem value="Final Class" label="Final Class">
+
+-   **`final` class:** Cannot be subclassed.
+    ```java
+    public final class SecureSystem { /* ... */ }
+    ```
+
+</TabItem>
+<TabItem value="Final Method" label="Final Method">
+
+-   **`final` method:** Cannot be overridden by subclasses.
+    ```java
+    public class Parent {
+        public final void lockMethod() { /* ... */ }
+    }
+    ```
+
+</TabItem>
+</Tabs>

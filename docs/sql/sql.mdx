@@ -3,22 +3,56 @@ sidebar_label: "SQL"
 sidebar_position: 1
 ---
 
-# Databases
+# SQL
+
+Structured Query Language (SQL) is a standard language for managing and manipulating databases. It's used to perform tasks such as retrieving, updating, inserting, and deleting data in a relational database.
+
+SQL is essential for anyone working with data, from data analysts and scientists to software engineers and database administrators.
+
+## Key Concepts
+
+SQL commands are divided into several categories:
+
+- **Data Query Language (DQL):** Used to retrieve data from the database.
+  - `SELECT`: The most common DQL command, used to fetch data from one or more tables.
+- **Data Definition Language (DDL):** Used to define and manage the database structure.
+  - `CREATE`: Creates new tables, databases, or other database objects.
+  - `ALTER`: Modifies the structure of an existing database object.
+  - `DROP`: Deletes existing database objects.
+- **Data Manipulation Language (DML):** Used for adding, deleting, and modifying data in the database.
+  - `INSERT`: Adds new records to a table.
+  - `UPDATE`: Modifies existing records in a table.
+  - `DELETE`: Removes records from a table.
+- **Data Control Language (DCL):** Used to manage user access and permissions.
+  - `GRANT`: Gives users access privileges to the database.
+  - `REVOKE`: Withdraws user access privileges.
 
 ## SQLite
 
-```bash
-sudo apt install sqlite3
-```
+For local development and learning, SQLite is a lightweight, serverless database that's easy to set up.
 
-- Create a new database
+- **Install SQLite:**
+  ```bash
+  sudo apt install sqlite3
+  ```
 
-```bash
-sqlite3 demo.db
-```
+- **Create a new database:**
+  ```bash
+  sqlite3 demo.db
+  ```
 
-- Running sql scripts
+- **Run an SQL script:**
+  ```bash
+  sqlite3 demo.db < create_table.sql
+  ```
 
-```bash
-sqlite3 demo.db < create_table.sql
-```
+## What's Next?
+
+Now that you have a basic understanding of SQL, you can explore the following topics to learn more:
+
+- **[Database](./database.mdx):** Learn how to create, alter, and drop tables.
+- **[SELECT](./select.mdx):** Dive deeper into querying data from tables.
+- **[INSERT](./insert.mdx):** Discover how to add new records to your database.
+- **[UPDATE](./update.mdx):** Understand how to modify existing data.
+- **[DELETE](./delete.mdx):** Learn how to remove records from a table.
+- **[Joins](./joins.mdx):** Explore how to combine data from multiple tables.

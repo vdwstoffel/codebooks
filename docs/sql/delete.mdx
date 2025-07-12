@@ -3,32 +3,63 @@ sidebar_label: "DELETE"
 sidebar_position: 5
 ---
 
-# DELETE
+# DELETE Statement
 
-## Delete a record
+The `DELETE` statement is used to remove existing records from a table. You can use it to delete a single row, multiple rows, or all rows in a table.
+
+## Basic Syntax
+
+The basic structure of a `DELETE` query is as follows:
 
 ```sql
-DELETE FROM "users"
-WHERE "name" = 'Mike Meyers';
+DELETE FROM table_name
+WHERE
+  condition;
 ```
 
-## Delete record with multiple conditions
+- `DELETE FROM table_name`: Specifies the table from which to delete records.
+- `WHERE condition`: Determines which records to delete. If you omit the `WHERE` clause, **all records in the table will be deleted!**
+
+:::danger Be Careful
+Always use a `WHERE` clause with your `DELETE` statements unless you intend to remove every record. Forgetting it can lead to irreversible data loss.
+:::
+
+---
+
+## Deleting Specific Records
+
+To delete specific records, use a `WHERE` clause that identifies the rows you want to remove.
+
+- **Delete a single record:**
+
+  ```sql
+  DELETE FROM "users"
+  WHERE
+    "email" = 'mike@gmail.com';
+  ```
+
+- **Delete records with multiple conditions:**
+
+  ```sql
+  DELETE FROM "users"
+  WHERE
+    "age" > 30
+    AND "subscribed" = false;
+  ```
+
+- **Delete records within a range:**
+
+  ```sql
+  DELETE FROM "users"
+  WHERE
+    "age" BETWEEN 20 AND 30;
+  ```
+
+## Deleting All Records
+
+To delete all records from a table, you can omit the `WHERE` clause. This action cannot be undone.
 
 ```sql
-DELETE FROM "users"
-WHERE "age" > 30
-AND "subscribed" = 'false';
-```
-
-## Delete records within a range
-
-```sql
-DELETE FROM "users"
-WHERE "age" BETWEEN 20 AND 30;
-```
-
-## Delete all records
-
-```sql
-SELECT * FROM "users";
+-- WARNING: This will delete every record in the table.
+DELETE FROM "users";
 ```

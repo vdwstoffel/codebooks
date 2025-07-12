@@ -3,45 +3,77 @@ sidebar_label: "Database"
 sidebar_position: 2
 ---
 
-# Databases
+# Database Structure
 
-## Create a new table
+In SQL, the database structure is defined by tables, which are composed of columns and rows. The `CREATE TABLE`, `ALTER TABLE`, and `DROP TABLE` commands are fundamental for managing the structure of your database.
+
+## Common Data Types
+
+When creating a table, you need to specify the data type for each column. Here are some of the most common data types:
+
+- **`INTEGER` or `INT`:** Whole numbers (e.g., 1, 100, -50).
+- **`VARCHAR(n)`:** A variable-length string of characters, where `n` is the maximum number of characters (e.g., `VARCHAR(255)` for a name).
+- **`TEXT`:** For long-form text strings.
+- **`BOOLEAN`:** Represents `true` or `false` values.
+- **`DATE`:** Stores a date (e.g., `YYYY-MM-DD`).
+- **`TIMESTAMP`:** Stores a date and time (e.g., `YYYY-MM-DD HH:MI:SS`).
+- **`SERIAL` or `AUTO_INCREMENT`:** Automatically generates a unique number for each new record, often used for primary keys.
+
+## Constraints
+
+Constraints are rules applied to columns to ensure data integrity.
+
+- **`PRIMARY KEY`:** Uniquely identifies each record in a table. Must contain unique values and cannot contain `NULL` values.
+- **`FOREIGN KEY`:** Links two tables together. It is a field (or collection of fields) in one table that refers to the `PRIMARY KEY` in another table.
+- **`NOT NULL`:** Ensures that a column cannot have a `NULL` value.
+- **`UNIQUE`:** Ensures that all values in a column are different.
+- **`DEFAULT`:** Sets a default value for a column when no value is specified.
+- **`CHECK`:** Ensures that the values in a column satisfy a specific condition.
+
+## Creating a Table
+
+The `CREATE TABLE` command is used to create a new table in your database. You define the table's name, its columns, and the data type for each column.
 
 ```sql
 CREATE TABLE IF NOT EXISTS "users" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    age INTEGER,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    age INTEGER CHECK (age >= 18),
     password VARCHAR(255) NOT NULL,
     subscribed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-## Drop a table
+In this example, we create a `users` table with several constraints to ensure data integrity.
+
+## Modifying a Table
+
+The `ALTER TABLE` command is used to add, delete, or modify columns in an existing table.
+
+- **Add a Column:**
+  ```sql
+  ALTER TABLE "users"
+  ADD COLUMN "verified" BOOLEAN DEFAULT FALSE;
+  ```
+
+- **Rename a Column:**
+  ```sql
+  ALTER TABLE "users"
+  RENAME COLUMN "name" TO "full_name";
+  ```
+
+- **Drop a Column:**
+  ```sql
+  ALTER TABLE "users"
+  DROP COLUMN "password";
+  ```
+
+## Deleting a Table
+
+The `DROP TABLE` command is used to remove a table from the database. This action is irreversible and will delete all data in the table.
 
 ```sql
 DROP TABLE "users";
-```
-
-## Insert Columns into database
-
-```sql
-ALTER TABLE "users"
-ADD "verified" BOOLEAN;
-```
-
-## Rename a column
-
-```sql
-ALTER TABLE users
-RENAME COLUMN "name" TO "userName";
-```
-
-## Drop a column
-
-```sql
-ALTER TABLE "users"
-DROP COLUMN "password";
 ```

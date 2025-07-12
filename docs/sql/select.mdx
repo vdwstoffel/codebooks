@@ -3,107 +3,124 @@ sidebar_label: "SELECT"
 sidebar_position: 3
 ---
 
-# SELECT
+# SELECT Statement
 
-## Select all columns
+The `SELECT` statement is the most commonly used command in SQL. It allows you to retrieve data from one or more tables in a database. The flexibility of `SELECT` makes it a powerful tool for data analysis and reporting.
 
-```sql
-SELECT * FROM "users";
-```
+## Basic Syntax
 
-## Select specific columns
+- **Select All Columns:**
+  To retrieve all columns from a table, use the `*` wildcard.
+  ```sql
+  SELECT * FROM "users";
+  ```
 
-```sql
-SELECT "name", "email" FROM "users";
-```
+- **Select Specific Columns:**
+  To retrieve specific columns, list their names after the `SELECT` keyword.
+  ```sql
+  SELECT "name", "email" FROM "users";
+  ```
 
-## Select unique records
+## Filtering with `WHERE`
 
-```sql
-SELECT DISTINCT "age" FROM "users"
-```
+The `WHERE` clause is used to filter records and extract only those that fulfill a specified condition.
 
-## Select records with a condition
+- **Single Condition:**
+  ```sql
+  SELECT * FROM "users" WHERE "age" > 30;
+  ```
 
-```sql
-SELECT * FROM "users"
-WHERE "subscribed" = 'true';
-```
+- **Multiple Conditions (`AND`, `OR`):**
+  ```sql
+  SELECT * FROM "users" WHERE "subscribed" = 'false' AND "age" < 40;
+  ```
 
-```sql
-SELECT * FROM "users"
-WHERE "age" > 30;
-```
+- **Ranges (`BETWEEN`):**
+  ```sql
+  SELECT * FROM "users" WHERE "age" BETWEEN 18 AND 30;
+  ```
 
-## Select records with multiple conditions
+## Sorting with `ORDER BY`
 
-```sql
-SELECT * FROM "users"
-WHERE "subscribed" = 'false'
-AND "age" < 40;
-```
+The `ORDER BY` keyword is used to sort the result set in ascending or descending order.
 
-## Select within range
+- **Ascending Order:**
+  ```sql
+  SELECT * FROM "users" ORDER BY "name" ASC;
+  ```
 
-```sql
-SELECT * FROM "users"
-WHERE "age" BETWEEN 18 AND 30;
-```
+- **Descending Order:**
+  ```sql
+  SELECT * FROM "users" ORDER BY "name" DESC;
+  ```
 
-## Order Results
+## Limiting Results with `LIMIT`
 
-```sql
-SELECT * FROM "users"
-ORDER BY "name" ASC;
-```
-
-```sql
-SELECT * FROM "users"
-ORDER BY "name" DESC;
-```
-
-## Limit Results
+The `LIMIT` clause is used to specify the maximum number of records to return.
 
 ```sql
-SELECT * FROM "users"
-LIMIT 3;
+SELECT * FROM "users" LIMIT 5;
 ```
 
-## Selecting Patterns
+## Pattern Matching with `LIKE`
 
-`%` : Zero, one, or multiple characters
+The `LIKE` operator is used in a `WHERE` clause to search for a specified pattern in a column.
 
-`_` : Single character
+- **`%`:** Represents zero, one, or multiple characters.
+- **`_`:** Represents a single character.
 
 ```sql
-SELECT * FROM "users"
-WHERE "email" LIKE '%@gmail.com';
+-- Select all users with a Gmail account
+SELECT * FROM "users" WHERE "email" LIKE '%@gmail.com';
+
+-- Select all users whose name starts with 'J'
+SELECT * FROM "users" WHERE "name" LIKE 'J%';
 ```
+
+## Aggregate Functions
+
+Aggregate functions perform a calculation on a set of values and return a single value.
+
+- **`COUNT()`:** Returns the number of rows.
+  ```sql
+  SELECT COUNT(*) FROM "users";
+  ```
+
+- **`SUM()`:** Returns the total sum of a numeric column.
+  ```sql
+  SELECT SUM("age") FROM "users";
+  ```
+
+- **`AVG()`:** Returns the average value of a numeric column.
+  ```sql
+  SELECT AVG("age") FROM "users";
+  ```
+
+- **`MIN()` and `MAX()`:** Return the minimum and maximum values of a column.
+  ```sql
+  SELECT MIN("age"), MAX("age") FROM "users";
+  ```
+
+## Grouping with `GROUP BY`
+
+The `GROUP BY` statement groups rows that have the same values in specified columns into summary rows. It is often used with aggregate functions.
 
 ```sql
-SELECT * FROM "users"
-WHERE "name" LIKE 'J%';
+SELECT
+  "age",
+  COUNT(*)
+FROM "users"
+GROUP BY
+  "age";
 ```
 
-## Grouping Results
+## Aliases
 
-Imagine you have a table called Sales that looks like this:
-| Product | Category | Quantity | Price |
-|---------|----------|----------|-------|
-| Laptop | Electronics | 5 | 1000 |
-| Smartphone | Electronics | 10 | 800 |
-| Chair | Furniture | 7 | 120 |
-| Table | Furniture | 4 | 200 |
+SQL aliases are used to give a table or a column in a table a temporary, more readable name.
 
 ```sql
-SELECT Category, SUM(Quantity) AS TotalQuantity
-FROM Sales
-GROUP BY Category;
+SELECT
+  "name" AS "user_name",
+  "email" AS "user_email"
+FROM "users";
 ```
-
-The result of this query will be:
-
-| Category    | TotalQuantity |
-| ----------- | ------------- |
-| Electronics | 15            |
-| Furniture   | 11            |

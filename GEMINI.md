@@ -8,8 +8,7 @@ All examples are in the `docs` folder, separated by language and then by concept
 
 ## Formatting Conventions
 
-- In `.mdx` files, the main heading should be a level 1 heading (`#`).
-- All other top-level headings should be level 2 (`##`).
+- In `.mdx` files, the main heading should be a level 1 heading (`#`). All other top-level headings should be level 2 (`##`).
 - For React components, use function declarations and default exports (e.g., `export default function MyComponent() { ... }`).
 
 ## Key Technologies
@@ -40,3 +39,5 @@ sidebar_position: 3
 - Do not use numbering in headers (e.g., use `## My Header` instead of `## 1. My Header`).
 - For entry point files (e.g., `java.mdx`, `javascript.mdx`), ensure the "What's Next?" section lists topics in a logical order for learning, typically based on their `sidebar_position`. After adding or updating a new file, re-evaluate the sidebar positions and the "What's Next?" section to maintain this logical flow.
 - When creating documentation pages, ensure examples are easy to understand and can serve as a base for further expansion by the user.
+- When writing SQL examples, place each keyword (`SELECT`, `FROM`, `WHERE`, `GROUP BY`, etc.) on a new line to improve readability.
+- If multiple files are used to show an example, add it as tabs to improve readability.

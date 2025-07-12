@@ -3,21 +3,66 @@ sidebar_label: "INSERT"
 sidebar_position: 4
 ---
 
-# INSERT
+# INSERT INTO Statement
 
-## Insert a new record
+The `INSERT INTO` statement is used to add new records to a table in a database. You can use it to insert a single row or multiple rows at a time.
+
+## Basic Syntax
+
+There are two primary ways to use the `INSERT INTO` statement:
+
+1.  **Specify both column names and values:** This is the recommended approach because it makes the query more readable and less prone to errors if the table structure changes.
+
+    ```sql
+    INSERT INTO table_name (column1, column2, column3)
+    VALUES (value1, value2, value3);
+    ```
+
+2.  **Provide only the values:** If you are adding values for all the columns in the table in the same order as they are defined, you do not need to specify the column names.
+
+    ```sql
+    INSERT INTO table_name
+    VALUES (value1, value2, value3);
+    ```
+
+--- 
+
+## Inserting a Single Record
+
+Here’s how to insert a single record into the `users` table, specifying the columns you want to provide values for.
 
 ```sql
 INSERT INTO "users" ("name", "email", "age", "password", "subscribed")
-VALUES ("John Doe", "email@email.com", "31", "12345678", "false");
+VALUES
+  ('John Doe', 'john.doe@example.com', 31, 'securepassword123', false);
 ```
 
-## Insert Multiple records
+## Inserting Multiple Records
+
+You can insert multiple records in a single query by separating the value tuples with commas.
 
 ```sql
 INSERT INTO "users" ("name", "email", "age", "password", "subscribed")
-VALUES ("Mike Meyers", "mike@gmail.com", "29", "123123123", "true"),
-       ("Jane Thyme", "thyme@gmail.com", "47", "111111", "true"),
-       ("Sally Smith", "sally@hotmail.com", "22", "222222", "false"),
-       ("Tom Jones", "jones@email.com", "33", "333333", "true");
+VALUES
+  ('Mike Meyers', 'mike@gmail.com', 29, '123123123', true),
+  ('Jane Thyme', 'thyme@gmail.com', 47, '111111', true),
+  ('Sally Smith', 'sally@hotmail.com', 22, '222222', false),
+  ('Tom Jones', 'jones@email.com', 33, '333333', true);
+```
+
+## Inserting Data from Another Table
+
+You can also use `INSERT INTO` to copy rows from one table and insert them into another. The `INSERT INTO SELECT` statement copies data from a source table and inserts it into a destination table. The data types in the source and destination tables must match.
+
+Let's say you have a `new_users` table and you want to copy all users older than 30 from the `users` table.
+
+```sql
+INSERT INTO "new_users" ("name", "email", "age")
+SELECT
+  "name",
+  "email",
+  "age"
+FROM "users"
+WHERE
+  "age" > 30;
 ```
