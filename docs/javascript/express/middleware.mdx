@@ -1,0 +1,167 @@
+---
+sidebar_label: "Middleware"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Express.js Middleware
+
+Middleware functions are functions that have access to the request object (`req`), the response object (`res`), and the `next` middleware function in the application's request-response cycle. They can perform tasks like:
+
+-   Executing any code.
+-   Making changes to the request and the response objects.
+-   Ending the request-response cycle.
+-   Calling the next middleware in the stack.
+
+Middleware functions can be applied at the application level, router level, or error-handling level.
+
+## Application-Level Middleware
+
+These are functions bound to an instance of the `app` object using `app.use()` or `app.METHOD()`.
+
+### Example: Simple Logger
+
+A common use case for middleware is logging incoming requests.
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+// This middleware will be executed for every request to the app
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} at ${new Date().toISOString()}`);
+  next(); // Pass control to the next middleware function
+});
+
+app.get('/', (req, res) => {
+  res.send('Hello from Express with a logger!');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### Example: JSON Body Parser
+
+Express comes with built-in middleware. `express.json()` is used to parse incoming requests with JSON payloads.
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+// Enable JSON body parsing for all incoming requests
+app.use(express.json());
+
+app.post('/data', (req, res) => {
+  // req.body will contain the parsed JSON data
+  console.log(req.body);
+  res.status(200).json({ message: 'Data received!', data: req.body });
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+## Router-Level Middleware
+
+These middleware functions are bound to an instance of `express.Router()`.
+
+### Example: Authentication Check
+
+Middleware can be applied to specific routes or groups of routes defined by a router.
+
+<Tabs>
+<TabItem value="authMiddleware.js" label="authMiddleware.js">
+
+```javascript
+export const isAuthenticated = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+  const token = authHeader.split(' ')[1];
+  // In a real app, you would verify the token (e.g., using JWT)
+  if (token === 'mysecrettoken') {
+    req.user = { id: '123', name: 'TestUser' }; // Attach user info to request
+    next();
+  } else {
+    res.status(403).json({ message: 'Invalid token' });
+  }
+};
+```
+
+</TabItem>
+<TabItem value="userRoutes.js" label="userRoutes.js">
+
+```javascript
+import { Router } from 'express';
+import { isAuthenticated } from './authMiddleware.js';
+
+const router = Router();
+
+// Apply isAuthenticated middleware to all routes defined by this router
+router.use(isAuthenticated);
+
+router.get('/profile', (req, res) => {
+  res.status(200).json({ message: `Welcome, ${req.user.name}! This is your profile.` });
+});
+
+export default router;
+```
+
+</TabItem>
+<TabItem value="app.js" label="app.js">
+
+```javascript
+import express from 'express';
+import userRoutes from './userRoutes.js';
+
+const app = express();
+
+app.use('/users', userRoutes);
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Error-Handling Middleware
+
+Error-handling middleware functions have four arguments: `(err, req, res, next)`. They are typically defined last, after all other `app.use()` and route calls.
+
+### Example: Centralized Error Handler
+
+```javascript title="app.js"
+import express from 'express';
+
+const app = express();
+
+app.get('/error', (req, res, next) => {
+  // Simulate an error
+  const error = new Error('Something went wrong!');
+  error.status = 500;
+  next(error); // Pass the error to the error-handling middleware
+});
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log the error stack for debugging
+  res.status(err.status || 500).json({
+    message: err.message || 'An unexpected error occurred',
+    error: err.status || 500,
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
