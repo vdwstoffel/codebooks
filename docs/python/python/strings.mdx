@@ -1,0 +1,157 @@
+---
+sidebar_label: "Strings"
+sidebar_position: 2
+---
+
+# Python Strings
+
+Strings are sequences of characters, used for storing text data. They are immutable, meaning once created, their content cannot be changed.
+
+## Creating Strings
+
+Strings can be created using single, double, or triple quotes.
+
+```python
+# Single quotes
+my_string = 'Hello, World!'
+# "Hello, World!"
+
+# Double quotes
+another_string = "Python is fun!"
+# "Python is fun!"
+
+# Triple quotes for multi-line strings
+multi_line_string = """This is a
+multi-line
+string."""
+# "This is a\nmulti-line\nstring."
+```
+
+## String Concatenation
+
+Joining two or more strings together.
+
+```python
+greeting = "Hello"
+name = "Alice"
+message = greeting + ", " + name + "!"
+# "Hello, Alice!"
+
+# Using f-strings (formatted string literals) - Recommended for Python 3.6+
+f_message = f"{greeting}, {name}!"
+# "Hello, Alice!"
+```
+
+## String Length
+
+Use the `len()` function to get the number of characters in a string.
+
+```python
+text = "Docusaurus"
+length = len(text)
+# 10
+```
+
+## Accessing Characters (Indexing and Slicing)
+
+Strings are ordered sequences, so you can access individual characters or substrings.
+
+```python
+my_string = "Python"
+
+# Accessing individual characters (0-indexed)
+first_char = my_string[0]
+# "P"
+last_char = my_string[-1]
+# "n"
+
+# Slicing (start:end:step)
+substring = my_string[0:3] # Characters from index 0 up to (but not including) 3
+# "Pyt"
+from_start = my_string[:2]
+# "Py"
+to_end = my_string[2:]
+# "thon"
+reverse_string = my_string[::-1]
+# "nohtyP"
+```
+
+## Common String Methods
+
+Python strings have many built-in methods for manipulation and analysis.
+
+### Case Conversion
+
+```python
+text = "Hello World"
+upper_case = text.upper()
+# "HELLO WORLD"
+lower_case = text.lower()
+# "hello world"
+title_case = text.title()
+# "Hello World"
+capitalize_first = text.capitalize()
+# "Hello world"
+```
+
+### Stripping Whitespace
+
+Remove leading/trailing whitespace.
+
+```python
+padded_text = "   some text   "
+stripped_text = padded_text.strip()
+# "some text"
+left_stripped = padded_text.lstrip()
+# "some text   "
+right_stripped = padded_text.rstrip()
+# "   some text"
+```
+
+### Splitting and Joining
+
+```python
+sentence = "Python is a versatile language"
+words = sentence.split(" ")
+# ["Python", "is", "a", "versatile", "language"]
+
+# Joining a list of strings
+new_sentence = "-".join(words)
+# "Python-is-a-versatile-language"
+```
+
+### Replacing Substrings
+
+```python
+original = "I like apples"
+new_text = original.replace("apples", "bananas")
+# "I like bananas"
+```
+
+### Finding Substrings
+
+```python
+text = "Hello, World!"
+index_of_world = text.find("World") # Returns starting index or -1 if not found
+# 7
+not_found = text.find("Python")
+# -1
+```
+
+### Counting Substrings
+
+```python
+text = "banana"
+count_a = text.count("a")
+# 3
+```
+
+### Checking Prefixes and Suffixes
+
+```python
+filename = "document.pdf"
+starts_with_doc = filename.startswith("doc")
+# True
+ends_with_pdf = filename.endswith(".pdf")
+# True
+```

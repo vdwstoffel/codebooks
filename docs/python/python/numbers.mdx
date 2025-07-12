@@ -1,0 +1,133 @@
+---
+sidebar_label: "Numbers"
+sidebar_position: 3
+---
+
+# Python Numbers
+
+Numbers are fundamental data types in Python used to store numerical values. Python supports integers, floating-point numbers, and complex numbers.
+
+## Integer (`int`)
+
+Integers are whole numbers, positive or negative, without decimals.
+
+```python
+my_integer = 100
+# 100
+negative_integer = -50
+# -50
+large_integer = 1234567890
+# 1234567890
+```
+
+## Floating-Point Numbers (`float`)
+
+Floating-point numbers (floats) are numbers with a decimal point.
+
+```python
+my_float = 3.14
+# 3.14
+negative_float = -0.5
+# -0.5
+scientific_notation = 1.23e-4 # 1.23 * 10^-4
+# 0.000123
+```
+
+## Complex Numbers (`complex`)
+
+Complex numbers are numbers with a real and an imaginary part, represented as `a + bj`, where `a` is the real part and `b` is the imaginary part.
+
+```python
+my_complex = 3 + 4j
+# (3+4j)
+real_part = my_complex.real
+# 3.0
+imaginary_part = my_complex.imag
+# 4.0
+```
+
+## Basic Arithmetic Operations
+
+Python supports standard arithmetic operations.
+
+```python
+a = 10
+b = 3
+
+addition = a + b
+# 13
+subtraction = a - b
+# 7
+multiplication = a * b
+# 30
+division = a / b # Returns a float
+# 3.3333333333333335
+floor_division = a // b # Returns an integer (discards fractional part)
+# 3
+modulus = a % b # Returns the remainder of the division
+# 1
+exponentiation = a ** b # a to the power of b
+# 1000
+```
+
+## Type Conversion (Type Casting)
+
+You can convert numbers from one type to another using built-in functions.
+
+```python
+int_to_float = float(10)
+# 10.0
+
+float_to_int = int(3.99)
+# 3 (truncates, does not round)
+
+string_to_int = int("123")
+# 123
+
+string_to_float = float("3.14")
+# 3.14
+```
+
+## Built-in Number Functions
+
+Python provides several useful functions for working with numbers.
+
+### `abs()`: Absolute Value
+
+Returns the absolute value of a number.
+
+```python
+abs_value = abs(-15)
+# 15
+```
+
+### `round()`: Rounding Numbers
+
+Rounds a number to a specified number of decimal places. If no decimal places are specified, it rounds to the nearest integer.
+
+```python
+rounded_float = round(3.14159, 2)
+# 3.14
+rounded_integer = round(4.7)
+# 5
+```
+
+### `pow()`: Power Function
+
+Returns the value of `x` to the power of `y` (`x**y`).
+
+```python
+power_result = pow(2, 3)
+# 8
+```
+
+### `min()` and `max()`: Minimum and Maximum
+
+Returns the smallest or largest item in an iterable or among multiple arguments.
+
+```python
+min_value = min(10, 5, 20)
+# 5
+max_value = max(10, 5, 20)
+# 20
+```
