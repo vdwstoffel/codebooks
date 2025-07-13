@@ -42,4 +42,7 @@ sidebar_position: 3
 - When writing SQL examples, place each keyword (`SELECT`, `FROM`, `WHERE`, `GROUP BY`, etc.) on a new line to improve readability.
 - If multiple files are used to show an example, add it as tabs to improve readability. Remember to import `Tabs` and `TabItem` from `@theme/Tabs` at the top of the `.mdx` file.
 - When creating examples, the main "Examples" section should be an H2 (`##`), and each individual example within that section should be an H3 (`###`).
-- When providing web examples, use the custom `BrowserWindow` component where applicable.
+- When providing web examples, use the custom `BrowserWindow` component where applicable. Use hte ijmport statement:
+```javascript
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+```
