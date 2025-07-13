@@ -1,42 +1,45 @@
 ---
-sidebar_label: "Usefull Libraries"
-sidebar_position: 9
+sidebar_label: "Useful Libraries"
+sidebar_position: 10
 ---
 
-# Usefull Libraries
+# Useful Libraries for Express
 
-## Secure http headers
+The Express ecosystem is rich with third-party libraries that can help you add functionality, improve security, and streamline development. This guide highlights some of the most popular and useful libraries for building Express applications.
 
-Help secure Express apps by setting HTTP response headers.
+## Security Libraries
+
+### Helmet
+
+`helmet` helps secure your Express apps by setting various HTTP headers. It's a collection of 15 smaller middleware functions that set security-related HTTP response headers.
 
 ```bash
-npm i helmt
+npm install helmet
 ```
 
-```js
+```javascript
 import express from "express";
 import helmet from "helmet";
 
 const app = express();
-
 app.use(helmet());
 
 app.get("/", (req, res) => {
-  res.statusCode(200).json({ status: "success", message: "Hello" });
+  res.status(200).json({ status: "success", message: "Hello" });
 });
 
 export default app;
 ```
 
-## Limit Api requets
+### express-rate-limit
 
-Basic rate-limiting middleware for Express. Use to limit repeated requests to public APIs and/or endpoints such as password reset.
+This middleware is used to limit repeated requests to public APIs and endpoints, such as password reset pages, to prevent brute-force attacks.
 
 ```bash
-npm i express-rate-limit
+npm install express-rate-limit
 ```
 
-```js
+```javascript
 import express from "express";
 import rateLimit from "express-rate-limit";
 
@@ -44,13 +47,11 @@ const app = express();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-  standardHeaders: "draft-8", // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-  // store: ... , // Redis, Memcached, etc. See below.
+  limit: 100, // Limit each IP to 100 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Apply the rate limiting middleware to all requests.
 app.use(limiter);
 
 app.get("/", (req, res) => {
@@ -60,13 +61,15 @@ app.get("/", (req, res) => {
 export default app;
 ```
 
-## How to sanitize input
+### xss-clean
+
+This middleware sanitizes user input in `req.body`, `req.query`, and `req.params` to prevent Cross-Site Scripting (XSS) attacks.
 
 ```bash
-npm install xss-clean --save
+npm install xss-clean
 ```
 
-```js
+```javascript
 import express from "express";
 import xss from "xss-clean";
 
@@ -80,23 +83,24 @@ app.get("/", (req, res) => {
 export default app;
 ```
 
-## Prevent HTTP Parameter Pollution
+### hpp
 
-Express middleware to protect against HTTP Parameter Pollution attacks
+`hpp` (HTTP Parameter Pollution) is a middleware that protects against HTTP Parameter Pollution attacks.
 
 ```bash
-npm i hpp
+npm install hpp
 ```
 
-```js
+```javascript
 import express from "express";
-// highlight-next-line
 import hpp from "hpp";
 
 const app = express();
 
-// highlight-next-line
-app.use(hpp());
+// Protect against parameter pollution
+app.use(hpp({
+  whitelist: ['duration', 'ratingsQuantity'] // Allow duplicates for these parameters
+}));
 
 app.get("/", (req, res) => {
   console.log(req.query);
@@ -106,48 +110,111 @@ app.get("/", (req, res) => {
 export default app;
 ```
 
-- Without hpp middleware
+### cors
+
+`cors` is a middleware that enables Cross-Origin Resource Sharing (CORS) in your Express application. This is essential for allowing your API to be accessed by front-end applications running on a different domain.
 
 ```bash
-curl -X GET http://192.168.129.11:3000\?name\="John"\&name\="John"
-# { name: [ 'John', 'John' ] }
+npm install cors
 ```
 
-- With hpp middleware
-
-```bash
-curl -X GET http://192.168.129.11:3000\?name\="John"\&name\="John"
-# { name: 'John' }
-```
-
-### Adding a filter for allowed duplicates
-
-By adding a whitelist, you can allow duplicates for specific parameters.
-
-```js
+```javascript
 import express from "express";
-import hpp from "hpp";
+import cors from "cors";
 
 const app = express();
 
-app.use(hpp());
-// highlight-next-line
-app.use("/whitelist", hpp({ whitelist: ["filter"] }));
+// Enable CORS for all routes
+app.use(cors());
+
+// Or, for more specific options:
+// app.use(cors({ origin: 'https://your-frontend-app.com' }));
 
 app.get("/", (req, res) => {
-  console.log(req.query);
-  res.status(200).json({ message: "hello" });
-});
-
-app.get("/whitelist", (req, res) => {
-  console.log(req.query);
-  res.status(200).json({ message: "hello" });
+  res.status(200).json({ message: "CORS is enabled!" });
 });
 
 export default app;
 ```
 
+## Request Handling & Middleware
+
+### compression
+
+This middleware will attempt to compress response bodies for all requests that traverse through the middleware, which can significantly improve the performance of your application.
+
 ```bash
-curl -X GET http://192.168.129.11:3000/whitelist\?filter\="colour"\&filter\="type"
-# { filter: [ 'colour', 'type' ] }
+npm install compression
+```
+
+```javascript
+import express from "express";
+import compression from "compression";
+
+const app = express();
+app.use(compression());
+
+app.get("/", (req, res) => {
+  res.send("This response is compressed!");
+});
+
+export default app;
+```
+
+## Development & Debugging
+
+### morgan
+
+`morgan` is an HTTP request logger middleware for Node.js. It simplifies the process of logging requests to your application, providing you with information such as the request method, URL, status code, and response time.
+
+```bash
+npm install morgan
+```
+
+```javascript
+import express from "express";
+import morgan from "morgan";
+
+const app = express();
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+app.get("/", (req, res) => {
+  res.send("Hello with Morgan!");
+});
+
+export default app;
+```
+
+### dotenv
+
+`dotenv` is a zero-dependency module that loads environment variables from a `.env` file into `process.env`. This is essential for managing configuration and keeping sensitive data out of your codebase.
+
+```bash
+npm install dotenv
+```
+
+Create a `.env` file in the root of your project:
+
+```
+PORT=3000
+DATABASE_URL=your_database_url
+```
+
+Then, in your application entry file:
+
+```javascript
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 ```
