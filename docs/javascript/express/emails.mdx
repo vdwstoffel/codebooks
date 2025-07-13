@@ -1,67 +1,189 @@
 ---
 sidebar_label: "Emails"
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Emails
+# Sending Emails in Express
 
-## Sending emails
+Sending emails is a common requirement in web applications, whether for sending notifications, password resets, or marketing communications. `Nodemailer` is the most popular Node.js library for sending emails. This guide will walk you through setting up Nodemailer in your Express application, from a basic setup to a more advanced, production-ready implementation.
+
+## Basic Setup with Nodemailer
+
+First, you need to add `Nodemailer` to your project:
 
 ```bash
-npm i nodemailer
+npm install nodemailer
 ```
 
-<Tabs>
+For development, you can use a service like [Mailtrap](https://mailtrap.io/) to catch outgoing emails in a sandbox environment without sending them to actual recipients. This is great for testing.
 
-<TabItem value="mailer.js">
+Here is a basic example of how to configure and use Nodemailer:
 
-```js
+```javascript
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+  host: process.env.EMAIL_HOST, // e.g., sandbox.smtp.mailtrap.io
+  port: process.env.EMAIL_PORT, // e.g., 2525
   auth: {
-    user: "0ab28d4be596ec",
-    pass: "********c54c",
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
-export async function mailer() {
-  const info = await transporter.sendMail({
-    from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-    to: "bar@example.com, baz@example.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
+export const sendTestEmail = async () => {
+  const mailOptions = {
+    from: '"Your App" <noreply@yourapp.com>',
+    to: "test@example.com",
+    subject: "Hello from Nodemailer",
+    text: "This is a test email.",
+    html: "<b>This is a test email.</b>",
+  };
 
+  const info = await transporter.sendMail(mailOptions);
   console.log("Message sent: %s", info.messageId);
-  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+};
+```
+
+:::tip
+Always use environment variables for sensitive data like email credentials. Never hardcode them in your application.
+:::
+
+## Advanced Email Class
+
+For a more structured and reusable approach, you can create an `Email` class. This class can handle different email templates and transport configurations for development and production environments.
+
+First, install additional packages for HTML templating and converting HTML to text:
+
+```bash
+npm install pug html-to-text
+```
+
+<Tabs>
+<TabItem value="email.js" label="email.js">
+
+```javascript
+import nodemailer from 'nodemailer';
+import pug from 'pug';
+import { htmlToText } from 'html-to-text';
+
+export default class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstName = user.name.split(' ')[0];
+    this.url = url;
+    this.from = `Your App <${process.env.EMAIL_FROM}>`;
+  }
+
+  newTransport() {
+    if (process.env.NODE_ENV === 'production') {
+      // For production, use a real email service like SendGrid, Mailgun, etc.
+      return nodemailer.createTransport({
+        service: 'SendGrid', // or another service
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
+    }
+
+    // For development, use Mailtrap
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+  }
+
+  async send(template, subject) {
+    // 1) Render HTML based on a Pug template
+    const html = pug.renderFile(`${__dirname}/../views/emails/${template}.pug`, {
+      firstName: this.firstName,
+      url: this.url,
+      subject,
+    });
+
+    // 2) Define email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText(html),
+    };
+
+    // 3) Create a transport and send email
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send('welcome', 'Welcome to the Family!');
+  }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your password reset token (valid for only 10 minutes)'
+    );
+  }
 }
 ```
 
 </TabItem>
-<TabItem value = "app.js">
+<TabItem value="welcome.pug" label="views/emails/welcome.pug">
 
-```js
-import express from "express";
+```pug
+extends baseEmail
 
-import { mailer } from "./mailer.js";
+block content
+  p Hi #{firstName},
+  p Welcome to Your App, we're glad to have you 🎉🙏
+  p We're all a big family here, so make sure to upload your user photo so we get to know you a bit better!
+  table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+    tbody
+      tr
+        td(align='left')
+          table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+            tbody
+              tr
+                td
+                  a(href=url, target='_blank') Upload user photo
+  p If you need any help, please don't hesitate to contact me!
+  p - Jane Doe, CEO
+```
+
+</TabItem>
+<TabItem value="app.js" label="app.js">
+
+```javascript
+import express from 'express';
+import Email from './email';
 
 const app = express();
 
-app.get("/send", async (req, res) => {
-  await mailer();
-  res.status(200).json({ status: "succes", message: "Mail sent" });
+app.get("/send-welcome", async (req, res) => {
+  const user = { email: 'test@example.com', name: 'John Doe' };
+  const url = 'http://localhost:3000/me'; // Example URL
+
+  try {
+    await new Email(user, url).sendWelcome();
+    res.status(200).json({ status: "success", message: "Email sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Error sending email" });
+  }
 });
 
 export default app;
 ```
 
 </TabItem>
-
 </Tabs>
+
+By using a class-based approach and templates, you can keep your email logic clean, reusable, and easy to maintain. This setup allows you to easily switch between development and production environments and add new email types as your application grows.
