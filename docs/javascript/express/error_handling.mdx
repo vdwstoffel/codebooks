@@ -1,0 +1,219 @@
+---
+sidebar_label: "Error Handling"
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# Error Handling in Express
+
+Error handling is a critical part of building robust and reliable web applications. In Express, the way you handle errors can significantly impact the stability and user experience of your application. This guide covers the fundamentals of error handling in Express, from the default handler to custom middleware for both synchronous and asynchronous errors.
+
+## Default Error Handler
+
+Express comes with a built-in error handler that takes care of any errors that might be encountered in the application. This default handler is a middleware function that is added at the end of the middleware stack.
+
+If an error occurs, Express will catch it and, if no custom error handler is present, the default one will be triggered. It returns a `500 Internal Server Error` response to the client with the error message in the response body during development.
+
+## Custom Error Handling Middleware
+
+While the default error handler is useful, it's often better to implement a custom error handler to have more control over the response sent to the client. A custom error-handling middleware function is defined in the same way as other middleware functions, but with four arguments instead of three: `(err, req, res, next)`.
+
+This middleware should be defined last, after all other `app.use()` and route calls.
+
+```javascript
+import express from "express";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  // This will cause an error because 'user' is not defined
+  res.send(user);
+});
+
+// Custom error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+export default app;
+```
+
+## Handling Synchronous Errors
+
+Express can automatically catch errors that occur in synchronous code within route handlers and middleware. You don't need to do anything special for these errors to be passed to your error handling middleware.
+
+```javascript
+app.get('/sync-error', (req, res) => {
+  throw new Error('This is a synchronous error!');
+});
+```
+
+## Handling Asynchronous Errors
+
+Errors that occur in asynchronous code (e.g., inside a `.then()` block of a Promise or in a callback) must be explicitly passed to the `next()` function. If you don't, the request will hang, and the error handler will not be called.
+
+```javascript
+import fs from 'fs';
+
+app.get('/async-error', (req, res, next) => {
+  fs.readFile('/file-does-not-exist', (err, data) => {
+    if (err) {
+      // Pass the error to the next middleware
+      return next(err);
+    }
+    res.send(data);
+  });
+});
+```
+
+Starting with Express 5, route handlers and middleware that return a Promise will automatically call `next(err)` when they reject or throw an error. This simplifies asynchronous error handling.
+
+```javascript
+// With Express 5, this works automatically
+app.get('/async-await-error', async (req, res, next) => {
+  const data = await someAsyncFunctionThatThrows();
+  res.send(data);
+});
+```
+
+To simplify error handling in asynchronous routes, you can create a `catchAsync` utility function that wraps your async route handlers and catches any rejected Promises, passing the error to `next()`.
+
+```javascript
+const catchAsync = (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+};
+
+// Example usage
+app.get(
+  '/async-error',
+  catchAsync(async (req, res, next) => {
+    const data = await someAsyncFunctionThatThrows();
+    res.send(data);
+  })
+);
+```
+
+## Complete Example
+
+Here is a more complete example of a custom error handling setup. It includes a custom `AppError` class to create operational errors with a status code and a global error handler that sends different responses in development and production environments.
+
+<Tabs>
+<TabItem value="AppError.js" label="AppError.js">
+
+```javascript
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export default AppError;
+```
+
+</TabItem>
+<TabItem value="errorController.js" label="errorController.js">
+
+```javascript
+const sendErrorDev = (err, res) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    error: err,
+    message: err.message,
+    stack: err.stack,
+  });
+};
+
+const sendErrorProd = (err, res) => {
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  } else {
+    // Programming or other unknown error: don't leak error details
+    console.error('ERROR 💥', err);
+
+    res.status(500).json({
+      status: 'error',
+      message: 'Something went very wrong!',
+    });
+  }
+};
+
+export default (err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+
+  if (process.env.NODE_ENV === 'development') {
+    sendErrorDev(err, res);
+  } else if (process.env.NODE_ENV === 'production') {
+    sendErrorProd(err, res);
+  }
+};
+```
+
+</TabItem>
+<TabItem value="app.js" label="app.js">
+
+```javascript
+import express from 'express';
+import AppError from './AppError';
+import globalErrorHandler from './errorController';
+
+const app = express();
+
+app.get('/', (req, res, next) => {
+  // Example of throwing an operational error
+  return next(new AppError('This is an operational error', 400));
+});
+
+// All other routes that are not found
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Global error handling middleware
+app.use(globalErrorHandler);
+
+export default app;
+```
+
+</TabItem>
+</Tabs>
+
+## Handling Unhandled Rejections
+
+It's also important to handle unhandled promise rejections that might occur outside of the Express request-response cycle. You can do this by listening to the `unhandledRejection` event on the `process` object.
+
+```javascript
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.error(err.name, err.message);
+  // Close server & exit process
+});
+```
+
+Similarly, you should also handle uncaught exceptions:
+
+```javascript
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+```
+
+By implementing these error handling techniques, you can create a more resilient and reliable Express application.
