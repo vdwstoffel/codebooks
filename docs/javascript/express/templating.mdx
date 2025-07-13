@@ -1,0 +1,259 @@
+---
+sidebar_label: "Templating"
+sidebar_position: 6
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Templating with EJS and Pug
+
+Templating engines allow you to use static template files in your application. At runtime, the templating engine replaces variables in a template file with actual values and transforms the template into an HTML file sent to the client. This section will show you how to use two popular templating engines: EJS and Pug.
+
+## Setup
+
+First, you need to tell Express which templating engine to use and where to find the templates (in a `views` directory).
+
+<Tabs>
+<TabItem value="ejs" label="EJS">
+
+**1. Install EJS:**
+```bash
+npm install ejs
+```
+
+**2. Configure Express:**
+```javascript
+import express from 'express';
+import path from 'path';
+
+const app = express();
+
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+export default app;
+```
+
+</TabItem>
+<TabItem value="pug" label="Pug">
+
+**1. Install Pug:**
+```bash
+npm install pug
+```
+
+**2. Configure Express:**
+```javascript
+import express from 'express';
+import path from 'path';
+
+const app = express();
+
+// Set Pug as the view engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+export default app;
+```
+
+</TabItem>
+</Tabs>
+
+## Examples
+
+### Basic Rendering
+
+Here’s how to render a simple view.
+
+<Tabs>
+<TabItem value="ejs" label="EJS">
+
+**`views/index.ejs`**
+```html
+<h1>Hello, World!</h1>
+<p>This is an EJS template.</p>
+```
+
+**`app.js`**
+```javascript
+app.get('/', (req, res) => {
+  res.render('index');
+});
+```
+
+</TabItem>
+<TabItem value="pug" label="Pug">
+
+**`views/index.pug`**
+```pug
+h1 Hello, World!
+p This is a Pug template.
+```
+
+**`app.js`**
+```javascript
+app.get('/', (req, res) => {
+  res.render('index');
+});
+```
+
+</TabItem>
+</Tabs>
+
+### Using Variables
+
+You can pass variables from your route handler to your template.
+
+<Tabs>
+<TabItem value="ejs" label="EJS">
+
+**`app.js`**
+```javascript
+app.get('/user', (req, res) => {
+  res.render('user', {
+    name: 'John Doe',
+    title: 'User Profile'
+  });
+});
+```
+
+**`views/user.ejs`**
+```html
+<h1><%= title %></h1>
+<p>Welcome, <%= name %>!</p>
+```
+
+</TabItem>
+<TabItem value="pug" label="Pug">
+
+**`app.js`**
+```javascript
+app.get('/user', (req, res) => {
+  res.render('user', {
+    name: 'John Doe',
+    title: 'User Profile'
+  });
+});
+```
+
+**`views/user.pug`**
+```pug
+h1= title
+p Welcome, #{name}!
+```
+
+</TabItem>
+</Tabs>
+
+### Using Loops
+
+You can iterate over arrays to display lists of data.
+
+<Tabs>
+<TabItem value="ejs" label="EJS">
+
+**`app.js`**
+```javascript
+app.get('/users', (req, res) => {
+  res.render('users', {
+    users: ['John', 'Jane', 'Jim']
+  });
+});
+```
+
+**`views/users.ejs`**
+```html
+<h1>Users</h1>
+<ul>
+  <% users.forEach(user => { %>
+    <li><%= user %></li>
+  <% }); %>
+</ul>
+```
+
+</TabItem>
+<TabItem value="pug" label="Pug">
+
+**`app.js`**
+```javascript
+app.get('/users', (req, res) => {
+  res.render('users', {
+    users: ['John', 'Jane', 'Jim']
+  });
+});
+```
+
+**`views/users.pug`**
+```pug
+h1 Users
+ul
+  each user in users
+    li= user
+```
+
+</TabItem>
+</Tabs>
+
+### Reusable Blocks (Partials/Includes)
+
+You can create reusable template partials for components like headers and footers.
+
+<Tabs>
+<TabItem value="ejs" label="EJS">
+
+**`views/partials/header.ejs`**
+```html
+<header>
+  <h1>My Awesome App</h1>
+</header>
+```
+
+**`views/index.ejs`**
+```html
+<%- include('partials/header') %>
+<main>
+  <p>Welcome to the main content!</p>
+</main>
+```
+
+</TabItem>
+<TabItem value="pug" label="Pug">
+
+**`views/includes/header.pug`**
+```pug
+header
+  h1 My Awesome App
+```
+
+**`views/index.pug`**
+```pug
+include includes/header
+main
+  p Welcome to the main content!
+```
+
+Pug also supports template inheritance with `block` and `extends`.
+
+**`views/layout.pug`**
+```pug
+doctype html
+html
+  head
+    title My Site
+  body
+    block content
+```
+
+**`views/page.pug`**
+```pug
+extends layout.pug
+
+block content
+  h1 My Page
+  p This is my page content.
+```
+
+</TabItem>
+</Tabs>
