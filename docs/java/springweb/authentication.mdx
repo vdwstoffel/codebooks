@@ -15,9 +15,11 @@ Auto0 account is required. In your dashbaord create a new single page applicatio
 
 <Tabs>
 
-<TabItem value="Depandancies">
+<TabItem value="Dependencies">
 
-```java title="pom.xml"
+To integrate Auth0 with Spring Boot, you can use the `okta-spring-boot-starter` which simplifies the configuration. Auth0 uses Okta's underlying technology for its authentication services.
+
+```xml title="pom.xml"
 <dependency>
     <groupId>com.okta.spring</groupId>
     <artifactId>okta-spring-boot-starter</artifactId>
@@ -25,14 +27,18 @@ Auto0 account is required. In your dashbaord create a new single page applicatio
 </dependency>
 ```
 
+In your `application.properties` or `application.yml` file, configure the Auth0 domain and audience. The `audience` should typically be the identifier of your API, which you configure in your Auth0 dashboard.
+
 ```properties title="application.properties"
-okta.oauth2.issuer=https://yourAuth0domain.com/
-okta.oauth2.audience=placeholderValue
+okta.oauth2.issuer=https://YOUR_AUTH0_DOMAIN/
+okta.oauth2.audience=YOUR_API_AUDIENCE
 ```
 
 </TabItem>
 
 <TabItem value="Security Config">
+
+This configuration sets up Spring Security to protect your API endpoints. It defines which endpoints are public and which require authentication, and configures the application as an OAuth2 Resource Server to validate JWTs issued by Auth0.
 
 ```java title="SecurityConfig.java"
 package com.auth0exmaple.security;
@@ -46,26 +52,29 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * Configures our application with Spring Security to restrict access to our API endpoints.
+ * This class sets up OAuth2 Resource Server with JWT validation.
  */
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        /*
-        This is where we configure the security required for our endpoints and setup our app to serve as
-        an OAuth2 Resource Server, using JWT validation.
-        */
-        return http
-                .authorizeHttpRequests((authorize) -> authorize
-                    .requestMatchers("/api/demo/public").permitAll()
-                    .requestMatchers("/api/demo/private").authenticated()
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        // Allow unauthenticated access to the public endpoint
+                        .requestMatchers("/api/demo/public").permitAll()
+                        // Require authentication for the private endpoint
+                        .requestMatchers("/api/demo/private").authenticated()
+                        // All other requests require authentication
+                        .anyRequest().authenticated()
                 )
+                // Enable CORS (Cross-Origin Resource Sharing) with default settings
                 .cors(withDefaults())
+                // Configure OAuth2 Resource Server to validate JWTs
                 .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(withDefaults())
-                )
-                .build();
+                        .jwt(withDefaults())
+                );
+        return http.build();
     }
 }
 ```
@@ -74,33 +83,40 @@ public class SecurityConfig {
 
 <TabItem value="Controller">
 
+This Spring Boot REST controller defines two endpoints: one public and one private. The private endpoint demonstrates how to access user information from the authenticated JWT.
+
 ```java title="DemoController.java"
 package com.auth0exmaple.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @RestController
 @RequestMapping("/api/demo")
 class DemoController {
 
-    @Autowired
-    public DemoController() {
-
-    };
-
+    /**
+     * This endpoint is publicly accessible without authentication.
+     *
+     * @return A public message.
+     */
     @GetMapping("/public")
-    public String publuc() {
-        return "Public acces";
+    public String publicEndpoint() {
+        return "Public access granted!";
     }
 
+    /**
+     * This endpoint requires authentication. The authenticated user's JWT is injected.
+     *
+     * @param jwt The authenticated user's JWT.
+     * @return A private message including the user's subject from the JWT.
+     */
     @GetMapping("/private")
-	public String index(@AuthenticationPrincipal Jwt jwt) {
-		return String.format("Hello, %s!", jwt.getSubject());
+	public String privateEndpoint(@AuthenticationPrincipal Jwt jwt) {
+		return String.format("Hello, %s! You have accessed a private endpoint.", jwt.getSubject());
 	}
 
 }
@@ -110,11 +126,15 @@ class DemoController {
 
 <TabItem value="Frontend Setup">
 
+To integrate Auth0 with your React application, install the `@auth0/auth0-react` SDK:
+
 ```bash
 npm install @auth0/auth0-react
 ```
 
-```tsx
+Wrap your React application with the `Auth0Provider` component. This component makes the Auth0 client available to all child components.
+
+```tsx title="main.tsx" or "index.tsx"
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Auth0Provider } from "@auth0/auth0-react";
@@ -125,10 +145,11 @@ import App from "./App.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Auth0Provider
-      domain="yourAuth0domain.com"
-      clientId="placeholderValue"
+      domain="YOUR_AUTH0_DOMAIN"
+      clientId="YOUR_AUTH0_CLIENT_ID"
       authorizationParams={{
         redirect_uri: window.location.origin,
+        audience: "YOUR_API_AUDIENCE", // Optional: if you have an API
       }}
     >
       <App />
@@ -137,11 +158,14 @@ createRoot(document.getElementById("root")!).render(
 );
 ```
 
+Replace `YOUR_AUTH0_DOMAIN`, `YOUR_AUTH0_CLIENT_ID`, and `YOUR_API_AUDIENCE` with your actual Auth0 application settings.
 </TabItem>
 
 <TabItem value="Component">
 
-```tsx
+This React component demonstrates how to use the `useAuth0` hook to manage authentication states (loading, authenticated, user information) and interact with your Spring Boot backend.
+
+```tsx title="App.tsx"
 import axios from "axios";
 import "./App.css";
 import { useAuth0 } from "@auth0/auth0-react";
