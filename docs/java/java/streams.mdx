@@ -1,0 +1,97 @@
+---
+sidebar_label: 'Streams'
+sidebar_position: 15
+---
+
+# Streams
+
+Java Streams provide a powerful and flexible way to process collections of data. They allow you to perform operations like filtering, mapping, and reducing data in a declarative and often more readable manner than traditional loops.
+
+## Examples
+
+### Filtering a List
+
+This example demonstrates how to filter a list of numbers to keep only the even numbers.
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class StreamFilterExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        List<Integer> evenNumbers = numbers.stream()
+                                           .filter(n -> n % 2 == 0)
+                                           .collect(Collectors.toList());
+
+        System.out.println(evenNumbers); // [2, 4, 6, 8, 10]
+    }
+}
+```
+
+### Mapping a List
+
+This example shows how to transform each element in a list by squaring it.
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class StreamMapExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+        List<Integer> squaredNumbers = numbers.stream()
+                                             .map(n -> n * n)
+                                             .collect(Collectors.toList());
+
+        System.out.println(squaredNumbers); // [1, 4, 9, 16, 25]
+    }
+}
+```
+
+### Reducing a List
+
+This example demonstrates how to sum all elements in a list using the `reduce` operation.
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class StreamReduceExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+        Optional<Integer> sum = numbers.stream()
+                                       .reduce((a, b) -> a + b);
+
+        sum.ifPresent(s -> System.out.println(s)); // 15
+    }
+}
+```
+
+### Chaining Operations
+
+This example combines filtering and mapping to get the squares of even numbers.
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class StreamChainingExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        List<Integer> squaredEvenNumbers = numbers.stream()
+                                                  .filter(n -> n % 2 == 0)
+                                                  .map(n -> n * n)
+                                                  .collect(Collectors.toList());
+
+        System.out.println(squaredEvenNumbers); // [4, 16, 36, 64, 100]
+    }
+}
