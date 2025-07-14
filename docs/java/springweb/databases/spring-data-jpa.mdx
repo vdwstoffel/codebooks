@@ -198,6 +198,94 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 }
 ```
 
+## Working with EntityManager
+
+While Spring Data JPA repositories provide a powerful abstraction for most common database operations, there are scenarios where you might need more fine-grained control over the persistence context. This is where the `EntityManager` comes into play. The `EntityManager` is part of the JPA specification and provides methods for interacting directly with the persistence context.
+
+**When to use `EntityManager` directly:**
+-   **Complex Scenarios**: For operations that are not easily expressed using Spring Data JPA's derived query methods or `@Query` annotations.
+-   **Detached Entities**: When you need to re-attach detached entities to the persistence context.
+-   **Flushing and Clearing**: To explicitly control when changes are synchronized with the database (flushing) or to clear the persistence context.
+-   **Native SQL Queries**: For executing native SQL queries that cannot be handled by JPQL.
+
+To use `EntityManager`, you typically inject it into your service layer:
+
+```java title="src/main/java/com/example/demo/service/TodoService.java"
+package com.example.demo.service;
+
+import com.example.demo.entity.Todo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class TodoService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Transactional
+    public Todo saveTodo(Todo todo) {
+        // Persist a new entity
+        entityManager.persist(todo);
+        return todo;
+    }
+
+    @Transactional
+    public Todo findTodoById(Long id) {
+        // Find an entity by its primary key
+        return entityManager.find(Todo.class, id);
+    }
+
+    @Transactional
+    public Todo updateTodo(Todo todo) {
+        // Merge changes from a detached entity back into the persistence context
+        return entityManager.merge(todo);
+    }
+
+    @Transactional
+    public void deleteTodo(Long id) {
+        // Find and remove an entity
+        Todo todo = entityManager.find(Todo.class, id);
+        if (todo != null) {
+            entityManager.remove(todo);
+        }
+    }
+
+    @Transactional
+    public void refreshTodo(Todo todo) {
+        // Refresh the state of the entity from the database
+        entityManager.refresh(todo);
+    }
+
+    @Transactional
+    public void detachTodo(Todo todo) {
+        // Detach the entity from the persistence context
+        entityManager.detach(todo);
+    }
+
+    @Transactional
+    public void flushAndClear() {
+        // Synchronize the persistence context to the underlying database
+        entityManager.flush();
+        // Clear the persistence context, detaching all managed entities
+        entityManager.clear();
+    }
+}
+```
+
+**Key `EntityManager` Methods:**
+
+-   **`persist(entity)`**: Makes a transient instance persistent. The entity will be inserted into the database when the transaction is committed.
+-   **`find(Class<T> entityClass, Object primaryKey)`**: Finds an entity by its primary key. Returns `null` if the entity does not exist.
+-   **`merge(entity)`**: Merges the state of a given entity into the current persistence context. If the entity is detached, a managed copy is returned. If the entity is new, it becomes managed.
+-   **`remove(entity)`**: Makes a managed entity instance removed. The entity will be deleted from the database when the transaction is committed.
+-   **`refresh(entity)`**: Refreshes the state of the entity from the database, overwriting any changes made in the current persistence context.
+-   **`detach(entity)`**: Detaches the given entity from the persistence context. Changes to a detached entity will not be synchronized with the database.
+-   **`flush()`**: Synchronizes the persistence context to the underlying database. This forces pending changes to be written to the database.
+-   **`clear()`**: Clears the persistence context, causing all managed entities to become detached.
+
 ## Modifying and Transactional Operations in Repositories
 
 In Spring Data JPA, the `@Modifying` and `@Transactional` annotations are used together directly on repository methods when you need to execute update or delete queries that modify the database.
@@ -253,3 +341,502 @@ In this `UserRepository` example:
 **Summary:**
 -   Use `@Modifying` for custom DML (Data Manipulation Language) queries (UPDATE, DELETE).
 -   Always use `@Transactional` on the repository method that invokes a `@Modifying` query to ensure the operation is atomic and changes are properly committed or rolled back. This is crucial for data integrity.
+
+## Foreign Keys and Relationships
+
+In relational databases, foreign keys establish relationships between tables. In JPA, these relationships are mapped using annotations on your entity classes. Spring Data JPA simplifies working with these relationships through its repositories.
+
+### One-to-Many / Many-to-One Relationship
+
+Let's consider a common scenario: an `Author` can write multiple `Book`s. This represents a One-to-Many relationship from `Author` to `Book`, and a Many-to-One relationship from `Book` to `Author`.
+
+#### Defining Entities with Relationships
+
+First, we define the `Author` and `Book` entities:
+
+<Tabs>
+<TabItem value="Author.java" label="Author.java">
+
+```java title="src/main/java/com/example/demo/entity/Author.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "authors")
+public class Author {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    // highlight-next-line
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Book> books = new HashSet<>();
+
+    public Author() {}
+
+    public Author(String name) {
+        this.name = name;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books = books;
+    }
+
+    // Helper method to add a book and maintain bidirectional relationship
+    public void addBook(Book book) {
+        this.books.add(book);
+        book.setAuthor(this);
+    }
+
+    // Helper method to remove a book and maintain bidirectional relationship
+    public void removeBook(Book book) {
+        this.books.remove(book);
+        book.setAuthor(null);
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Book.java" label="Book.java">
+
+```java title="src/main/java/com/example/demo/entity/Book.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "books")
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    // highlight-next-line
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id") // This column in the 'books' table will store the foreign key
+    private Author author;
+
+    public Book() {}
+
+    public Book(String title) {
+        this.title = title;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Explanation of Annotations:**
+
+-   **`@OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)`** (in `Author` entity):
+    -   `mappedBy = "author"`: Indicates that the `books` field in `Author` is the inverse side of the relationship. The `author` field in the `Book` entity is the owning side.
+    -   `cascade = CascadeType.ALL`: Operations (persist, merge, remove, refresh, detach) on `Author` will cascade to its associated `Book`s.
+    -   `orphanRemoval = true`: If a `Book` is removed from the `Author`'s `books` set, it will be deleted from the database.
+
+-   **`@ManyToOne(fetch = FetchType.LAZY)`** (in `Book` entity):
+    -   `fetch = FetchType.LAZY`: The `Author` entity will be loaded only when it's explicitly accessed, improving performance.
+
+-   **`@JoinColumn(name = "author_id")`** (in `Book` entity):
+    -   Specifies the foreign key column (`author_id`) in the `books` table that references the primary key of the `authors` table.
+
+#### Creating Repositories for Related Entities
+
+```java title="src/main/java/com/example/demo/repository/AuthorRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Author;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+}
+```
+
+```java title="src/main/java/com/example/demo/repository/BookRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
+    // Custom query to find books by author's name
+    List<Book> findByAuthorName(String authorName);
+}
+```
+
+#### Using Repositories with Relationships
+
+Here's how you can interact with these entities and their relationships using Spring Data JPA repositories:
+
+```java title="src/main/java/com/example/demo/service/LibraryService.java"
+package com.example.demo.service;
+
+import com.example.demo.entity.Author;
+import com.example.demo.entity.Book;
+import com.example.demo.repository.AuthorRepository;
+import com.example.demo.repository.BookRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class LibraryService {
+
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+
+    public LibraryService(AuthorRepository authorRepository, BookRepository bookRepository) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
+    }
+
+    @Transactional
+    public Author createAuthorWithBooks(String authorName, List<String> bookTitles) {
+        Author author = new Author(authorName);
+        for (String title : bookTitles) {
+            author.addBook(new Book(title));
+        }
+        return authorRepository.save(author);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Author> findAuthorById(Long id) {
+        return authorRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Book> findBooksByAuthorName(String authorName) {
+        return bookRepository.findByAuthorName(authorName);
+    }
+
+    @Transactional
+    public void addBookToExistingAuthor(Long authorId, String bookTitle) {
+        Optional<Author> authorOptional = authorRepository.findById(authorId);
+        authorOptional.ifPresent(author -> {
+            author.addBook(new Book(bookTitle));
+            authorRepository.save(author); // Save the author to persist the new book
+        });
+    }
+
+    @Transactional
+    public void deleteBook(Long bookId) {
+        bookRepository.deleteById(bookId);
+    }
+
+    @Transactional
+    public void deleteAuthorAndBooks(Long authorId) {
+        authorRepository.deleteById(authorId);
+    }
+}
+```
+
+### Many-to-Many Relationship
+
+A Many-to-Many relationship exists when multiple records in one table are associated with multiple records in another table. For example, a `Student` can enroll in multiple `Course`s, and a `Course` can have multiple `Student`s. In JPA, this is typically modeled with a join table.
+
+#### Defining Entities with Many-to-Many Relationship
+
+<Tabs>
+<TabItem value="Student.java" label="Student.java">
+
+```java title="src/main/java/com/example/demo/entity/Student.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "students")
+public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    // highlight-next-line
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses = new HashSet<>();
+
+    public Student() {}
+
+    public Student(String name) {
+        this.name = name;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }
+
+    // Helper methods to manage the relationship
+    public void addCourse(Course course) {
+        this.courses.add(course);
+        course.getStudents().add(this);
+    }
+
+    public void removeCourse(Course course) {
+        this.courses.remove(course);
+        course.getStudents().remove(this);
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Course.java" label="Course.java">
+
+```java title="src/main/java/com/example/demo/entity/Course.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "courses")
+public class Course {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    // highlight-next-line
+    @ManyToMany(mappedBy = "courses")
+    private Set<Student> students = new HashSet<>();
+
+    public Course() {}
+
+    public Course(String title) {
+        this.title = title;
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Set<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Explanation of Annotations:**
+
+-   **`@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})`** (in `Student` entity):
+    -   `cascade = {CascadeType.PERSIST, CascadeType.MERGE}`: Operations will cascade to associated entities.
+-   **`@JoinTable`** (in `Student` entity):
+    -   `name = "student_course"`: Specifies the name of the join table.
+    -   `joinColumns = @JoinColumn(name = "student_id")`: Defines the foreign key column in the join table that refers to the `Student` entity's primary key.
+    -   `inverseJoinColumns = @JoinColumn(name = "course_id")`: Defines the foreign key column in the join table that refers to the `Course` entity's primary key.
+-   **`@ManyToMany(mappedBy = "courses")`** (in `Course` entity):
+    -   `mappedBy = "courses"`: Indicates that the `students` field in `Course` is the inverse side of the relationship. The `courses` field in the `Student` entity is the owning side.
+
+#### Creating Repositories for Many-to-Many Entities
+
+```java title="src/main/java/com/example/demo/repository/StudentRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Student;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    List<Student> findByCoursesTitle(String courseTitle);
+}
+```
+
+```java title="src/main/java/com/example/demo/repository/CourseRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Course;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CourseRepository extends JpaRepository<Course, Long> {
+    List<Course> findByStudentsName(String studentName);
+}
+```
+
+#### Using Repositories with Many-to-Many Relationships
+
+```java title="src/main/java/com/example/demo/service/EnrollmentService.java"
+package com.example.demo.service;
+
+import com.example.demo.entity.Course;
+import com.example.demo.entity.Student;
+import com.example.demo.repository.CourseRepository;
+import com.example.demo.repository.StudentRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EnrollmentService {
+
+    private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository;
+
+    public EnrollmentService(StudentRepository studentRepository, CourseRepository courseRepository) {
+        this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
+    }
+
+    @Transactional
+    public Student enrollStudentInCourses(String studentName, List<String> courseTitles) {
+        Student student = new Student(studentName);
+        for (String title : courseTitles) {
+            Course course = courseRepository.findByTitle(title)
+                                .orElseGet(() -> courseRepository.save(new Course(title)));
+            student.addCourse(course);
+        }
+        return studentRepository.save(student);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Student> findStudentById(Long id) {
+        return studentRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Student> findStudentsByCourseTitle(String courseTitle) {
+        return studentRepository.findByCoursesTitle(courseTitle);
+    }
+
+    @Transactional
+    public void addCourseToStudent(Long studentId, String courseTitle) {
+        Optional<Student> studentOptional = studentRepository.findById(studentId);
+        studentOptional.ifPresent(student -> {
+            Course course = courseRepository.findByTitle(courseTitle)
+                                .orElseGet(() -> courseRepository.save(new Course(courseTitle)));
+            student.addCourse(course);
+            studentRepository.save(student);
+        });
+    }
+
+    @Transactional
+    public void removeCourseFromStudent(Long studentId, Long courseId) {
+        Optional<Student> studentOptional = studentRepository.findById(studentId);
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+
+        if (studentOptional.isPresent() && courseOptional.isPresent()) {
+            Student student = studentOptional.get();
+            Course course = courseOptional.get();
+            student.removeCourse(course);
+            studentRepository.save(student);
+        }
+    }
+}
+```
