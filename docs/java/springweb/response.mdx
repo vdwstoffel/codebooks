@@ -1,13 +1,12 @@
 ---
-sidebar_label: "ResponseEntity"
-title: "Using ResponseEntity"
-sidebar_position: 8
+sidebar_label: "Response Handling"
+sidebar_position: 4
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Using ResponseEntity
+# Response Handling
 
 `ResponseEntity` is a powerful tool in Spring Framework that represents the entire HTTP response. It allows you to control everything that goes into it, including the status code, headers, and the body. This makes it ideal for building flexible and precise REST APIs.
 
@@ -139,6 +138,69 @@ public class UserController {
 ```
 
 </TabItem>
+</Tabs>
+
+## Creating a Custom Response Wrapper
+
+For more complex applications, it's often a good practice to use a custom response wrapper. This allows you to standardize the structure of your API responses, making them more predictable for clients.
+
+<Tabs>
+
+<TabItem value="Response DTO">
+
+```java title="ApiResponse.java"
+package com.example.demo.dto;
+
+public class ApiResponse<T> {
+    private int statusCode;
+    private String message;
+    private T data;
+
+    public ApiResponse(int statusCode, String message, T data) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = data;
+    }
+
+    // Getters and setters
+}
+```
+
+</TabItem>
+
+<TabItem value="Controller">
+
+```java title="UserController.java"
+package com.example.demo.controller;
+
+import com.example.demo.dto.ApiResponse;
+import com.example.demo.model.User;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class UserController {
+
+    private final User user = new User(1L, "John Doe");
+
+    @GetMapping("/api/users/{id}")
+    public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
+        if (id.equals(user.getId())) {
+            // highlight-next-line
+            ApiResponse<User> response = new ApiResponse<>(200, "User found", user);
+            return ResponseEntity.ok(response);
+        }
+        // highlight-next-line
+        ApiResponse<User> response = new ApiResponse<>(404, "User not found", null);
+        return ResponseEntity.status(404).body(response);
+    }
+}
+```
+
+</TabItem>
+
 </Tabs>
 
 ## Returning Error Responses

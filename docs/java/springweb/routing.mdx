@@ -1,336 +1,139 @@
 ---
 sidebar_label: "Routing"
-sidebar_position: 1
+sidebar_position: 3
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # Routing
 
+In Spring Web, routing is the process of mapping incoming HTTP requests to the appropriate handler methods in your controllers. This is primarily achieved using annotations like `@RequestMapping`, `@GetMapping`, `@PostMapping`, etc.
+
 ## Path Variables
 
-```java
+Path variables allow you to capture values from the URL path and use them in your handler methods.
+
+```java title="src/main/java/com/example/demo/MyController.java"
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-@GetMapping("/students/{studentId}")
-public Student getStudent(@PathVariable int studentId) {
-    Student student = this.students.get(studentId);
-    return student;
-}
-```
-
-## Parse a JSON body
-
-`@RequestBody`: This annotation tells Spring to map the incoming JSON payload to the Expense object automatically. Spring uses Jackson (a JSON processing library) under the hood to handle this conversion.
-
-<Tabs>
-
-<TabItem value="Expense Entity">
-
-```java title="Expense.java"
-package com.example.cruddemo.entity;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class Expense {
-    private String expense;
-    private double total;
-    private String category;
-
-    public Expense() {};
-
-    public Expense(String expense, double total, String category) {
-        this.expense = expense;
-        this.total = total;
-        this.category = category;
-    }
-
-    public String getExpense() {
-        return this.expense;
-    }
-
-    public void setExpense(String expense) {
-        this.expense = expense;
-    }
-
-    public double getTotal() {
-        return this.total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
-    public String getCategory() {
-        return this.category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-}
-```
-
-</TabItem>
-
-<TabItem value="Controller">
-
-```java title="ExpenseController.java"
-package com.example.cruddemo.rest;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.cruddemo.entity.Expense;
-
 @RestController
-@RequestMapping("/api/expense")
-public class ExpenseController {
+@RequestMapping("/api")
+public class MyController {
 
-    private List<Expense> expenses;
-
-    @Autowired
-    public ExpenseController() {
-        this.expenses = new ArrayList<>();
-    }
-
-    @GetMapping
-    public List<Expense> getAllExpenses() {
-        return this.expenses;
-    }
-
-    @PostMapping
+    @GetMapping("/users/{userId}")
     // highlight-next-line
-    public void addExpense(@RequestBody Expense newExpense) {
-
-        String expenseName = newExpense.getExpense();
-        double expenseTotal = newExpense.getTotal();
-        String expenseCategory = newExpense.getCategory();
-
-        expenses.add(new Expense(expenseName, expenseTotal, expenseCategory));
+    public String getUserById(@PathVariable String userId) {
+        return "Fetching user with ID: " + userId;
     }
 }
 ```
 
-</TabItem>
+In this example, the `{userId}` in the URL is a path variable. The `@PathVariable` annotation binds the value of this variable to the `userId` parameter in the `getUserById` method.
 
-</Tabs>
+<BrowserWindow url="http://localhost:8080/api/users/123">
+  "Fetching user with ID: 123"
+</BrowserWindow>
 
-## Creating a custom Response
+## Query Parameters
 
-<Tabs>
+Query parameters are used to filter or customize the response. You can access them using the `@RequestParam` annotation.
 
-<TabItem value="Entity">
+```java title="src/main/java/com/example/demo/MyController.java"
+package com.example.demo;
 
-- `@Component` annotation tells Spring that this class is a bean and should be managed by the Spring container
-- `@Override` annotation tells the compiler that the method is an override of a method in the parent class
-
-```java title="User.java"
-package com.example.basic_rest.entity;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class User {
-    private String username;
-    private int age;
-
-    // Empty constructor required for Spring to create an instance of the class
-    public User() {
-    };
-
-    public User(String username, int age) {
-        this.username = username;
-        this.age = age;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public int getAge() {
-        return this.age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-}
-```
-
-</TabItem>
-
-<TabItem value="Response Dto">
-
-DTO (Data Transfer Object) is a design pattern used to transfer data between different layers of an application, such as from the controller to the service layer or between client and server in APIs.
-
-```java title="UserApiResponse.java"
-package com.example.basic_rest.dto;
-
-public class UserApiResponse<T> {
-    private int statusCode;
-    private int length;
-    private T data; // It allows the class to work with any type of data, making it flexible and reusable.
-
-    public UserApiResponse(int statusCode, int length, T data) {
-        this.statusCode = statusCode;
-        this.length = length;
-        this.data = data;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-}
-```
-
-</TabItem>
-
-<TabItem value="Create Controller">
-
-- `@RestController` annotation tells Spring that this class is a controller
-- `@RequestMapping` annotation tells Spring that this controller will handle requests that start with /api
-- `@Autowired` annotation tells Spring to inject an instance of Student into this controller
-- `@GetMapping` annotation tells Spring that this method will handle GET requests to /api/students
-
-Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of user into a JSON array if returnung the user as is.
-
-```java title="UserController.java"
-package com.example.basic_rest.controller;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.basic_rest.dto.UserApiResponse;
-import com.example.basic_rest.entity.User;
-
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
-
-    private List<User> users;
-
-    @Autowired
-    public UserController() {
-        this.users = new ArrayList<>();
-    }
-
-    @GetMapping
-    public ResponseEntity<UserApiResponse<List<User>>> getAllUser() {
-
-        List<User> users = this.users;
-        UserApiResponse<List<User>> response = new UserApiResponse<List<User>>(200, users.size(), users);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/adduser")
-    public ResponseEntity<UserApiResponse<User>> createUser(@RequestBody User user) {
-        users.add(new User(user.getUsername(), user.getAge()));
-
-        UserApiResponse<User> response = new UserApiResponse<User>(201, 1, user);
-        return ResponseEntity.ok(response);
-    }
-}
-```
-
-</TabItem>
-</Tabs>
-
-## How to parse query parameters
-
-- `@RequestParam` annotation is used to extract query parameters from the URL. It allows you to access the values of the parameters passed in the URL.
-
-
-- `@RequestParam(required = false)` indicates that the parameter is optional. If the parameter is not present in the request, it will be set to null.
-
-```java title="QueryController.java"
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class QueryParameterController {
+@RequestMapping("/api")
+public class MyController {
 
-    @GetMapping("/example")
-    public String getQueryParameters(@RequestParam(required = false) String param1,
-                                     @RequestParam(required = false) Integer param2) {
-        return "Received query parameters: param1 = " + param1 + ", param2 = " + param2;
+    @GetMapping("/posts")
+    // highlight-next-line
+    public String getPosts(@RequestParam(required = false) String category) {
+        if (category != null) {
+            return "Fetching posts in category: " + category;
+        }
+        return "Fetching all posts";
     }
 }
 ```
-`example.com/example?param1=value1&param2=123`
 
-## Upload a file
+By setting `required = false`, the `category` parameter becomes optional.
 
-```java
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+<BrowserWindow url="http://localhost:8080/api/posts?category=tech">
+  "Fetching posts in category: tech"
+</BrowserWindow>
 
-@PostMapping("/upload-statement")
+## Request Body
+
+When handling `POST` or `PUT` requests, you often need to process the data sent in the request body. The `@RequestBody` annotation deserializes the request body into a Java object.
+
+```java title="src/main/java/com/example/demo/MyController.java"
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api")
+public class MyController {
+
+    @PostMapping("/users")
+    // highlight-next-line
+    public String createUser(@RequestBody User user) {
+        return "Created user: " + user.getName();
+    }
+}
+
+// A simple User class
+class User {
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+## File Uploads
+
+Spring Web also supports file uploads using the `MultipartFile` class.
+
+```java title="src/main/java/com/example/demo/MyController.java"
+package com.example.demo;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/api")
+public class MyController {
+
+    @PostMapping("/upload")
+    // highlight-next-line
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a valid file");
+            return ResponseEntity.badRequest().body("Please upload a file");
         }
-
-        try (Reader reader = new InputStreamReader(file.getInputStream());
-                CSVParser csvParser = new CSVParser(reader,
-                        CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader().withTrim())) {
-
-            for (CSVRecord record : csvParser) {
-                // System.out.println("Processing record: " + record);
-                String date = record.get("Date");
-                String amount = record.get("Amount");
-                System.out.println(date + " " + amount);
-            }
-
-            return ResponseEntity.ok("File processed successfully");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file");
-        }
+        return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
     }
+}
 ```
