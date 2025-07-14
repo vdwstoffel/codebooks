@@ -28,7 +28,10 @@ All examples are in the `docs` folder, separated by language and then by concept
 - When providing code examples, focus solely on the technology or concept explicitly requested. Do not introduce 
 code from other technologies or frameworks unless specifically instructed to do so by the user. 
 - In code examples, show the output of a variable or expression as a comment (e.g., `// "Hello"`) on the same line, rather than using a separate print statement.
-- When creating or updating a topic, ensure the main introduction file for that language or technology (e.g., `java.mdx` for Java topics) is updated with a link to the new or modified file.
+- When creating or updating a topic, ensure the main introduction file for that language or technology (e.g., `java.mdx` for Java topics) is updated with a link to the new or modified file. The link should be placed in the "What's Next?" section at the end of the file, formatted as follows:
+```mdx
+- [New Topic](./new-topic.mdx)
+```
 - When adding or improving a page, always add the `sidebar_label` and `sidebar_position` to the top of the file. For example:
 ```mdx
 ---
@@ -46,3 +49,4 @@ sidebar_position: 3
 ```javascript
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 ```
+- When showing code examples, use `// highlight-next-line` to draw attention to important lines of code.

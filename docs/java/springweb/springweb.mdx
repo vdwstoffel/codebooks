@@ -3,11 +3,9 @@ sidebar_label: "Spring Web"
 sidebar_position: 1
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
-# Spring Boot
+# Spring Web
 
 <div
   style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
@@ -15,321 +13,87 @@ import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
   <img src="https://repository-images.githubusercontent.com/149085612/76e31b00-782c-11e9-8fdc-eec6e93d055b" />
 </div>
 
-Spring Boot is an open-source framework that simplifies the development of Java-based, production-ready applications.
+Spring Web is a module of the Spring Framework that provides features for developing web applications. It includes support for creating RESTful web services, handling requests and responses, and integrating with other web technologies.
 
-## Starting a Spring Boot Project
+## Getting Started
 
-To start a Spring Boot project, you can use the Spring Initializr. The Spring Initializr is a web-based tool that generates a Spring Boot project structure for you.
+To start a new Spring Boot project with Spring Web, you can use the [Spring Initializr](https://start.spring.io/).
 
-[Spring Initializer](https://start.spring.io/)
+### Dependencies
 
-**Dependencies**
+When creating your project, make sure to include the **Spring Web** dependency.
 
-- Spring Web
+## Creating a Simple REST Controller
 
-## Spring Boot quick start
+A REST controller is a key component in Spring Web that handles incoming HTTP requests and returns an appropriate response. The following example demonstrates how to create a basic controller that responds to a `GET` request.
 
-- Copy the zip file to your project directory
+```java title="src/main/java/com/example/demo/HelloController.java"
+package com.example.demo;
 
-```bash
-.
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── tutorial
-│   │   │           └── basic_rest
-│   │   │               ├── BasicRestApplication.java
-│   │   │               ├── entity
-│   │   │               │   └── User.java
-│   │   │               └── rest
-│   │   │                   └── UserController.java
-```
-
-<Tabs>
-
-<TabItem value="Create Class">
-
-- `@Component` annotation tells Spring that this class is a bean and should be managed by the Spring container
-- `@Override` annotation tells the compiler that the method is an override of a method in the parent class
-
-```java title="User.java"
-package com.example.basic_rest.entity;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class User {
-    private String username;
-    private int age;
-
-    // Empty constructor required for Spring to create an instance of the class
-    public User() {
-    };
-
-    public User(String username, int age) {
-        this.username = username;
-        this.age = age;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public int getAge() {
-        return this.age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-}
-```
-
-</TabItem>
-
-<TabItem value="Create Controller">
-
-- `@RestController` annotation tells Spring that this class is a controller
-- `@RequestMapping` annotation tells Spring that this controller will handle requests that start with /api
-- `@Autowired` annotation tells Spring to inject an instance of Student into this controller
-- `@GetMapping` annotation tells Spring that this method will handle GET requests to /api/students
-
-Jackson is a high-performance JSON processor for Java. It is used to convert Java objects into JSON and vice versa. It will automatically convert the list of user into a JSON array if returnung the user as is.
-
-```java title="UserController.java"
-package com.example.basic_rest.controller;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.basic_rest.entity.User;
-
 @RestController
-@RequestMapping("/api/users")
-public class UserController {
+@RequestMapping("/api")
+public class HelloController {
 
-    private List<User> users;
-
-    @Autowired
-    public UserController() {
-        this.users = new ArrayList<>();
-    }
-
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllUser() {
-
-        Map<String, Object> response = Map.of(
-                "statusCode", 200,
-                "length", this.users.size(),
-                "data", this.users);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/adduser")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-        users.add(new User(user.getUsername(), user.getAge()));
-
-        Map<String, Object> response = Map.of(
-            "statusCode", 201,
-            "data", user
-        );
-
-        return ResponseEntity.ok(response);
+    @GetMapping("/")
+    public String sayHello() {
+        return "Hello, World!";
     }
 }
 ```
 
-</TabItem>
-<TabItem value="Main">
+### Running the Application
 
-- `@SpringBootApplication` annotation tells Spring that this class is the entry point for the application
-
-```java title="CrudapiApplication.java"
-package com.stoffel.firstApp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class HelloWorldApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(HelloWorldApplication.class, args);
-	}
-
-}
-
-```
-
- </TabItem>
-
-</Tabs>
-
-- Run the application
+To run the application, you can use the following Maven command:
 
 ```bash
- mvn clean spring-boot:run
+mvn spring-boot:run
 ```
 
-## Injecting custom properties
+Once the application is running, you can access the endpoint at `http://localhost:8080/api`.
 
-```application title="application.properties"
-secret.name="Ted Lasso"
-```
+<BrowserWindow url="http://localhost:8080/api">
+  "Hello, World!"
+</BrowserWindow>
 
-```java title="ExampleRestController.java"
-package com.stoffel.firstApp.rest;
+## Key Concepts
 
-// highlight-next-line
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+| Annotation      | Description                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `@RestController` | A specialized version of `@Controller` that marks a class as a request handler and serializes return values to JSON.    |
+| `@RequestMapping` | Maps HTTP requests to a handler class or method. It can be used at the class level to define a base path for all endpoints in that class. |
+| `@GetMapping`     | A shortcut for `@RequestMapping(method = RequestMethod.GET)`. It maps HTTP `GET` requests to a specific handler method. |
+| `@PostMapping`    | A shortcut for `@RequestMapping(method = RequestMethod.POST)`. It maps HTTP `POST` requests to a specific handler method. |
+| `@PutMapping`     | A shortcut for `@RequestMapping(method = RequestMethod.PUT)`. It maps HTTP `PUT` requests to a specific handler method.    |
+| `@DeleteMapping`  | A shortcut for `@RequestMapping(method = RequestMethod.DELETE)`. It maps HTTP `DELETE` requests to a specific handler method. |
 
-@RestController
-public class ExampleRestController {
+## Hot Reloading
 
-    // highlight-next-line
-    @Value("${secret.name}")
-    // highlight-next-line
-    private String secretName;
+Spring Boot DevTools is a powerful feature that provides automatic application restarts whenever files on the classpath change. This can significantly speed up development by reducing the time spent manually restarting the server.
 
-    @GetMapping("/secret")
-    public String getSecret() {
-       return secretName;
-    }
-}
-```
+### Enabling DevTools
 
-<BrowserWindow url="http://localhost:8080/secret">"Ted Lasso"</BrowserWindow>
+To enable hot reloading, add the `spring-boot-devtools` dependency to your `pom.xml` file:
 
-## Adding hot reload
-
-- Add the following dependency to the `pom.xml` file
-
-```xml
+```xml title="pom.xml"
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-devtools</artifactId>
     <scope>runtime</scope>
+    <optional>true</optional>
 </dependency>
 ```
 
-## Monitoring the application
+Now, when you run your application, any changes to your code will trigger an automatic restart.
 
-Spring Boot Actuator provides a set of production-ready features to help you monitor and manage your application.
+## What's Next?
 
-- Add the following dependency to the `pom.xml` file
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-```
-
-- in the `application.properties` file, add the following line to enable the endpoints
-
-```properties title="application.properties"
-management.endpoints.web.exposure.include=health,info
-```
-
-| Name             | Description                                                          |
-| ---------------- | -------------------------------------------------------------------- |
-| /actuator/health | Shows application health information                                 |
-| /actuator/info   | Displays arbitrary application info                                  |
-| /actuator/beans  | Displays a complete list of all the Spring beans in your application |
-
-- To add properties to the /info endpoint
-
-```properties title="application.properties"
-management.info.env.enabled=true
-info.app.author=John Doe
-info.app.description=This is a test
-info.app.version=1.0.0
-```
-
-<BrowserWindow url="http://localhost:8080/actuator/info">
-  <p>
-    {
-      '{"app":{"author":"John Doe","description":"This is a test ","version":"1.0.0"}'
-    }
-  </p>
-</BrowserWindow>
-
-## Configuring the server
-
-```bash
-.
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── ...
-│   │   └── resources
-│   │       ├── application.properties
-│   │       ├── static
-│   │       └── templates
-```
-
-### Updating the default port
-
-- Add the following line to the `application.properties` file
-
-```properties title="application.properties"
-server.port=8081
-```
-
-### Update context path
-
-- Add the following line to the `application.properties` file
-
-```properties title="application.properties"
-server.servlet.context-path=/firstApp
-```
-
-Now go to [http://localhost:8081/firstApp/](http://localhost:8081/firstApp/)
-
-### Set logging for application
-
-```properties title="application.properties"
-logging.file.name=logs/firstApp.log
-```
-
-## Working with environment variables
-
-You can use environment variables to configure your application. Spring Boot will automatically map environment variables to properties in the `application.properties` file.
-
-Setp and .env file in the root of your project directory
-
-```bash
-SECRET_NAME="Ted Lasso"
-```
-
-Then in the `application.properties` file, you can use the following syntax to access the environment variable:
-
-```properties title="application.properties"
-secret.name=${SECRET_NAME}
-```
+- [Configuration](./configuration.mdx): Learn how to configure your Spring Web application, including server settings and environment variables.
+- **Routing**: Learn how to define more complex routing rules to handle different URLs and HTTP methods.
+- **Handling Responses**: Explore different ways to structure and format the data returned by your API.
+- **Working with Databases**: Integrate a database to store and retrieve data for your application.
+- **Authentication**: Secure your application by adding user authentication and authorization.
+- **Error Handling**: Implement robust error handling to gracefully manage exceptions and invalid requests.

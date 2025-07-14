@@ -1,0 +1,107 @@
+---
+sidebar_label: "Configuration"
+sidebar_position: 2
+---
+
+# Configuration and Setup
+
+This guide covers common configuration and setup tasks for Spring Web applications.
+
+## Monitoring with Spring Boot Actuator
+
+Spring Boot Actuator provides production-ready features to help you monitor and manage your application.
+
+### Enabling Actuator
+
+Add the `spring-boot-starter-actuator` dependency to your `pom.xml`:
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+### Exposing Endpoints
+
+By default, only the `health` endpoint is exposed over HTTP. You can expose more endpoints in your `application.properties` file:
+
+```properties title="application.properties"
+management.endpoints.web.exposure.include=health,info,beans,env
+```
+
+### Common Endpoints
+
+| Endpoint         | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| `/actuator/health` | Shows application health information.                        |
+| `/actuator/info`   | Displays arbitrary application info.                         |
+| `/actuator/beans`  | Displays a complete list of all Spring beans.                |
+| `/actuator/env`    | Displays the current environment properties.                 |
+
+## Server Configuration
+
+You can configure server properties in the `application.properties` file.
+
+### Changing the Port
+
+To change the default server port from `8080`:
+
+```properties title="application.properties"
+server.port=8081
+```
+
+### Updating the Context Path
+
+To set a base path for your application:
+
+```properties title="application.properties"
+server.servlet.context-path=/api
+```
+Now all your application endpoints will be prefixed with `/api`.
+
+## Working with Environment Variables
+
+Spring Boot allows you to externalize your configuration using environment variables.
+
+### Using `.env` Files
+
+You can place a `.env` file in the root of your project.
+
+```bash title=".env"
+DATABASE_URL="postgres://user:password@hostname:5432/database"
+```
+
+### Referencing in `application.properties`
+
+Then, reference the environment variable in your `application.properties` file:
+
+```properties title="application.properties"
+spring.datasource.url=${DATABASE_URL}
+```
+
+### Accessing in Code
+
+You can inject the property into your Spring components using the `@Value` annotation:
+
+```java title="src/main/java/com/example/demo/MyComponent.java"
+package com.example.demo;
+
+// highlight-next-line
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyComponent {
+
+    // highlight-next-line
+    @Value("${spring.datasource.url}")
+    private String databaseUrl;
+
+    public void printDatabaseUrl() {
+        System.out.println(databaseUrl);
+    }
+}
+```
+
+Spring Boot will automatically load the variables from the `.env` file and make them available in your application's environment.
