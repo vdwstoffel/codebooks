@@ -3,6 +3,8 @@ sidebar_label: "Spring Web"
 sidebar_position: 1
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # Spring Web
@@ -58,6 +60,210 @@ Once the application is running, you can access the endpoint at `http://localhos
 <BrowserWindow url="http://localhost:8080/api">
   "Hello, World!"
 </BrowserWindow>
+
+## MVC Style Quick Start
+
+This section provides a very simplified example of a basic MVC (Model-View-Controller) setup in Spring Boot, demonstrating the interaction between an Entity, JPA Repository, Service, and Controller.
+
+<Tabs>
+<TabItem value="entity" label="Entity (Model)">
+
+The `Product` class represents our data model. It's a simple JPA entity mapped to a database table.
+
+```java title="Product.java"
+package com.example.demo.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private double price;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}
+```
+
+</TabItem>
+<TabItem value="repository" label="JPA Repository">
+
+The `ProductRepository` is an interface that extends `JpaRepository`. Spring Data JPA automatically provides common CRUD (Create, Read, Update, Delete) operations for the `Product` entity.
+
+```java title="ProductRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+}
+```
+
+</TabItem>
+<TabItem value="service-interface" label="Service Interface">
+
+The `ProductService` interface defines the contract for our business logic. This promotes loose coupling and makes our application more testable.
+
+```java title="ProductService.java"
+package com.example.demo.service;
+
+import com.example.demo.model.Product;
+import java.util.List;
+import java.util.Optional;
+
+public interface ProductService {
+    List<Product> getAllProducts();
+    Optional<Product> getProductById(Long id);
+    Product saveProduct(Product product);
+    void deleteProduct(Long id);
+}
+```
+
+</TabItem>
+<TabItem value="service-implementation" label="Service Implementation">
+
+The `ProductServiceImpl` class implements the `ProductService` interface, providing the actual business logic and interacting with the `ProductRepository`.
+
+```java title="ProductServiceImpl.java"
+package com.example.demo.service.impl;
+
+import com.example.demo.model.Product;
+import com.example.demo.repository.ProductRepository;
+import com.example.demo.service.ProductService;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    @Override
+    public Optional<Product> getProductById(Long id) {
+        return productRepository.findById(id);
+    }
+
+    @Override
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
+}
+```
+
+</TabItem>
+<TabItem value="controller" label="Controller">
+
+The `ProductController` handles incoming HTTP requests, uses the `ProductService` to perform operations, and returns appropriate HTTP responses.
+
+```java title="ProductController.java"
+package com.example.demo.controller;
+
+import com.example.demo.model.Product;
+import com.example.demo.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        Product savedProduct = productService.saveProduct(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
+        return productService.getProductById(id)
+                .map(existingProduct -> {
+                    existingProduct.setName(product.getName());
+                    existingProduct.setPrice(product.getPrice());
+                    return ResponseEntity.ok(productService.saveProduct(existingProduct));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        if (productService.getProductById(id).isPresent()) {
+            productService.deleteProduct(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## Key Concepts
 
