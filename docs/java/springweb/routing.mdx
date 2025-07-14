@@ -9,6 +9,15 @@ import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 In Spring Web, routing is the process of mapping incoming HTTP requests to the appropriate handler methods in your controllers. This is primarily achieved using annotations like `@RequestMapping`, `@GetMapping`, `@PostMapping`, etc.
 
+## Key Concepts
+
+| Annotation        | Description                                                                                                |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| `@PathVariable`   | Binds a method parameter to a URI template variable.                                                       |
+| `@RequestParam`   | Binds a method parameter to a request parameter.                                                           |
+| `@RequestBody`    | Binds the body of the HTTP request to a method parameter.                                                  |
+| `@RequestParam`   | Binds a method parameter to a request parameter, often used for file uploads with `MultipartFile`.         |
+
 ## Path Variables
 
 Path variables allow you to capture values from the URL path and use them in your handler methods.

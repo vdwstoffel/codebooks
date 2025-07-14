@@ -1,0 +1,255 @@
+---
+sidebar_label: "Spring Data JPA"
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Spring Data JPA
+
+Spring Data JPA is a module of the Spring Framework that simplifies working with databases in Java applications. It builds on JPA (Java Persistence API) and provides powerful tools to perform common database operations with minimal boilerplate code.
+
+## Key Concepts
+
+| Annotation         | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| `@Entity`          | Marks a class as a JPA entity, mapping it to a database table.              |
+| `@Table`           | Specifies the primary table for the annotated entity.                       |
+| `@Id`              | Designates a primary key for the entity.                                    |
+| `@GeneratedValue`  | Configures the primary key generation strategy.                             |
+| `@Column`          | Maps a persistent property or field to a database column.                   |
+| `@Autowired`       | Automatically injects dependencies.                                         |
+| `@Service`         | Indicates that a class is a "Service", typically holding business logic.    |
+| `@Query`           | Defines custom queries directly on repository methods.                      |
+| `@Param`           | Binds a method parameter to a named parameter in a custom query.            |
+
+## Getting Started
+
+To use Spring Data JPA, you need to add the following dependencies to your `pom.xml` file:
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<!-- Add your database driver dependency (e.g., PostgreSQL) -->
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+You also need to configure the database connection in your `application.properties` file:
+
+```properties title="application.properties"
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_database
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
+```
+
+## Creating an Entity
+
+An entity is a Java class that represents a table in your database. You can use annotations to define column properties like name, nullability, and length.
+
+**Note on Constructors:** JPA requires that all entity classes have a no-argument constructor. This is because JPA providers (like Hibernate) use reflection to create instances of your entities when loading data from the database. If you don't explicitly define any constructors, Java automatically provides a default public no-argument constructor. If you define any parameterized constructors, you must also explicitly define a public no-argument constructor.
+
+```java title="src/main/java/com/example/demo/entity/Todo.java"
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "todos") // Maps to a table named 'todos'
+public class Todo {
+
+    @Id // Designates 'id' as the primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increments the ID
+    private Long id;
+
+    // highlight-next-line
+    @Column(name = "task_description", nullable = false, length = 255) // Maps to 'task_description' column, cannot be null, max length 255
+    private String task;
+
+    // highlight-next-line
+    @Column(name = "is_completed", columnDefinition = "boolean default false") // Maps to 'is_completed' column, with a default value
+    private boolean completed;
+
+    // highlight-next-line
+    @Column(unique = true) // Ensures values in this column are unique
+    private String uniqueIdentifier;
+
+    // JPA requires a no-argument constructor
+    public Todo() {
+    }
+
+    // Optional: Parameterized constructor for convenience
+    public Todo(String task, boolean completed, String uniqueIdentifier) {
+        this.task = task;
+        this.completed = completed;
+        this.uniqueIdentifier = uniqueIdentifier;
+    }
+
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTask() {
+        return task;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getUniqueIdentifier() {
+        return uniqueIdentifier;
+    }
+
+    public void setUniqueIdentifier(String uniqueIdentifier) {
+        this.uniqueIdentifier = uniqueIdentifier;
+    }
+}
+```
+
+## Creating a Repository
+
+A repository is an interface that provides methods for CRUD operations.
+
+```java title="src/main/java/com/example/demo/repository/TodoRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Todo;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+}
+```
+
+## Using the Repository
+
+Once you have a repository, you can inject it into your services or controllers to interact with the database.
+
+```java title="src/main/java/com/example/demo/service/TodoService.java"
+package com.example.demo.service;
+
+import com.example.demo.entity.Todo;
+import com.example.demo.repository.TodoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class TodoService {
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    public List<Todo> findAll() {
+        return todoRepository.findAll();
+    }
+
+    public Todo save(Todo todo) {
+        return todoRepository.save(todo);
+    }
+}
+```
+
+## Custom Queries
+
+You can also define custom queries in your repository using the `@Query` annotation.
+
+```java title="src/main/java/com/example/demo/repository/TodoRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Todo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+
+    // highlight-next-line
+    @Query("SELECT t FROM Todo t WHERE t.completed = true")
+    List<Todo> findCompletedTodos();
+
+    // highlight-next-line
+    @Query("SELECT t FROM Todo t WHERE t.task = :task")
+    // highlight-next-line
+    List<Todo> findByTask(@Param("task") String task);
+}
+```
+
+## Modifying and Transactional Operations in Repositories
+
+In Spring Data JPA, the `@Modifying` and `@Transactional` annotations are used together directly on repository methods when you need to execute update or delete queries that modify the database.
+
+### `@Modifying` and `@Transactional`
+
+-   **`@Modifying`**: This annotation is placed on a query method to indicate that the query is an update or delete operation (DML - Data Manipulation Language). Without this, Spring Data JPA would expect a `SELECT` query.
+-   **`@Transactional`**: This annotation ensures that the method is executed within a transaction. For `@Modifying` queries, it is almost always required because update and delete operations need to be committed to the database. If an exception occurs, the transaction can be rolled back, ensuring data consistency. When used on a repository method, it ensures that the DML operation is atomic.
+
+**Why they are needed together:**
+When you perform an update or delete operation using `@Modifying`, these changes are not immediately persisted to the database unless they are part of an active transaction that is committed. `@Modifying` queries are executed directly against the database, bypassing the persistence context (first-level cache). If you don't wrap them in a transaction, the changes might not be committed, or you might encounter a `TransactionRequiredException`.
+
+**Example:** Using `@Modifying` and `@Transactional` directly in a Repository.
+
+```java title="src/main/java/com/example/demo/repository/UserRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.User; // Assuming a User entity exists
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional; // Import Transactional
+
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    // highlight-next-line
+    @Modifying // Indicates this is a DML query
+    @Transactional // Ensures the operation runs within a transaction
+    @Query("UPDATE User u SET u.email = :email WHERE u.id = :id")
+    int updateEmailById(@Param("email") String email, @Param("id") Long id);
+
+    // highlight-next-line
+    @Modifying // Indicates this is a DML query
+    @Transactional // Ensures the operation runs within a transaction
+    @Query("DELETE FROM User u WHERE u.active = false")
+    int deleteInactiveUsers();
+
+    // You can also use @Transactional for methods that involve multiple repository operations
+    // that need to be atomic, even if they don't directly use @Modifying queries.
+    @Transactional
+    default void updateAndCleanUsers(Long userId, String newEmail) {
+        updateEmailById(newEmail, userId);
+        deleteInactiveUsers();
+    }
+}
+```
+
+In this `UserRepository` example:
+-   `updateEmailById` and `deleteInactiveUsers` are marked with both `@Modifying` and `@Transactional`. This ensures that these direct update/delete queries are executed within a transaction and their changes are committed.
+-   The `updateAndCleanUsers` default method demonstrates how `@Transactional` can be used on a repository method that orchestrates multiple DML operations, ensuring atomicity.
+
+**Summary:**
+-   Use `@Modifying` for custom DML (Data Manipulation Language) queries (UPDATE, DELETE).
+-   Always use `@Transactional` on the repository method that invokes a `@Modifying` query to ensure the operation is atomic and changes are properly committed or rolled back. This is crucial for data integrity.

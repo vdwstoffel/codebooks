@@ -1,0 +1,67 @@
+---
+sidebar_label: "Spring Data REST"
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Spring Data REST
+
+Spring Data REST is a module that builds on top of Spring Data JPA and automatically exposes your repositories as RESTful endpoints.
+
+## Key Concepts
+
+| Annotation                 | Description                                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `@RepositoryRestResource`  | Customizes the RESTful export of a Spring Data repository, allowing you to change the path, relation name, and other export details. |
+| `@Entity`                  | (From JPA) Marks a class as a JPA entity, indicating it's a persistent class mapped to a database table.                               |
+| `JpaRepository`            | (From Spring Data JPA) A Spring Data interface that provides CRUD operations and common queries for a specific entity type.              |
+
+## Getting Started
+
+To use Spring Data REST, you need to add the following dependency to your `pom.xml` file:
+
+```xml title="pom.xml"
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-rest</artifactId>
+</dependency>
+```
+
+## Exposing a Repository
+
+Once you have the dependency, Spring Data REST will automatically expose any `JpaRepository` beans as RESTful endpoints.
+
+```java title="src/main/java/com/example/demo/repository/TodoRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Todo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+@RepositoryRestResource(collectionResourceRel = "todos", path = "todos")
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+}
+```
+
+With this configuration, Spring Data REST will expose a `/todos` endpoint with support for CRUD operations.
+
+## Customizing the Endpoint
+
+You can customize the endpoint path and relation name using the `@RepositoryRestResource` annotation.
+
+```java title="src/main/java/com/example/demo/repository/TodoRepository.java"
+package com.example.demo.repository;
+
+import com.example.demo.entity.Todo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+// highlight-next-line
+@RepositoryRestResource(collectionResourceRel = "tasks", path = "tasks")
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+}
+```
+
+Now the endpoint will be available at `/tasks`.
