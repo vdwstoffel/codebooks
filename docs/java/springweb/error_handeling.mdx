@@ -1,5 +1,5 @@
 ---
-sidebar_label: "Error Handeling"
+sidebar_label: "Error Handling"
 sidebar_position: 6
 ---
 
@@ -7,57 +7,99 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
-# Error Handeling
+# Error Handling in Spring Web
 
-## Route exception handeling
+Effective error handling is crucial for building robust and user-friendly web applications. In Spring Web, you can manage exceptions at different levels: within individual controllers or globally across your application. This document explores both approaches, providing clear examples for common scenarios.
 
-1. Create a custom error response class
-2. Create a custom exception class
-3. Update REST service to throw exception if not found
-4. Add an exception handler using @ExceptionHandler
+## Route-Specific Exception Handling
+
+This approach involves handling exceptions directly within the controller where they occur. It's suitable for exceptions that are specific to a particular endpoint or resource.
+
+### Step-by-Step Implementation:
+
+1.  **Define a Custom Error Response Class:** This class structures the error details sent back to the client.
+2.  **Create a Custom Exception Class:** Extend `RuntimeException` to define specific error conditions.
+3.  **Update the REST Service:** Modify your controller method to throw the custom exception when an error condition is met.
+4.  **Add an Exception Handler:** Use the `@ExceptionHandler` annotation within the controller to catch and process the custom exception, returning an appropriate HTTP response.
 
 <Tabs>
-
-<TabItem value="Error class"> 
+<TabItem value="Error Response Class" label="StudentErrorResponse.java">
 
 ```java title="StudentErrorResponse.java"
 package com.tutorial.crudapi.rest;
 
+/**
+ * Represents a standardized error response structure for the API.
+ * This class is used to return consistent error messages to the client,
+ * including an HTTP status code, a descriptive message, and a timestamp.
+ */
 public class StudentErrorResponse {
-    private int status;
-    private String message;
-    private long timeStamp;
+    private int status; // HTTP status code (e.g., 404 for Not Found)
+    private String message; // A descriptive error message
+    private long timeStamp; // Timestamp when the error occurred
 
-    // Default no argument constructor
+    /**
+     * Default no-argument constructor.
+     */
     public StudentErrorResponse() {
-    };
+    }
 
+    /**
+     * Constructs a new StudentErrorResponse with specified status, message, and timestamp.
+     *
+     * @param status    The HTTP status code.
+     * @param message   The error message.
+     * @param timeStamp The timestamp of the error.
+     */
     public StudentErrorResponse(int status, String message, long timeStamp) {
         this.status = status;
         this.message = message;
         this.timeStamp = timeStamp;
     }
 
-    // getter and setter methods
-
+    // Getter and Setter methods for all fields
+    // public int getStatus() { ... }
+    // public void setStatus(int status) { ... }
+    // public String getMessage() { ... }
+    // public void setMessage(String message) { ... }
+    // public long getTimeStamp() { ... }
+    // public void setTimeStamp(long timeStamp) { ... }
 }
 ```
 </TabItem>
 
-<TabItem value="Exception class">
+<TabItem value="Custom Exception Class" label="StudentNotFoundException.java">
 
 ```java title="StudentNotFoundException.java"
 package com.tutorial.crudapi.rest;
 
+/**
+ * Custom exception class to indicate that a student was not found.
+ * This exception extends RuntimeException, making it an unchecked exception.
+ */
 public class StudentNotFoundException extends RuntimeException {
+
+    /**
+     * Constructs a new StudentNotFoundException with the specified detail message.
+     * @param message The detail message.
+     */
     public StudentNotFoundException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new StudentNotFoundException with the specified detail message and cause.
+     * @param message The detail message.
+     * @param cause The cause (which is saved for later retrieval by the Throwable.getCause() method).
+     */
     public StudentNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructs a new StudentNotFoundException with the specified cause.
+     * @param cause The cause (which is saved for later retrieval by the Throwable.getCause() method).
+     */
     public StudentNotFoundException(Throwable cause) {
         super(cause);
     }
@@ -65,107 +107,195 @@ public class StudentNotFoundException extends RuntimeException {
 ```
 </TabItem>
 
-
-<TabItem value="StudentController.java">
+<TabItem value="Controller with Exception Handler" label="StudentController.java">
 
 ```java title="StudentController.java"
+package com.tutorial.crudapi.rest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController; // Assuming this is a REST controller
 
-// ...
-@GetMapping("/{studentId}")
-public Student getStudent(@PathVariable int studentId) {
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.annotation.PostConstruct; // For @PostConstruct
 
-    // assume this.student is a list
-    if ((studentId >= this.students.size()) || (studentId < 0) ) {
-        throw new StudentNotFoundException("Student id not found: " + studentId);
+// Dummy Student class for example purposes
+class Student {
+    private String firstName;
+    private String lastName;
+
+    public Student(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
-    Student student = this.students.get(studentId);
-    return student;
+    // Getters (omitted for brevity)
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
 }
 
-// Add an exception handler using @ExceptionHandler
-@ExceptionHandler
-public ResponseEntity<StudentErrorResponse> handleException(StudentNotFoundException exc) {
+@RestController // Indicates that this class is a REST controller
+public class StudentController {
 
-    // create a StudentErrorResponse (setter Values from error entity)
-    StudentErrorResponse error = new StudentErrorResponse();
-    error.setStatus(HttpStatus.NOT_FOUND.value());
-    error.setMessage(exc.getMessage());
-    error.setTimeStamp(System.currentTimeMillis());
+    private List<Student> students;
 
-    // return ResponseEntity
-    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-}
+    // Initialize student data
+    @PostConstruct
+    public void loadData() {
+        students = new ArrayList<>();
+        students.add(new Student("Poornima", "Patel"));
+        students.add(new Student("Mario", "Rossi"));
+        students.add(new Student("Mary", "Smith"));
+    }
 
-// Generic Exception handler
-@ExceptionHandler
-public ResponseEntity<StudentErrorResponse> handleException(Exception exc) {
+    /**
+     * Retrieves a student by their ID.
+     * Throws StudentNotFoundException if the student ID is invalid.
+     *
+     * @param studentId The ID of the student to retrieve.
+     * @return The Student object.
+     * @throws StudentNotFoundException if the student with the given ID is not found.
+     */
+    @GetMapping("/students/{studentId}")
+    public Student getStudent(@PathVariable int studentId) {
 
-    StudentErrorResponse error = new StudentErrorResponse();
-    error.setStatus(HttpStatus.BAD_REQUEST.value());
-    error.setMessage(exc.getMessage()); // Can also update to any error string you want to send
-    error.setTimeStamp(System.currentTimeMillis());
+        // Check the studentId against the list size
+        // highlight-next-line
+        if ((studentId >= students.size()) || (studentId < 0)) {
+            // highlight-next-line
+            throw new StudentNotFoundException("Student id not found: " + studentId);
+        }
 
-    // return ResponseEntity
-    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        // highlight-next-line
+        return students.get(studentId);
+    }
+
+    /**
+     * Exception handler for StudentNotFoundException.
+     * This method catches StudentNotFoundException and returns a custom error response
+     * with HTTP status 404 Not Found.
+     *
+     * @param exc The StudentNotFoundException that was thrown.
+     * @return A ResponseEntity containing StudentErrorResponse and HTTP status 404.
+     */
+    // highlight-next-line
+    @ExceptionHandler
+    public ResponseEntity<StudentErrorResponse> handleException(StudentNotFoundException exc) {
+
+        // Create a StudentErrorResponse instance
+        StudentErrorResponse error = new StudentErrorResponse();
+        // highlight-next-line
+        error.setStatus(HttpStatus.NOT_FOUND.value()); // Set HTTP status to 404
+        // highlight-next-line
+        error.setMessage(exc.getMessage()); // Set the error message from the exception
+        // highlight-next-line
+        error.setTimeStamp(System.currentTimeMillis()); // Set current timestamp
+
+        // Return ResponseEntity with the error object and HTTP status 404
+        // highlight-next-line
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Generic exception handler for any other unhandled exceptions.
+     * This method catches any Exception and returns a custom error response
+     * with HTTP status 400 Bad Request.
+     *
+     * @param exc The Exception that was thrown.
+     * @return A ResponseEntity containing StudentErrorResponse and HTTP status 400.
+     */
+    // highlight-next-line
+    @ExceptionHandler
+    public ResponseEntity<StudentErrorResponse> handleException(Exception exc) {
+
+        // Create a StudentErrorResponse instance
+        StudentErrorResponse error = new StudentErrorResponse();
+        // highlight-next-line
+        error.setStatus(HttpStatus.BAD_REQUEST.value()); // Set HTTP status to 400
+        // highlight-next-line
+        error.setMessage(exc.getMessage()); // Set the error message from the exception
+        // highlight-next-line
+        error.setTimeStamp(System.currentTimeMillis()); // Set current timestamp
+
+        // Return ResponseEntity with the error object and HTTP status 400
+        // highlight-next-line
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
 ```
-
-
 </TabItem>
-
 </Tabs>
 
-## Global error handeling
+## Global Exception Handling with `@ControllerAdvice`
 
-Instead of adding the errors at controller level create a seperate class anotated with `@ControllerAdvice` for global error handeling
+For a more centralized and organized approach, Spring provides `@ControllerAdvice`. A class annotated with `@ControllerAdvice` can contain `@ExceptionHandler` methods that apply globally to all controllers in your application. This avoids duplicating exception handling logic across multiple controllers.
 
+### Step-by-Step Implementation:
+
+1.  **Define a Custom Error Response Class and Custom Exception Class:** (Same as above, re-use `StudentErrorResponse.java` and `StudentNotFoundException.java`).
+2.  **Create a Global Exception Handler Class:** Annotate a new class with `@ControllerAdvice`.
+3.  **Add `@ExceptionHandler` Methods:** Implement methods within this class to handle specific exceptions, similar to how you would in a controller.
 
 <Tabs>
-
-<TabItem value="Error class"> 
+<TabItem value="Error Response Class" label="StudentErrorResponse.java">
 
 ```java title="StudentErrorResponse.java"
 package com.tutorial.crudapi.rest;
 
+// Re-using the same StudentErrorResponse class defined above.
+// See "Error Response Class" tab under "Route-Specific Exception Handling" for full code.
+
+/**
+ * Represents a standardized error response structure for the API.
+ * This class is used to return consistent error messages to the client,
+ * including an HTTP status code, a descriptive message, and a timestamp.
+ */
 public class StudentErrorResponse {
     private int status;
     private String message;
     private long timeStamp;
 
-    // Default no argument constructor
-    public StudentErrorResponse() {
-    };
-
+    public StudentErrorResponse() {}
     public StudentErrorResponse(int status, String message, long timeStamp) {
         this.status = status;
         this.message = message;
         this.timeStamp = timeStamp;
     }
 
-    // getter and setter methods
-
+    // Getter and Setter methods for all fields
+    // public int getStatus() { ... }
+    // public void setStatus(int status) { ... }
+    // public String getMessage() { ... }
+    // public void setMessage(String message) { ... }
+    // public long getTimeStamp() { ... }
+    // public void setTimeStamp(long timeStamp) { ... }
 }
 ```
 </TabItem>
 
-<TabItem value="Exception class">
+<TabItem value="Custom Exception Class" label="StudentNotFoundException.java">
 
 ```java title="StudentNotFoundException.java"
 package com.tutorial.crudapi.rest;
 
+// Re-using the same StudentNotFoundException class defined above.
+// See "Custom Exception Class" tab under "Route-Specific Exception Handling" for full code.
+
+/**
+ * Custom exception class to indicate that a student was not found.
+ * This exception extends RuntimeException, making it an unchecked exception.
+ */
 public class StudentNotFoundException extends RuntimeException {
     public StudentNotFoundException(String message) {
         super(message);
     }
-
     public StudentNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
-
     public StudentNotFoundException(Throwable cause) {
         super(cause);
     }
@@ -173,8 +303,7 @@ public class StudentNotFoundException extends RuntimeException {
 ```
 </TabItem>
 
-
-<TabItem value="StudentRestExceptionHandler.java">
+<TabItem value="Global Exception Handler" label="StudentRestExceptionHandler.java">
 
 ```java title="StudentRestExceptionHandler.java"
 package com.tutorial.crudapi.rest;
@@ -184,38 +313,65 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Global exception handler for the Student REST API.
+ * This class uses @ControllerAdvice to centralize exception handling logic
+ * across all @RestController classes in the application.
+ */
 // highlight-next-line
 @ControllerAdvice
 public class StudentRestExceptionHandler {
+
+    /**
+     * Handles StudentNotFoundException globally.
+     * This method catches StudentNotFoundException and returns a custom error response
+     * with HTTP status 404 Not Found.
+     *
+     * @param exc The StudentNotFoundException that was thrown.
+     * @return A ResponseEntity containing StudentErrorResponse and HTTP status 404.
+     */
     @ExceptionHandler
     public ResponseEntity<StudentErrorResponse> handleException(StudentNotFoundException exc) {
 
-        // create a StudentErrorResponse (setter Values from error entity)
+        // Create a StudentErrorResponse instance
         StudentErrorResponse error = new StudentErrorResponse();
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setMessage(exc.getMessage());
-        error.setTimeStamp(System.currentTimeMillis());
+        // highlight-next-line
+        error.setStatus(HttpStatus.NOT_FOUND.value()); // Set HTTP status to 404
+        // highlight-next-line
+        error.setMessage(exc.getMessage()); // Set the error message from the exception
+        // highlight-next-line
+        error.setTimeStamp(System.currentTimeMillis()); // Set current timestamp
 
-        // return ResponseEntity
+        // Return ResponseEntity with the error object and HTTP status 404
+        // highlight-next-line
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    // Generic Exception handler
+    /**
+     * Generic exception handler for any other unhandled exceptions globally.
+     * This method catches any Exception and returns a custom error response
+     * with HTTP status 400 Bad Request.
+     *
+     * @param exc The Exception that was thrown.
+     * @return A ResponseEntity containing StudentErrorResponse and HTTP status 400.
+     */
     @ExceptionHandler
     public ResponseEntity<StudentErrorResponse> handleException(Exception exc) {
 
+        // Create a StudentErrorResponse instance
         StudentErrorResponse error = new StudentErrorResponse();
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage(exc.getMessage()); // Can also update to any error string you want to send
-        error.setTimeStamp(System.currentTimeMillis());
+        // highlight-next-line
+        error.setStatus(HttpStatus.BAD_REQUEST.value()); // Set HTTP status to 400
+        // highlight-next-line
+        error.setMessage(exc.getMessage()); // Set the error message from the exception
+        // highlight-next-line
+        error.setTimeStamp(System.currentTimeMillis()); // Set current timestamp
 
-        // return ResponseEntity
+        // Return ResponseEntity with the error object and HTTP status 400
+        // highlight-next-line
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
 ```
-
-
 </TabItem>
-
 </Tabs>

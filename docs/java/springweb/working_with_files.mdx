@@ -15,18 +15,46 @@ import TabItem from "@theme/TabItem";
 <TabItem value="FileWriter" >
 
 ```java
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+@Service
 public class FileService {
 
-    public File createFile() throws IOException {
-        File file = new File("output.txt");
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write("This is example content written to the file.");
+    /**
+     * Creates a temporary file with some content.
+     *
+     * @return The created temporary file.
+     * @throws IOException If an I/O error occurs.
+     */
+    public File createTemporaryFile() throws IOException {
+        // Create a temporary file that will be deleted on JVM exit
+        File tempFile = File.createTempFile("example", ".txt");
+        tempFile.deleteOnExit(); // Ensure the file is deleted when the application exits
+
+        try (FileWriter writer = new FileWriter(tempFile)) {
+            writer.write("This is example content written to the temporary file.\n");
+            writer.write("You can add more lines here.\n");
         }
-        return file;
+        return tempFile;
+    }
+
+    /**
+     * Deletes a given file.
+     *
+     * @param file The file to delete.
+     * @return true if the file was successfully deleted, false otherwise.
+     */
+    public boolean deleteFile(File file) {
+        if (file != null && file.exists()) {
+            return file.delete();
+        }
+        return false;
     }
 }
 ```
@@ -35,30 +63,62 @@ public class FileService {
 <TabItem value="Controller" >
 
 ```java
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/files")
 public class FileController {
 
-    private final FileService fileService = new FileService();
+    private final FileService fileService;
 
-    @GetMapping
-    public ResponseEntity<FileSystemResource> getFile() {
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
+
+    /**
+     * Endpoint to create a temporary file and download it.
+     *
+     * @return ResponseEntity containing the file as a resource.
+     */
+    @GetMapping("/download/temp")
+    public ResponseEntity<Resource> downloadTemporaryFile() {
+        File file = null;
         try {
-            File file = fileService.createFile();
-            FileSystemResource resource = new FileSystemResource(file);
+            file = fileService.createTemporaryFile();
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+            headers.add(HttpHeaders.PRAGMA, "no-cache");
+            headers.add(HttpHeaders.EXPIRES, "0");
 
-            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
         } catch (IOException e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            // Ensure the temporary file is deleted after sending
+            if (file != null) {
+                fileService.deleteFile(file);
+            }
         }
     }
 }
@@ -66,6 +126,79 @@ public class FileController {
 
 </TabItem>
 
+</Tabs>
+
+## Downloading an Existing File
+
+This example demonstrates how to serve an existing file from a specified server path.
+
+<Tabs>
+<TabItem value="Controller" label="Controller">
+
+```java
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+@RestController
+@RequestMapping("/files")
+public class FileDownloadController {
+
+    private static final String FILE_DIRECTORY = "/path/to/your/files/"; // Configure your file directory
+
+    /**
+     * Endpoint to download an existing file by its filename.
+     *
+     * @param filename The name of the file to download.
+     * @return ResponseEntity containing the file as a resource.
+     */
+    @GetMapping("/download/{filename:.+}")
+    public ResponseEntity<Resource> downloadExistingFile(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(FILE_DIRECTORY).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() && resource.isReadable()) {
+                String contentType = "application/octet-stream"; // Default content type
+                // You can determine content type based on file extension if needed
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="Usage" label="Usage">
+
+To download a file, you can access the endpoint with the filename:
+
+```bash
+curl -O http://localhost:8080/files/download/your_existing_file.txt
+```
+
+Replace `your_existing_file.txt` with the actual name of the file you want to download from the configured `FILE_DIRECTORY`.
+
+</TabItem>
 </Tabs>
 
 ## Uploading and Parsing a Text File
@@ -84,28 +217,96 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/upload")
 public class FileUploadController {
 
+    /**
+     * Uploads a text file and parses its content as a string.
+     *
+     * @param file The MultipartFile representing the uploaded text file.
+     * @return ResponseEntity indicating success or failure.
+     */
     @PostMapping("/text")
     public ResponseEntity<String> uploadTextFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
         }
 
-        try {
-            // Get the content of the file as a string
-            String content = new String(file.getBytes());
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String content = reader.lines().collect(Collectors.joining("\n"));
 
             // Here you can process the content of the file
             System.out.println("File content: " + content);
 
             return ResponseEntity.ok("File uploaded and content parsed successfully.");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read file content.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read file content: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Uploads a binary file.
+     *
+     * @param file The MultipartFile representing the uploaded binary file.
+     * @return ResponseEntity indicating success or failure.
+     */
+    @PostMapping("/binary")
+    public ResponseEntity<String> uploadBinaryFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
+        }
+
+        try {
+            // Get the content of the file as a byte array
+            byte[] bytes = file.getBytes();
+
+            // Here you can process the binary content, e.g., save it to disk
+            // Files.write(Paths.get("/path/to/save/" + file.getOriginalFilename()), bytes);
+            System.out.println("Received binary file: " + file.getOriginalFilename() + " with size: " + bytes.length + " bytes");
+
+            return ResponseEntity.ok("Binary file uploaded successfully.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload binary file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Uploads a large file by streaming its content.
+     *
+     * @param file The MultipartFile representing the uploaded large file.
+     * @return ResponseEntity indicating success or failure.
+     */
+    @PostMapping("/large")
+    public ResponseEntity<String> uploadLargeFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
+        }
+
+        try {
+            // Process the file as a stream to avoid loading the entire file into memory
+            // Example: Save to a temporary file or stream directly to another service
+            // Path tempFile = Files.createTempFile("upload-", ".tmp");
+            // Files.copy(file.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+            long bytesRead = 0;
+            byte[] buffer = new byte[4096]; // 4KB buffer
+            int bytes = 0;
+            while ((bytes = file.getInputStream().read(buffer)) != -1) {
+                bytesRead += bytes;
+                // Process chunk of bytes, e.g., write to another stream or file
+            }
+
+            System.out.println("Received large file: " + file.getOriginalFilename() + " total bytes read: " + bytesRead);
+
+            return ResponseEntity.ok("Large file uploaded and processed via streaming successfully.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload large file: " + e.getMessage());
         }
     }
 }
@@ -114,13 +315,25 @@ public class FileUploadController {
 </TabItem>
 <TabItem value="Usage" label="Usage">
 
-To upload a file, you can use a tool like `curl`:
+To upload a text file, you can use a tool like `curl`:
 
 ```bash
 curl -X POST -F "file=@/path/to/your/file.txt" http://localhost:8080/upload/text
 ```
 
-Replace `/path/to/your/file.txt` with the actual path to your text file.
+To upload a binary file (e.g., an image):
+
+```bash
+curl -X POST -F "file=@/path/to/your/image.jpg" http://localhost:8080/upload/binary
+```
+
+To upload a large file (streaming):
+
+```bash
+curl -X POST -F "file=@/path/to/your/large_file.zip" http://localhost:8080/upload/large
+```
+
+Replace `/path/to/your/file.txt`, `/path/to/your/image.jpg`, and `/path/to/your/large_file.zip` with the actual paths to your files.
 
 </TabItem>
 </Tabs>
