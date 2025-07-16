@@ -1,0 +1,94 @@
+---
+sidebar_label: "CSS"
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS
+
+CSS (Cascading Style Sheets) is a stylesheet language used to describe the presentation of a document written in a markup language like HTML. It controls the layout, colors, fonts, and overall visual appearance of a webpage, allowing for a clear separation between content and design.
+
+## Key Concepts
+
+- **Selectors:** Patterns that select the HTML elements you want to style.
+- **Properties and Values:** The visual properties you want to change (e.g., `color`, `font-size`) and their new values.
+- **The Cascade:** The rules that determine which styles apply to an element when multiple conflicting styles are present.
+- **Box Model:** The concept that every HTML element is a rectangular box, with properties like `margin`, `border`, `padding`, and `content`.
+- **Flexbox and Grid:** Powerful layout systems for creating complex and responsive designs.
+
+## CSS Implementation
+
+There are three ways to implement CSS:
+
+<Tabs>
+  <TabItem value="inline" label="Inline">
+    An inline style is applied directly to a single HTML element using the `style` attribute.
+
+    ```html
+    // highlight-next-line
+    <p style="color: blue;">This is a blue paragraph.</p>
+    ```
+
+  </TabItem>
+  <TabItem value="internal" label="Internal">
+    An internal style sheet is defined within the `<style>` element, inside the `<head>` section of an HTML page.
+
+    ```html
+    <head>
+      // highlight-start
+      <style>
+        p {
+          color: green;
+        }
+      </style>
+      // highlight-end
+    </head>
+    <body>
+      <p>This is a green paragraph.</p>
+    </body>
+    ```
+
+  </TabItem>
+  <TabItem value="external" label="External">
+    An external style sheet is a separate `.css` file that is linked to an HTML page using the `<link>` element in the `<head>` section. This is the most common and recommended method.
+
+    <Tabs>
+    <TabItem value="html" label="index.html">
+
+    ```html
+    <head>
+      // highlight-next-line
+      <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+      <p>This paragraph's style is defined in styles.css.</p>
+    </body>
+    ```
+
+    </TabItem>
+    <TabItem value="css" label="styles.css">
+
+    ```css
+    p {
+      color: purple;
+    }
+    ```
+
+    </TabItem>
+    </Tabs>
+
+  </TabItem>
+</Tabs>
+
+## What's Next?
+
+- [Styling Text](./styling-text.mdx)
+- [CSS Units](./units.mdx)
+- [CSS Selectors](./selectors.mdx)
+- [CSS Borders](./borders.mdx)
+- [CSS Pseudo-classes](./pseudo-classes.mdx)
+
+This section will be updated with more detailed examples and tutorials on various CSS topics.

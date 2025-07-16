@@ -1,0 +1,120 @@
+---
+sidebar_label: 'Tables'
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# HTML Tables
+
+HTML tables are used to present data in a two-dimensional format, with rows and columns. They are useful for displaying tabular data, such as financial reports, schedules, and statistics.
+
+## Basic Table Structure
+
+A basic HTML table consists of the `<table>` element, which contains one or more `<tr>` (table row), `<th>` (table header), and `<td>` (table data) elements.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <table>
+      <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Age</th>
+      </tr>
+      <tr>
+        <td>Jill</td>
+        <td>Smith</td>
+        <td>50</td>
+      </tr>
+      <tr>
+        <td>Eve</td>
+        <td>Jackson</td>
+        <td>94</td>
+      </tr>
+    </table>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <table style={{ border: '1px solid black', borderCollapse: 'collapse', width: '100%' }}>
+    <tr style={{ border: '1px solid black' }}>
+      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f2f2f2' }}>Firstname</th>
+      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f2f2f2' }}>Lastname</th>
+      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f2f2f2' }}>Age</th>
+    </tr>
+    <tr style={{ border: '1px solid black' }}>
+      <td style={{ border: '1px solid black', padding: '8px' }}>Jill</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>Smith</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>50</td>
+    </tr>
+    <tr style={{ border: '1px solid black' }}>
+      <td style={{ border: '1px solid black', padding: '8px' }}>Eve</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>Jackson</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>94</td>
+    </tr>
+  </table>
+</BrowserWindow>
+
+## Table with Colspan
+
+The `colspan` attribute can be used to make a cell span multiple columns.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <table>
+      <tr>
+        <th>Name</th>
+        <td colspan="2">Telephone</td>
+      </tr>
+      <tr>
+        <td>Bill Gates</td>
+        <td>555 77 854</td>
+        <td>555 77 855</td>
+      </tr>
+    </table>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <table style={{ border: '1px solid black', borderCollapse: 'collapse', width: '100%' }}>
+    <tr style={{ border: '1px solid black' }}>
+      <th style={{ border: '1px solid black', padding: '8px', backgroundColor: '#f2f2f2' }}>Name</th>
+      <td colSpan="2" style={{ border: '1px solid black', padding: '8px', textAlign: 'center' }}>Telephone</td>
+    </tr>
+    <tr style={{ border: '1px solid black' }}>
+      <td style={{ border: '1px solid black', padding: '8px' }}>Bill Gates</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>555 77 854</td>
+      <td style={{ border: '1px solid black', padding: '8px' }}>555 77 855</td>
+    </tr>
+  </table>
+</BrowserWindow>

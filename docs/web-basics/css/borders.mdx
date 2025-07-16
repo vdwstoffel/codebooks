@@ -1,0 +1,103 @@
+---
+sidebar_label: 'Borders'
+sidebar_position: 5
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS Borders
+
+CSS borders allow you to create a line around any HTML element. You can control the style, width, and color of the border to create various visual effects.
+
+## Key Concepts
+
+| Property          | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `border-style`    | Sets the style of the border (e.g., `solid`, `dotted`, `dashed`).                                        |
+| `border-width`    | Specifies the thickness of the border.                                                                   |
+| `border-color`    | Sets the color of the border.                                                                            |
+| `border`          | A shorthand property for setting `border-width`, `border-style`, and `border-color` in one declaration. |
+| `border-radius`   | Rounds the corners of the border.                                                                        |
+
+## Examples
+
+### Solid Border
+
+This example shows how to create a simple solid border around a `div` element.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <div class="solid-border">This div has a solid border.</div>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .solid-border {
+      border: 2px solid #007bff;
+      padding: 10px;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{ border: '2px solid #007bff', padding: '10px' }}>
+    This div has a solid border.
+  </div>
+</BrowserWindow>
+
+### Dashed Border
+
+Here's how to create a dashed border.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <div class="dashed-border">This div has a dashed border.</div>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .dashed-border {
+      border: 2px dashed #28a745;
+      padding: 10px;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{ border: '2px dashed #28a745', padding: '10px' }}>
+    This div has a dashed border.
+  </div>
+</BrowserWindow>
+
+### Rounded Border
+
+This example demonstrates how to create a border with rounded corners using `border-radius`.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <div class="rounded-border">This div has a rounded border.</div>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .rounded-border {
+      border: 2px solid #dc3545;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{ border: '2px solid #dc3545', borderRadius: '10px', padding: '10px' }}>
+    This div has a rounded border.
+  </div>
+</BrowserWindow>

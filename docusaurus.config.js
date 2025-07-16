@@ -89,8 +89,8 @@ const config = {
             items: [
               {
                 type: "doc",
-                label: "HTML/CSS",
-                docId: "html/html",
+                label: "Web Basics",
+                docId: "web-basics/html/html",
               },
               {
                 type: "doc",

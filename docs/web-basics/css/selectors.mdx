@@ -1,0 +1,152 @@
+---
+sidebar_label: 'CSS Selectors'
+sidebar_position: 4
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS Selectors
+
+CSS selectors are patterns used to select and style HTML elements. They are the foundation of CSS, allowing you to target specific elements on a page.
+
+## Common Selectors
+
+- **Element Selector:** Selects elements based on the element name (e.g., `p`, `h1`, `div`).
+- **Class Selector:** Selects elements with a specific class attribute (e.g., `.my-class`).
+- **ID Selector:** Selects a single element with a specific ID attribute (e.g., `#my-id`).
+
+Here is an example that demonstrates how different selectors can be used to style various elements on a page.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+
+```html
+<div id="container">
+  <h1>Main Title</h1>
+  <p class="highlight">This is a highlighted paragraph.</p>
+  <p>This is a regular paragraph.</p>
+  <ul>
+    <li>First item</li>
+    <li class="highlight">Second item (highlighted)</li>
+  </ul>
+</div>
+```
+
+  </TabItem>
+  <TabItem value="css" label="CSS">
+
+```css
+/* Element selector */
+h1 {
+  color: navy;
+}
+
+/* Class selector */
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+/* ID selector */
+#container {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* Descendant selector */
+ul li {
+  color: green;
+}
+```
+
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{ border: '1px solid #ccc', padding: '10px' }}>
+    <h1 style={{ color: 'navy' }}>Main Title</h1>
+    <p style={{ backgroundColor: 'yellow', fontWeight: 'bold' }}>This is a highlighted paragraph.</p>
+    <p>This is a regular paragraph.</p>
+    <ul>
+      <li style={{ color: 'green' }}>First item</li>
+      <li style={{ backgroundColor: 'yellow', fontWeight: 'bold', color: 'green' }}>Second item (highlighted)</li>
+    </ul>
+  </div>
+</BrowserWindow>
+
+## Targeting Multiple Selectors
+
+You can target multiple selectors by separating them with a comma. This allows you to apply the same styles to different elements or groups of elements with a single rule.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+
+```html
+<p class="text">This is a paragraph.</p>
+<span class="text">This is a span.</span>
+<div class="text">This is a div.</div>
+```
+
+  </TabItem>
+  <TabItem value="css" label="CSS">
+
+```css
+p, span, div {
+  font-family: Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.text {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+```
+
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <p style={{ fontFamily: 'Arial, sans-serif', color: '#333', lineHeight: '1.6', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>This is a paragraph.</p>
+  <span style={{ fontFamily: 'Arial, sans-serif', color: '#333', lineHeight: '1.6', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>This is a span.</span>
+  <div style={{ fontFamily: 'Arial, sans-serif', color: '#333', lineHeight: '1.6', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>This is a div.</div>
+</BrowserWindow>
+
+## Descendant Selector
+
+The descendant selector (` `) selects all elements that are descendants of a specified element. This allows you to target elements nested within other elements.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+
+```html
+<div class="container">
+  <p>This is a paragraph inside the container.</p>
+  <span>This is a span inside the container.</span>
+  <ul>
+    <li>List item 1</li>
+    <li>List item 2</li>
+  </ul>
+</div>
+<p>This is a paragraph outside the container.</p>
+```
+
+  </TabItem>
+  <TabItem value="css" label="CSS">
+
+```css
+.container p {
+  color: blue;
+  font-weight: bold;
+}
+
+.container li {
+  list-style-type: square;
+}
+```
+
+  </TabItem>
+</Tabs>

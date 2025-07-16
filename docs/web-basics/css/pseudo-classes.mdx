@@ -1,0 +1,120 @@
+---
+sidebar_label: 'Pseudo-classes'
+sidebar_position: 6
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS Pseudo-classes
+
+A CSS pseudo-class is a keyword added to a selector that specifies a special state of the selected element(s). For example, a pseudo-class can be used to style an element when a user mouses over it, or to style an element when it gets focus.
+
+## Common Pseudo-classes
+
+| Pseudo-class    | Description                                                                 |
+| --------------- | --------------------------------------------------------------------------- |
+| `:hover`        | Selects an element when the user's mouse is over it.                        |
+| `:active`       | Selects an element when it is being activated (e.g., clicked).              |
+| `:focus`        | Selects an element that has focus (e.g., a form input).                     |
+| `:first-child`  | Selects the first element among a group of sibling elements.                |
+| `:last-child`   | Selects the last element among a group of sibling elements.                 |
+| `:nth-child(n)` | Selects elements based on their position in a group of siblings.            |
+
+## Examples
+
+### hover
+
+This example demonstrates how to change the background color of a button when the user hovers over it.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <button class="hover-btn">Hover over me</button>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .hover-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      transition: background-color: 0.3s;
+    }
+
+    .hover-btn:hover {
+      background-color: #0056b3;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <button style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', cursor: 'pointer' }}>Hover over me</button>
+</BrowserWindow>
+
+### focus
+
+This example shows how to add a border to an input field when it has focus.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <input type="text" class="focus-input" placeholder="Click on me">
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .focus-input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s;
+    }
+
+    .focus-input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <input type="text" placeholder="Click on me" style={{ padding: '10px', border: '1px solid #ccc' }} />
+</BrowserWindow>
+
+### nth-child
+
+This example demonstrates how to style every even list item with a different background color.
+
+<Tabs>
+  <TabItem value="html" label="HTML">
+    ```html
+    <ul class="nth-child-list">
+      <li>First item</li>
+      <li>Second item</li>
+      <li>Third item</li>
+      <li>Fourth item</li>
+    </ul>
+    ```
+  </TabItem>
+  <TabItem value="css" label="CSS">
+    ```css
+    .nth-child-list li:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <ul>
+    <li>First item</li>
+    <li style={{ backgroundColor: '#f2f2f2' }}>Second item</li>
+    <li>Third item</li>
+    <li style={{ backgroundColor: '#f2f2f2' }}>Fourth item</li>
+  </ul>
+</BrowserWindow>
