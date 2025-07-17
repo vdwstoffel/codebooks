@@ -7,51 +7,99 @@ sidebar_position: 3
 
 [React](https://react.dev/) lets you build user interfaces out of individual pieces called components. Create your own React components like Thumbnail, LikeButton, and Video. Then combine them into entire screens, pages, and apps.
 
-## Create a React App
+## Getting Started
+
+### Create a React App
+
+To create a new React project, you can use `create-vite`.
 
 ```bash
 npm create vite@latest
-cd my-app
+cd my-react-app
 npm run dev
 ```
 
-## Change default port (Vite)
+### Change default port (Vite)
+
+To change the default port in a Vite project, you need to modify the `vite.config.js` file.
 
 ```js title="vite.config.js"
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  plugins: [react()],
   server: {
-    port: 8000,
+    // highlight-next-line
+    port: 3000,
     host: true, // needed for docker
   },
 });
 ```
 
-## How to connect external api to React
+### Working with environment variables
+
+To load environment variables from a `.env` file, you can create a `.env` file in the root of your project.
+
+```js title=".env"
+VITE_API_URL=http://localhost:8000/api
+```
+
+You can then access the environment variables in your code using `import.meta.env`.
+
+```javascript title="App.jsx"
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log(apiUrl); // "http://localhost:8000/api"
+```
+
+## Development Server
+
+### Connecting to an external API
+
+To connect to an external API, you can use the `proxy` option in `vite.config.js` to avoid CORS issues during development.
 
 ```js title="vite.config.js"
-server: {
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
     proxy: {
+      // highlight-next-line
       "/api": {
-        target: "http://localhost:<express-port>", // Your Express backend URL
+        target: "http://localhost:8080", // Your backend server
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
+});
 ```
 
-```js title="App.js"
-const res = await axios.get("api/backend-route");
+Now, you can make requests to `/api` and they will be forwarded to your backend server.
+
+```javascript title="App.jsx"
+import axios from "axios";
+
+function App() {
+  const fetchData = async () => {
+    // highlight-next-line
+    const response = await axios.get("/api/users");
+    console.log(response.data);
+  };
+
+  return <button onClick={fetchData}>Fetch Data</button>;
+}
 ```
 
-## Add SSL certificate to use HTTPS in Vite
+### Enabling HTTPS in Vite
 
-# Enabling HTTPS in Vite for Local Development
+To use HTTPS in Vite for local development, you can set up a self-signed SSL certificate using `mkcert`.
 
-To use HTTPS in Vite, you can set up a self-signed SSL certificate. Here's how to do it:
+**Install `mkcert`**
 
-- Install `mkcert` to create a self-signed certificate:
+First, install `mkcert` on your system. For example, on Linux:
 
 ```bash
 sudo apt-get install wget libnss3-tools
@@ -60,44 +108,51 @@ mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
 chmod +x /usr/bin/mkcert
 ```
 
-- Set Up a Local Certificate Authority:
+**Set Up a Local Certificate Authority**
 
 ```bash
 mkcert -install
 ```
 
-- Generate a Certificate for Your Localhost:
+**Generate a Certificate for Localhost**
 
 ```bash
 mkcert localhost
 ```
 
-- Update Your Vite Configuration:
+This will create `localhost.pem` and `localhost-key.pem` files in your current directory.
+
+**Update Your Vite Configuration**
+
+Finally, update your `vite.config.js` to use the generated SSL certificate.
 
 ```js title="vite.config.js"
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  plugins: [react()],
   server: {
+    // highlight-start
     https: {
       key: "./localhost-key.pem",
       cert: "./localhost.pem",
     },
+    // highlight-end
     host: "localhost",
     port: 3000,
   },
 });
 ```
 
-## Working with environment variables
+## What's Next?
 
-## Loading environment variables from an .env file
-
-```js title=".env"
-VITE_API_URL=http://localhost:8000/api
-```
-
-```js title="App.js"
-const apiUrl = import.meta.env.VITE_API_URL;
-console.log(apiUrl); // Outputs: http://localhost:8000/api
-```
+- [Components](./components.mdx)
+- [Hooks](./hooks.mdx)
+- [React Router](./react_router.mdx)
+- [State Management with Redux](./redux.mdx)
+- [Fetching Data with React Query](./reactQuery.mdx)
+- [Authentication](./authentication.mdx)
+- [Useful Libraries](./usefull_libraries.mdx)
+- [General Tips](./general.mdx)
+- [How To](./how_to.mdx)
