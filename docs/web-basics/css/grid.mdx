@@ -1,0 +1,229 @@
+---
+sidebar_label: 'Grid'
+sidebar_position: 8
+---
+
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# CSS Grid Layout
+
+CSS Grid Layout is a two-dimensional layout system for the web, allowing you to lay content out in rows and columns. It provides a powerful and flexible way to create complex web layouts.
+
+## Core Concepts
+
+- **Grid Container**: The element on which `display: grid` is applied. It's the direct parent of all the grid items.
+- **Grid Item**: The children (direct descendants) of the grid container.
+- **Grid Line**: The dividing lines that make up the structure of the grid.
+- **Grid Track**: The space between two adjacent grid lines (a column or a row).
+- **Grid Cell**: The space between two adjacent row and two adjacent column grid lines.
+- **Grid Area**: The total space surrounded by four grid lines, which can contain multiple grid cells.
+
+## Examples
+
+### Creating a Grid Container
+
+To start using Grid, create a grid container by setting `display: grid`.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+```html
+<div class="grid-container">
+  <div class="grid-item">1</div>
+  <div class="grid-item">2</div>
+  <div class="grid-item">3</div>
+  <div class="grid-item">4</div>
+  <div class="grid-item">5</div>
+  <div class="grid-item">6</div>
+</div>
+```
+</TabItem>
+<TabItem value="css" label="CSS">
+```css
+.grid-container {
+  /* highlight-next-line */
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'auto auto auto',
+    gap: '10px',
+    backgroundColor: '#2196F3',
+    padding: '10px'
+  }}>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>1</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>2</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>3</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>4</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>5</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>6</div>
+  </div>
+</BrowserWindow>
+
+### grid-template-columns
+
+This property defines the number and size of columns in the grid.
+
+- **`fr` unit**: Represents a fraction of the available space in the grid container.
+
+<Tabs>
+<TabItem value="css" label="CSS">
+```css
+.grid-container {
+  display: grid;
+  /* highlight-next-line */
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 10px;
+}
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: '1fr 2fr 1fr',
+    gap: '10px',
+    backgroundColor: '#2196F3',
+    padding: '10px'
+  }}>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>1</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>2</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>3</div>
+  </div>
+</BrowserWindow>
+
+### grid-template-rows
+
+This property defines the number and height of the rows in the grid.
+
+<Tabs>
+<TabItem value="css" label="CSS">
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  /* highlight-next-line */
+  grid-template-rows: 50px 100px;
+  gap: 10px;
+}
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'auto auto auto',
+    gridTemplateRows: '50px 100px',
+    gap: '10px',
+    backgroundColor: '#2196F3',
+    padding: '10px'
+  }}>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>1</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>2</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>3</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>4</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>5</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>6</div>
+  </div>
+</BrowserWindow>
+
+### Spanning Items
+
+Grid items can be made to span multiple columns or rows using `grid-column` and `grid-row`.
+
+<Tabs>
+<TabItem value="css" label="CSS">
+```css
+.item1 {
+  /* highlight-start */
+  grid-column: 1 / 3; /* Start at line 1, end at line 3 */
+  grid-row: 1;
+  /* highlight-end */
+}
+.item2 {
+  /* highlight-start */
+  grid-column: 3;
+  grid-row: 1 / 3; /* Start at line 1, end at line 3 */
+  /* highlight-end */
+}
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'auto auto auto',
+    gap: '10px',
+    backgroundColor: '#2196F3',
+    padding: '10px'
+  }}>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridColumn: '1 / 3', gridRow: '1'}}>1</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridColumn: '3', gridRow: '1 / 3'}}>2</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>3</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center'}}>4</div>
+  </div>
+</BrowserWindow>
+
+### Naming Grid Areas
+
+You can name grid areas using `grid-template-areas` for easier layout management.
+
+<Tabs>
+<TabItem value="css" label="CSS">
+```css
+.grid-container {
+  display: grid;
+  /* highlight-start */
+  grid-template-areas:
+    'header header header'
+    'menu main right'
+    'footer footer footer';
+  /* highlight-end */
+  gap: 10px;
+}
+
+.item1 { grid-area: header; }
+.item2 { grid-area: menu; }
+.item3 { grid-area: main; }
+.item4 { grid-area: right; }
+.item5 { grid-area: footer; }
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow>
+  <div style={{
+    display: 'grid',
+    gridTemplateAreas: `'header header header' 'menu main right' 'footer footer footer'`,
+    gap: '10px',
+    backgroundColor: '#2196F3',
+    padding: '10px'
+  }}>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridArea: 'header'}}>Header</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridArea: 'menu'}}>Menu</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridArea: 'main'}}>Main</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridArea: 'right'}}>Right</div>
+    <div style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.8)', padding: '20px', fontSize: '30px', textAlign: 'center', gridArea: 'footer'}}>Footer</div>
+  </div>
+</BrowserWindow>

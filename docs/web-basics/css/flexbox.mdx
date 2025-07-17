@@ -1,0 +1,183 @@
+---
+sidebar_label: 'Flexbox'
+sidebar_position: 7
+---
+
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Flexbox
+
+Flexbox is a one-dimensional layout model that allows you to design complex layout structures more easily. It provides a more efficient way to lay out, align, and distribute space among items in a container, even when their size is unknown or dynamic.
+
+## Core Concepts
+
+The two main components of a flexbox layout are the **flex container** (the parent element) and the **flex items** (the children).
+
+- **Flex Container**: You can turn any element into a flex container by setting its `display` property to `flex` or `inline-flex`.
+- **Flex Items**: The direct children of a flex container automatically become flex items.
+
+Flexbox operates along two axes:
+- **Main Axis**: This is the primary axis along which flex items are laid out. It is defined by the `flex-direction` property.
+- **Cross Axis**: This is the axis perpendicular to the main axis.
+
+## Examples
+
+### Creating a Flex Container
+
+To get started with Flexbox, you need to first create a flex container.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+```html
+<div class="flex-container">
+  <div class="flex-item">Item 1</div>
+  <div class="flex-item">Item 2</div>
+  <div class="flex-item">Item 3</div>
+</div>
+```
+</TabItem>
+<TabItem value="css" label="CSS">
+```css
+.flex-container {
+  /* highlight-next-line */
+  display: flex;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  gap: 0.5rem;
+}
+
+.flex-item {
+  background-color: #4caf50;
+  color: white;
+  padding: 1rem;
+  border-radius: 4px;
+}
+```
+</TabItem>
+</Tabs>
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', padding: '1rem', backgroundColor: '#f0f0f0', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+### justify-content
+
+The `justify-content` property aligns flex items along the main axis.
+
+#### flex-start
+
+Items are packed toward the start of the flex-direction.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '1rem', backgroundColor: '#f0f0f0', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### flex-end
+
+Items are packed toward the end of the flex-direction.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem', backgroundColor: '#f0f0f0', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### center
+
+Items are centered along the line.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem', backgroundColor: '#f0f0f0', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### space-between
+
+Items are evenly distributed in the line; first item is on the start line, last item on the end line.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#f0f0f0' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### space-around
+
+Items are evenly distributed in the line with equal space around them.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', justifyContent: 'space-around', padding: '1rem', backgroundColor: '#f0f0f0' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+### align-items
+
+The `align-items` property aligns flex items along the cross axis.
+
+#### stretch
+
+Stretch to fill the container (still respect min-width/max-width).
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', alignItems: 'stretch', padding: '1rem', backgroundColor: '#f0f0f0', height: '150px', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### flex-start
+
+Items are placed at the start of the cross axis.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', alignItems: 'flex-start', padding: '1rem', backgroundColor: '#f0f0f0', height: '150px', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### flex-end
+
+Items are placed at the end of the cross axis.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', alignItems: 'flex-end', padding: '1rem', backgroundColor: '#f0f0f0', height: '150px', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>
+
+#### center
+
+Items are centered in the cross-axis.
+
+<BrowserWindow url="http://localhost:3000">
+    <div style={{ display: 'flex', alignItems: 'center', padding: '1rem', backgroundColor: '#f0f0f0', height: '150px', gap: '0.5rem' }}>
+        <div style={{ backgroundColor: '#4caf50', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 1</div>
+        <div style={{ backgroundColor: '#2196f3', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 2</div>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', padding: '1rem', borderRadius: '4px' }}>Item 3</div>
+    </div>
+</BrowserWindow>

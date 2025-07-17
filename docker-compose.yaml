@@ -6,7 +6,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: codebook
     ports:
-      - "9080:9080"
+      - "9000:9000"
     volumes:
       - ./src:/app/src
       - ./docs:/app/docs
