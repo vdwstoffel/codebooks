@@ -1,0 +1,62 @@
+---
+sidebar_label: 'Box Model'
+sidebar_position: 5
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+
+# CSS Box Model
+
+The CSS box model is a fundamental concept that describes how elements are rendered on a web page. Every HTML element can be thought of as a box, which consists of four main parts: the content area, padding, border, and margin.
+
+<BrowserWindow url="https://example.com">
+  <div
+    style={{
+      width: "300px",
+      height: "200px",
+      backgroundColor: "#f0f0f0",
+      padding: "20px",
+      border: "10px solid #333",
+      margin: "15px",
+    }}
+  >
+    <div style={{ backgroundColor: "#66b3ff", height: "100%" }}>
+      Content Area
+    </div>
+  </div>
+</BrowserWindow>
+
+## The Four Parts of the Box Model
+
+### Content Area
+The innermost part of the box, which contains the actual content of the element, such as text, images, or other media. The dimensions of this area are defined by the `width` and `height` properties.
+
+### Padding
+The space between the content area and the border. It is transparent and is used to create visual separation between the content and the border. You can control the padding on all four sides using the `padding` property or individual properties like `padding-top`, `padding-right`, `padding-bottom`, and `padding-left`.
+
+### Border
+A line that surrounds the padding and content. It can be styled with properties like `border-width`, `border-style`, and `border-color`.
+
+### Margin
+The outermost layer of the box, which creates space between the element and other elements on the page. It is also transparent. You can control the margin on all four sides using the `margin` property or individual properties like `margin-top`, `margin-right`, `margin-bottom`, and `margin-left`.
+
+## The `box-sizing` Property
+
+The `box-sizing` property determines how the total width and height of an element are calculated. It has two possible values:
+
+- **`content-box`** (default): The `width` and `height` properties only apply to the content area. The total width of the element is the sum of the `width`, `padding`, and `border`.
+- **`border-box`**: The `width` and `height` properties include the content, padding, and border. This makes it easier to size elements, as the specified width and height will be the final rendered size of the box.
+
+### Example
+
+```css
+.my-element {
+  width: 300px;
+  padding: 20px;
+  border: 5px solid black;
+  box-sizing: border-box; /* Total width will be 300px */
+}
+```
