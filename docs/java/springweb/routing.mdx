@@ -83,11 +83,18 @@ By setting `required = false`, the `category` parameter becomes optional.
 
 ## Request Body
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 When handling `POST` or `PUT` requests, you often need to process the data sent in the request body. The `@RequestBody` annotation deserializes the request body into a Java object.
+
+<Tabs>
+<TabItem value="controller" label="MyController.java">
 
 ```java title="src/main/java/com/example/demo/MyController.java"
 package com.example.demo;
 
+import com.example.demo.dto.UserDto;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,13 +106,19 @@ public class MyController {
 
     @PostMapping("/users")
     // highlight-next-line
-    public String createUser(@RequestBody User user) {
+    public String createUser(@RequestBody UserDto user) {
         return "Created user: " + user.getName();
     }
 }
+```
 
-// A simple User class
-class User {
+</TabItem>
+<TabItem value="dto" label="UserDto.java">
+
+```java title="src/main/java/com/example/demo/dto/UserDto.java"
+package com.example.demo.dto;
+
+public class UserDto {
     private String name;
 
     public String getName() {
@@ -117,6 +130,11 @@ class User {
     }
 }
 ```
+
+The `UserDto` class is a **P**lain **O**ld **J**ava **O**bject (POJO). It does not require any Spring annotations like `@Component` because it's simply a data container. Spring uses an internal library (Jackson) to automatically convert the JSON request body into a `UserDto` object without it needing to be a managed Spring bean.
+
+</TabItem>
+</Tabs>
 
 ## File Uploads
 

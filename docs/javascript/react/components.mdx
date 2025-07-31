@@ -15,17 +15,20 @@ import Counter from "@site/src/components/reactExamples/components/Counter";
 
 # Components
 
-## Basic Component Example
+## Basic Component
+
+Components are the building blocks of React applications. They are independent and reusable pieces of UI. A basic functional component is a JavaScript function that returns JSX.
 
 ```jsx
-import BrowserWindow from "../../BrowserWindow/BrowserWindow";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 export default function BasicComponent() {
-  return;
-
-  <BrowserWindow>
-    <h1>This is a basic component</h1>;
-  </BrowserWindow>;
+  return (
+    // highlight-next-line
+    <BrowserWindow>
+      <h1>This is a basic component</h1>
+    </BrowserWindow>
+  );
 }
 ```
 
@@ -33,11 +36,15 @@ export default function BasicComponent() {
 
 ## Passing Props
 
+Components can receive data through props (short for properties). Props are passed to components using attributes, similar to HTML attributes.
+
 ```jsx
 export default function PassingProps() {
   return (
     <>
+      {/* highlight-next-line */}
       <User name="John" age={42} />
+      {/* highlight-next-line */}
       <User name="Strong" age={31} />
     </>
   );
@@ -52,15 +59,16 @@ function User({ name, age }) {
 }
 ```
 
-{" "}
-
 <PassingProps />
 
 ## Child Components
 
+Components can render other components as their children. The `children` prop allows you to pass components or elements directly into another component.
+
 ```jsx
 export default function ChildComponents() {
   return (
+    // highlight-next-line
     <Container>
       <button>Click Me!</button>
     </Container>
@@ -74,13 +82,11 @@ function Container({ children }) {
 }
 ```
 
-{" "}
-
 <ChildComponents />
 
 ## React Composition
 
-instead of prop drilling, you can use composition to pass props to child components
+React's composition model allows you to build complex components from simpler ones. Instead of prop drilling (passing props through many layers of components), you can use composition to pass components as children or props.
 
 ```jsx
 import React from "react";
@@ -95,14 +101,16 @@ function ChildComponent({ message }) {
 
 function App() {
   return (
+    // highlight-next-line
     <ParentComponent>
+      {/* highlight-next-line */}
       <ChildComponent message="Hello" />
     </ParentComponent>
   );
 }
 ```
 
-## Lifting state up
+## Lifting State Up
 
 Lifting state up in React refers to the process of moving state from child components up to a common ancestor component. This allows multiple components to share and manipulate the same state, which is often necessary when those components need to stay in sync.
 
@@ -110,11 +118,14 @@ Lifting state up in React refers to the process of moving state from child compo
 import { useState } from "react";
 
 export default function LiftingState() {
+  // highlight-next-line
   const [count, setCount] = useState(0);
 
   return (
     <>
+      {/* highlight-next-line */}
       <ChildA count={count} />
+      {/* highlight-next-line */}
       <ChildB setCount={setCount} />
     </>
   );
@@ -131,15 +142,16 @@ function ChildB({ setCount }) {
 }
 ```
 
-{" "}
-
 <LiftingState />
 
-## Group children with React Fragments
+## React Fragments
+
+React fragments let you group a list of children without adding extra nodes to the DOM. This can be useful when you need to return multiple elements from a component but don't want to wrap them in an unnecessary `div`.
 
 ```jsx
 export default function Example() {
   return (
+    // highlight-next-line
     <>
       <ChildA />
       <ChildB />
@@ -150,14 +162,17 @@ export default function Example() {
 
 ## Compound Component Pattern
 
+The Compound Component pattern provides a flexible and reusable way to build components that work together implicitly. It allows you to create a set of components that share state and logic, without explicitly passing props down through every level of the component tree.
+
 <Tabs>
 
 <TabItem value="Counter.jsx">
 
 ```jsx
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState }n from "react";
 
 // 1. Create Context
+// highlight-next-line
 const CounterContext = createContext();
 
 // 2. Create Parent component
@@ -167,6 +182,7 @@ export default function Counter({ children }) {
   const decrement = () => setCount((c) => c - 1);
 
   return (
+    // highlight-next-line
     <CounterContext.Provider value={{ count, increment, decrement }}>
       {children}
     </CounterContext.Provider>
@@ -179,24 +195,31 @@ function Label({ label }) {
 }
 
 function Count() {
+  // highlight-next-line
   const { count } = useContext(CounterContext);
   return <span>{count}</span>;
 }
 
 function Increase({ icon = "+" }) {
+  // highlight-next-line
   const { increment } = useContext(CounterContext);
   return <button onClick={increment}>{icon}</button>;
 }
 
 function Decrement({ icon = "-" }) {
+  // highlight-next-line
   const { decrement } = useContext(CounterContext);
   return <button onClick={decrement}>{icon}</button>;
 }
 
 // 4. Add child compoents as properties
+// highlight-next-line
 Counter.Label = Label;
+// highlight-next-line
 Counter.Count = Count;
+// highlight-next-line
 Counter.Increase = Increase;
+// highlight-next-line
 Counter.Decrement = Decrement;
 ```
 
@@ -209,6 +232,7 @@ import Counter from "./Counter";
 
 export default function CounterApp() {
   return (
+    // highlight-next-line
     <Counter>
       <Counter.Label label="Counter Example" />
       <Counter.Increase icon="-" />
@@ -224,3 +248,4 @@ export default function CounterApp() {
 </Tabs>
 
 <CounterApp />
+

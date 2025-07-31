@@ -1,0 +1,217 @@
+---
+sidebar_label: 'Positioning'
+sidebar_position: 11
+---
+
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS Positioning
+
+The `position` property in CSS is used to control how an element is placed in a document. It can be used to create layouts, align elements, and create sticky elements that stay in place when the user scrolls.
+
+## Common `position` Values
+
+### `static`
+
+This is the default value. Elements with `position: static` are not positioned in any special way; they are always positioned according to the normal flow of the page.
+
+```css
+.static-element {
+  position: static;
+}
+```
+
+### `relative`
+
+An element with `position: relative` is positioned relative to its normal position. You can use the `top`, `right`, `bottom`, and `left` properties to move it from its normal position.
+
+This is often used as a container for absolutely positioned elements.
+
+```css
+.relative-container {
+  position: relative;
+  height: 200px;
+  border: 2px solid #333;
+}
+```
+
+### `absolute`
+
+An element with `position: absolute` is positioned relative to its nearest positioned ancestor (i.e., the nearest ancestor that is not `static`). If an absolute-positioned element has no positioned ancestors, it uses the document body, and moves along with page scrolling.
+
+This is useful for creating overlays, tooltips, and other elements that need to be placed at a specific point on the page.
+
+```css
+.absolute-element {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+  background-color: #f00;
+}
+```
+
+### `fixed`
+
+An element with `position: fixed` is positioned relative to the viewport, which means it always stays in the same place even if the page is scrolled. The `top`, `right`, `bottom`, and `left` properties are used to position the element.
+
+This is often used for navigation bars, footers, and other elements that should always be visible.
+
+```css
+.fixed-element {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+}
+```
+
+### `sticky`
+
+An element with `position: sticky` is positioned based on the user's scroll position. It toggles between `relative` and `fixed`, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like `position:fixed`).
+
+This is commonly used for headers that should stick to the top of the page when the user scrolls down.
+
+```css
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+```
+
+## Examples
+
+### Centering an Element
+
+A common use case for `absolute` positioning is to center an element both horizontally and vertically within its container.
+
+```css
+.parent {
+  position: relative;
+}
+
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+```
+
+<BrowserWindow>
+  <div style={{ position: 'relative', height: '200px', border: '2px solid #333' }}>
+    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: '#f00', padding: '20px' }}>
+      Centered
+    </div>
+  </div>
+</BrowserWindow>
+
+### Sticky Header
+
+Here is an example of a sticky header that stays at the top of the page when you scroll.
+
+```css
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+```
+
+<BrowserWindow>
+  <div style={{ height: '300px', overflowY: 'scroll', border: '2px solid #333' }}>
+    <div style={{ position: 'sticky', top: 0, backgroundColor: '#fff', padding: '10px', borderBottom: '1px solid #ccc' }}>
+      <h2>Sticky Header</h2>
+    </div>
+    <div style={{ padding: '20px' }}>
+      <p>Scroll down to see the sticky effect.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+    </div>
+  </div>
+</BrowserWindow>
+
+### Overlapping Elements with z-index
+
+The `z-index` property specifies the stack order of an element. An element with a greater stack order is always in front of an element with a lower stack order. `z-index` only works on positioned elements (e.g., `absolute`, `relative`, `fixed`, or `sticky`).
+
+```css
+.container {
+  position: relative;
+}
+
+.box {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+}
+
+.red-box {
+  background-color: rgba(255, 82, 82, 0.8);
+  top: 20px;
+  left: 20px;
+  // highlight-next-line
+  z-index: 1; /* Lower z-index, appears behind */
+}
+
+.blue-box {
+  background-color: rgba(52, 152, 219, 0.8);
+  top: 50px;
+  left: 50px;
+  // highlight-next-line
+  z-index: 2; /* Higher z-index, appears in front */
+}
+```
+
+<BrowserWindow>
+  <div style={{ position: 'relative', height: '220px', width: '220px', border: '2px solid #ccc' }}>
+    <div style={{
+      position: 'absolute',
+      top: '20px',
+      left: '20px',
+      width: '150px',
+      height: '150px',
+      backgroundColor: 'rgba(255, 82, 82, 0.8)',
+      border: '2px solid #c0392b',
+      zIndex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontSize: '1.2rem',
+      fontWeight: 'bold'
+    }}>
+      z-index: 1
+    </div>
+    <div style={{
+      position: 'absolute',
+      top: '50px',
+      left: '50px',
+      width: '150px',
+      height: '150px',
+      backgroundColor: 'rgba(52, 152, 219, 0.8)',
+      border: '2px solid #2980b9',
+      zIndex: 2,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontSize: '1.2rem',
+      fontWeight: 'bold'
+    }}>
+      z-index: 2
+    </div>
+  </div>
+</BrowserWindow>

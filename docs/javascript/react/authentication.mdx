@@ -5,275 +5,235 @@ sidebar_position: 8
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # Authentication
 
-## Authentication with redux
+Implementing authentication in a React application is crucial for protecting routes and managing user sessions. This guide demonstrates how to set up a basic authentication flow using Redux Toolkit for state management and React Router for protected routes.
+
+## Project Structure
+
+Here is a typical file structure for handling authentication:
 
 ```bash
-npm i axios
-npm install @reduxjs/toolkit react-redux
-```
-
-```terminal
 .
-├── api
+├── api/
 │   └── userApi.js
+├── features/
+│   ├── auth/
+│   │   ├── authSlice.js
+│   │   ├── AuthWrapper.jsx
+│   │   ├── LoginPage.jsx
+│   │   └── SecretPage.jsx
 ├── App.jsx
 ├── main.jsx
-├── store.js
-└── users
-    ├── authSlice.js
-    ├── AuthWrapper.jsx
-    ├── Home.jsx
-    ├── LoginPage.jsx
-    └── SecretPage.jsx
+└── store.js
 ```
+
+## Authentication with Redux Toolkit
+
+This example demonstrates how to build a complete authentication flow, including an API utility for making requests, a Redux slice for managing authentication state, and components for logging in, viewing protected content, and handling redirects.
+
+### Examples
 
 <Tabs>
+  <TabItem value="userApi.js" label="api/userApi.js">
+    This utility simulates API calls for logging in and fetching user details. In a real application, these functions would make actual HTTP requests.
 
-<TabItem value="userApi.jsx">
-
-```js
-import axios from "axios";
-
-export async function loginUser() {
-  await axios.post("/login");
-  localStorage.setItem("userDemoToken", "userHasedToken");
-}
-
-export async function getUserDetails() {
-  const token = localStorage.getItem("userDemoToken");
-  if (!token) return;
-
-  const res = await axios.get("/me", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  console.log(res.data);
-  return res.data;
-}
-```
-
-</TabItem>
-
-<TabItem value="authSlice.js">
-
-```js
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-import { getUserDetails } from "../api/userApi";
-
-const initialState = {
-  isLoggedIn: false,
-  userDetails: {},
-  isLoading: false,
-  error: "",
-};
-
-export const authSlice = createSlice({
-  name: "auth",
-  initialState: initialState,
-  reducers: {
-    logout: (state) => {
-      state.isLoggedIn = false;
-      state.userDetails = {};
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(authenticateUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = "";
-      })
-      .addCase(authenticateUser.fulfilled, (state, action) => {
-        console.log(action);
-        state.isLoading = false;
-        state.isLoggedIn = true;
-        state.userDetails.username = action.payload.username;
-        state.error = "";
-      })
-      .addCase(authenticateUser.rejected, (state) => {
-        state.isLoading = false;
-        state.error = "Error Logging in";
-      });
-  },
-});
-
-export const authenticateUser = createAsyncThunk(
-  "auth/authenticateUser",
-  async () => {
-    const response = await getUserDetails();
-    console.log("Auth res", response);
-    return response;
-  }
-);
-
-export const { logout } = authSlice.actions;
-export default authSlice.reducer;
-```
-
-</TabItem>
-
-<TabItem value="store.js">
-
-```js
-import { configureStore } from "@reduxjs/toolkit";
-
-import authSlice from "./users/authSlice";
-
-export default configureStore({
-  reducer: {
-    auth: authSlice,
-  },
-});
-```
-
-</TabItem>
-
-<TabItem value="AuthWrapper.jsx">
-
-```jsx
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { authenticateUser } from "./authSlice";
-
-export default function AuthWrapper({ children }) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isLoggedIn } = useSelector((state) => state.auth);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("userDemoToken");
-    if (token) {
-      dispatch(authenticateUser()).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+    ```js
+    // Simulating a login request
+    export async function loginUser() {
+      // In a real app, you would make a POST request to your server
+      // For this example, we'll just set a token in localStorage
+      localStorage.setItem("userToken", "your-auth-token");
     }
-  }, [dispatch]);
 
-  useEffect(() => {
-    if (!loading && !isLoggedIn) {
-      navigate("/login");
+    // Simulating a request to get user details
+    export async function getUserDetails() {
+      const token = localStorage.getItem("userToken");
+      if (!token) throw new Error("No token found");
+
+      // In a real app, you would send the token to the server to get user info
+      return { username: "exampleUser" };
     }
-  }, [loading, isLoggedIn, navigate]);
+    ```
+  </TabItem>
 
-  return <>{children}</>;
-}
-```
+  <TabItem value="authSlice.js" label="features/auth/authSlice.js">
+    The `authSlice` manages the user's authentication state, including whether they are logged in, their details, and loading/error states.
 
-</TabItem>
+    ```js
+    import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+    import { getUserDetails } from "../../api/userApi";
 
-<TabItem value="Home.jsx">
+    const initialState = {
+      isLoggedIn: false,
+      userDetails: null,
+      status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+      error: null,
+    };
 
-```jsx
-import { useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+    export const authenticateUser = createAsyncThunk("auth/authenticateUser", async () => {
+      const response = await getUserDetails();
+      return response;
+    });
 
-import { authenticateUser, logout } from "./authSlice";
+    const authSlice = createSlice({
+      name: "auth",
+      initialState,
+      reducers: {
+        logout: (state) => {
+          state.isLoggedIn = false;
+          state.userDetails = null;
+          localStorage.removeItem("userToken");
+        },
+      },
+      extraReducers: (builder) => {
+        builder
+          .addCase(authenticateUser.pending, (state) => {
+            state.status = "loading";
+          })
+          .addCase(authenticateUser.fulfilled, (state, action) => {
+            state.status = "succeeded";
+            state.isLoggedIn = true;
+            state.userDetails = action.payload;
+          })
+          .addCase(authenticateUser.rejected, (state, action) => {
+            state.status = "failed";
+            state.error = action.error.message;
+          });
+      },
+    });
 
-export default function Home() {
-  const dispatch = useDispatch();
-  const { isLoggedIn } = useSelector((state) => state.auth);
+    export const { logout } = authSlice.actions;
+    export default authSlice.reducer;
+    ```
+  </TabItem>
 
-  useEffect(() => {
-    dispatch(authenticateUser());
-  }, [dispatch, isLoggedIn]);
+  <TabItem value="store.js" label="store.js">
+    The Redux store is configured to include the `auth` reducer.
 
-  function logOutHandler() {
-    localStorage.removeItem("userDemoToken");
-    dispatch(logout());
-  }
+    ```js
+    import { configureStore } from "@reduxjs/toolkit";
+    import authReducer from "./features/auth/authSlice";
 
-  return (
-    <>
-      <h1>Home Page</h1>
-      <p>Logged In: {`${isLoggedIn}`}</p>
-      <NavLink to="/login">Login</NavLink>
-      <NavLink to="/secret">Secret</NavLink>
-      <button onClick={logOutHandler}>LogOut</button>
-    </>
-  );
-}
-```
+    export default configureStore({
+      reducer: {
+        auth: authReducer,
+      },
+    });
+    ```
+  </TabItem>
 
-</TabItem>
+  <TabItem value="AuthWrapper.jsx" label="features/auth/AuthWrapper.jsx">
+    The `AuthWrapper` is a protected route component. It checks for a token and dispatches the `authenticateUser` action. If the user is not authenticated, it redirects them to the login page.
 
-<TabItem value="LoginPage.jsx">
+    ```jsx
+    import { useEffect } from "react";
+    import { useDispatch, useSelector } from "react-redux";
+    import { useNavigate } from "react-router-dom";
+    import { authenticateUser } from "./authSlice";
 
-```jsx
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../api/userApi";
+    export default function AuthWrapper({ children }) {
+      const dispatch = useDispatch();
+      const navigate = useNavigate();
+      const { isLoggedIn, status } = useSelector((state) => state.auth);
 
-export default function LoginPage() {
-  const navigate = useNavigate();
+      useEffect(() => {
+        const token = localStorage.getItem("userToken");
+        if (token && !isLoggedIn) {
+          dispatch(authenticateUser());
+        } else if (!token) {
+          navigate("/login");
+        }
+      }, [dispatch, isLoggedIn, navigate]);
 
-  function loginHandler() {
-    loginUser();
-    navigate("/");
-  }
+      if (status === "loading") return <p>Loading...</p>;
 
-  return (
-    <>
-      <h1>Hello</h1>
-      <button onClick={loginHandler}>Login</button>
-    </>
-  );
-}
-```
+      return isLoggedIn ? children : null;
+    }
+    ```
+  </TabItem>
 
-</TabItem>
+  <TabItem value="LoginPage.jsx" label="features/auth/LoginPage.jsx">
+    The `LoginPage` component provides a button to simulate logging in. After a successful login, it redirects the user to the home page.
 
-<TabItem value="SecretPage.jsx">
+    ```jsx
+    import { useNavigate } from "react-router-dom";
+    import { loginUser } from "../../api/userApi";
 
-```jsx
-export default function SecretPage() {
-  return <h1>Secret Page that required auth</h1>;
-}
-```
+    export default function LoginPage() {
+      const navigate = useNavigate();
 
-</TabItem>
+      const handleLogin = async () => {
+        await loginUser();
+        navigate("/");
+      };
 
-<TabItem value="App.jsx">
+      return (
+        <div>
+          <h1>Login Page</h1>
+          <button onClick={handleLogin}>Log In</button>
+        </div>
+      );
+    }
+    ```
+  </TabItem>
 
-```jsx
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+  <TabItem value="App.jsx" label="App.jsx">
+    The main `App` component sets up the routes for the application, including the protected route for the secret page.
 
-import LoginPage from "./users/LoginPage";
-import SecretPage from "./users/SecretPage";
-import AuthWrapper from "./users/AuthWrapper";
-import Home from "./users/Home";
+    ```jsx
+    import { createBrowserRouter, RouterProvider, NavLink, Outlet } from "react-router-dom";
+    import { useDispatch, useSelector } from "react-redux";
+    import { logout } from "./features/auth/authSlice";
+    import LoginPage from "./features/auth/LoginPage";
+    import SecretPage from "./features/auth/SecretPage";
+    import AuthWrapper from "./features/auth/AuthWrapper";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/secret",
-    element: (
-      <AuthWrapper>
-        <SecretPage />
-      </AuthWrapper>
-    ),
-  },
-]);
+    function Root() {
+      const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+      const dispatch = useDispatch();
 
-export default function App() {
-  return <RouterProvider router={router} />;
-}
-```
+      return (
+        <div>
+          <nav>
+            <NavLink to="/">Home</NavLink> | <NavLink to="/secret">Secret Page</NavLink>
+            {isLoggedIn && (
+              <>
+                <span> | Welcome, {userDetails?.username}</span>
+                <button onClick={() => dispatch(logout())} style={{ marginLeft: '10px' }}>Logout</button>
+              </>
+            )}
+          </nav>
+          <hr />
+          <Outlet />
+        </div>
+      );
+    }
 
-</TabItem>
+    const router = createBrowserRouter([
+      {
+        path: "/",
+        element: <Root />,
+        children: [
+          { index: true, element: <h1>Home Page</h1> },
+          {
+            path: "secret",
+            element: (
+              <AuthWrapper>
+                <SecretPage />
+              </AuthWrapper>
+            ),
+          },
+        ],
+      },
+      { path: "/login", element: <LoginPage /> },
+    ]);
 
+    export default function App() {
+      return <RouterProvider router={router} />;
+    }
+    ```
+  </TabItem>
 </Tabs>

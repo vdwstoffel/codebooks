@@ -1,0 +1,152 @@
+---
+sidebar_label: "Classes"
+sidebar_position: 6
+---
+
+# Python Classes (OOP)
+
+Object-Oriented Programming (OOP) is a programming paradigm based on the concept of "objects", which can contain data in the form of fields (often known as attributes or properties) and code in the form of procedures (often known as methods).
+
+In Python, everything is an object. A class is a blueprint for creating objects.
+
+## Creating a Basic Class
+
+A class is defined using the `class` keyword. The `__init__` method is a special method that is called when an object is created. It is used to initialize the attributes of the object.
+
+### Example
+
+```python
+class Dog:
+    # The __init__ method is called when a new Dog object is created
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    # This is a method of the Dog class
+    def bark(self):
+        return "Woof!"
+
+# Create a new Dog object
+dog1 = Dog("Buddy", 3)
+
+print(dog1.name)  # "Buddy"
+print(dog1.age)   # 3
+print(dog1.bark()) # "Woof!"
+```
+
+## Inheritance
+
+Inheritance allows us to define a class that inherits all the methods and properties from another class. The parent class is the class being inherited from, also called the base class. The child class is the class that inherits from another class, also called the derived class.
+
+### Example
+
+In this example, we create a `GoldenRetriever` class that inherits from the `Dog` class. The `GoldenRetriever` class has all the attributes and methods of the `Dog` class, plus a new method called `fetch`.
+
+```python
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        return "Woof!"
+
+# The GoldenRetriever class inherits from the Dog class
+class GoldenRetriever(Dog):
+    def fetch(self):
+        return "Fetching the ball!"
+
+retriever = GoldenRetriever("Max", 5)
+
+print(retriever.name)      # "Max"
+print(retriever.bark())      # "Woof!"
+print(retriever.fetch())     # "Fetching the ball!"
+```
+
+### Using the `super()` Function
+
+The `super()` function is used to give access to methods and properties of a parent or sibling class. It is most commonly used in the `__init__` method to call the parent class's `__init__` method.
+
+```python
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def bark(self):
+        return "Woof!"
+
+class Poodle(Dog):
+    def __init__(self, name, age, haircut_style):
+        # Call the __init__ method of the parent class
+        super().__init__(name, age)
+        self.haircut_style = haircut_style
+
+    def groom(self):
+        return f"Getting a {self.haircut_style} haircut."
+
+poodle = Poodle("Fifi", 2, "lion cut")
+
+print(poodle.name)          # "Fifi"
+print(poodle.groom())       # "Getting a lion cut haircut."
+```
+
+## Encapsulation
+
+Encapsulation is the bundling of data and the methods that operate on that data into a single unit, or class. In Python, we can use naming conventions to indicate that an attribute should not be accessed directly.
+
+-   **Protected attributes** (by convention) are prefixed with a single underscore (`_`). This tells other developers that the attribute is intended for internal use.
+-   **Private attributes** are prefixed with a double underscore (`__`). This causes the name to be mangled, making it harder to access from outside the class.
+
+### Example
+
+```python
+class Car:
+    def __init__(self, make, model):
+        self.make = make          # Public attribute
+        self._speed = 0           # Protected attribute
+        self.__engine_status = "off" # Private attribute
+
+    def start_engine(self):
+        self.__engine_status = "on"
+        return "Engine started."
+
+    def get_engine_status(self):
+        return self.__engine_status
+
+my_car = Car("Toyota", "Corolla")
+
+print(my_car.make)              # "Toyota"
+print(my_car._speed)            # 0 (accessible, but convention says not to)
+
+# print(my_car.__engine_status) # This would cause an AttributeError
+
+print(my_car.start_engine())      # "Engine started."
+print(my_car.get_engine_status()) # "on"
+```
+
+## Polymorphism
+
+Polymorphism allows us to use a single interface to represent different underlying forms (data types). With polymorphism, we can execute the same method on different objects, and each object will respond in its own way.
+
+### Example
+
+```python
+class Cat:
+    def speak(self):
+        return "Meow"
+
+class Dog:
+    def speak(self):
+        return "Woof"
+
+# A function that can work with any object that has a `speak` method
+def make_animal_speak(animal):
+    print(animal.speak())
+
+cat = Cat()
+dog = Dog()
+
+make_animal_speak(cat) # "Meow"
+make_animal_speak(dog) # "Woof"
+```

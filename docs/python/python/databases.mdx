@@ -1,149 +1,173 @@
 ---
 sidebar_label: Databases
+sidebar_position: 7
 ---
 
-# Databases
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
-### Sqlite3
+# Python Database Interaction
 
-```python
-import sqlite3
+Interacting with databases is a fundamental part of many Python applications, from web development to data analysis. Python's standard library includes `sqlite3` for working with SQLite databases, and there are numerous third-party libraries like `psycopg2` for connecting to other relational databases such as PostgreSQL.
 
-def connect_to_database():
+This page provides examples of common database operations using both `sqlite3` and `psycopg2`.
 
-    con = sqlite3.connect("demo.db")
-    if con:
-        cur = con.cursor()
-        return con, cur
-    else:
-        raise Exception("Error connecting to database")
+## Examples
 
-def create_table():
-    query = """
-            CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR(30),
-                age INTEGER
-            );
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query)
+<Tabs>
+  <TabItem value="sqlite" label="Sqlite3">
+    SQLite is a C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine. It's often used for local storage or embedded databases.
 
-def create_record(name: str, age: int):
+    ```python
+    import sqlite3
 
-    query = f"""
-            INSERT INTO users (name, age)
-            VALUES (?, ?);
-            """
+    # Establishes a connection to the SQLite database. If the database does not exist, it will be created.
+    def connect_to_database():
+        con = sqlite3.connect("demo.db")
+        if con:
+            cur = con.cursor()
+            return con, cur
+        else:
+            raise Exception("Error connecting to database")
 
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (name, age))
-        con.commit()
+    # Creates a 'users' table if it doesn't already exist.
+    def create_table():
+        query = """
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR(30),
+                    age INTEGER
+                );
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query)
 
-def update_name(user_id: int, new_name: str):
-    query = """
-            UPDATE users
-            SET name = ?
-            WHERE user_id = ?;
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (new_name, user_id))
-        con.commit()
+    # Inserts a new record into the 'users' table.
+    def create_record(name: str, age: int):
+        query = f"""
+                INSERT INTO users (name, age)
+                VALUES (?, ?);
+                """ # Use ? as placeholders for SQLite
 
-def get_users():
-    query = "SELECT * FROM users;"
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query)
-        data = cur.fetchall()
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (name, age))
+            con.commit()
 
-    return data     # [(1, 'John Smith', 23), (2, 'Strong', 33)]
+    # Updates the name of a user based on their user_id.
+    def update_name(user_id: int, new_name: str):
+        query = """
+                UPDATE users
+                SET name = ?
+                WHERE user_id = ?;
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (new_name, user_id))
+            con.commit()
 
-def get_user_by_id(user_id: int):
-    query = """
-            SELECT * FROM users
-            WHERE user_id = ?;
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
-        data = cur.fetchone()
-    return data     # (1, 'John Smith', 23)
-```
+    # Retrieves all records from the 'users' table.
+    def get_users():
+        query = "SELECT * FROM users;"
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query)
+            data = cur.fetchall()
 
-### Psycopg2 (PostgreSQL)
+        return data     # Example: [(1, 'John Smith', 23), (2, 'Strong', 33)]
 
-```bash
-pip install psycopg2-binary
-```
+    # Retrieves a single user record by their user_id.
+    def get_user_by_id(user_id: int):
+        query = """
+                SELECT * FROM users
+                WHERE user_id = ?;
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
+            data = cur.fetchone()
+        return data     # Example: (1, 'John Smith', 23)
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="Psycopg2 (PostgreSQL)">
+    Psycopg2 is a PostgreSQL adapter for the Python programming language. It is designed for heavily loaded production systems.
 
-```python
-import psycopg2
+    ```bash
+    pip install psycopg2-binary
+    ```
 
-def connect_to_database():
+    ```python
+    import psycopg2
 
-    con = psycopg2.connect("postgresql://demo_user:demo_password@192.168.129.11:5432/demo_db")
-    if con:
-        cur = con.cursor()
-        return con, cur
-    else:
-        raise Exception("Error connecting to database")
+    # Establishes a connection to the PostgreSQL database.
+    def connect_to_database():
+        # Replace with your PostgreSQL connection string
+        con = psycopg2.connect("postgresql://demo_user:demo_password@localhost:5432/demo_db")
+        if con:
+            cur = con.cursor()
+            return con, cur
+        else:
+            raise Exception("Error connecting to database")
 
-def create_table():
-    query = """
-            CREATE TABLE IF NOT EXISTS users (
-                user_id SERIAL PRIMARY KEY,
-                name VARCHAR(30),
-                age INTEGER
-            );
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query)
+    # Creates a 'users' table if it doesn't already exist.
+    def create_table():
+        query = """
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id SERIAL PRIMARY KEY,
+                    name VARCHAR(30),
+                    age INTEGER
+                );
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query)
 
-def create_record(name: str, age: int):
+    # Inserts a new record into the 'users' table.
+    def create_record(name: str, age: int):
+        query = f"""
+                INSERT INTO users (name, age)
+                VALUES (%s, %s);
+                """ # Use %s as placeholders for Psycopg2
 
-    query = f"""
-            INSERT INTO users (name, age)
-            VALUES (%s, %s);
-            """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (name, age))
+            con.commit()
 
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (name, age))
-        con.commit()
+    # Updates the name of a user based on their user_id.
+    def update_name(user_id: int, new_name: str):
+        query = """
+                UPDATE users
+                SET name = %s
+                WHERE user_id = %s;
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (new_name, user_id))
+            con.commit()
 
-def update_name(user_id: int, new_name: str):
-    query = """
-            UPDATE users
-            SET name = %s
-            WHERE user_id = %s;
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (new_name, user_id))
-        con.commit()
+    # Retrieves all records from the 'users' table.
+    def get_users():
+        query = "SELECT * FROM users;"
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query)
+            data = cur.fetchall()
 
-def get_users():
-    query = "SELECT * FROM users;"
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query)
-        data = cur.fetchall()
+        return data     # Example: [(1, 'John Smith', 23), (2, 'Strong', 33)]
 
-    return data     # [(1, 'John Smith', 23), (2, 'Strong', 33)]
-
-def get_user_by_id(user_id: int):
-    query = """
-            SELECT * FROM users
-            WHERE user_id = %s;
-            """
-    con, cur = connect_to_database()
-    with con:
-        cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
-        data = cur.fetchone()
-    return data     # (1, 'John Smith', 23)
-```
+    # Retrieves a single user record by their user_id.
+    def get_user_by_id(user_id: int):
+        query = """
+                SELECT * FROM users
+                WHERE user_id = %s;
+                """
+        con, cur = connect_to_database()
+        with con:
+            cur.execute(query, (user_id,))  # Note the comma, to pass as a tuple
+            data = cur.fetchone()
+        return data     # Example: (1, 'John Smith', 23)
+    ```
+  </TabItem>
+</Tabs>

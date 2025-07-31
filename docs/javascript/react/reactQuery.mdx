@@ -8,7 +8,7 @@ import TabItem from "@theme/TabItem";
 
 import TanstackApp from "@site/src/components/reactExamples/reactQuery/TanstackApp";
 
-# ReactQuery
+# React Query
 
 [React Query](https://tanstack.com/query/v5/docs/framework/react/overview) makes fetching, caching, synchronizing and updating server state in your web applications a breeze.
 
@@ -102,18 +102,76 @@ export default function TanstackApp() {
 
 </Tabs>
 
+
 <TanstackApp app="BasicExample" />
 
-## Passing arguments to fetchQuery
+## Passing Arguments to Queries
+
+When a query depends on a variable, you should include it in the `queryKey`. This ensures that the query is re-fetched automatically when the variable changes. It's also a good practice to use the `enabled` option to prevent a query from running until it has all the required parameters.
+
+<Tabs>
+<TabItem value="Request.jsx">
 
 ```jsx
-export function useGetExpenses(idToken) {
-  const { data } = useQuery({
-    queryKey: ["expenses"],
-    queryFn: () => getAllExpenseByUserId(idToken),
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+import { getUserById } from "../helpers/fakeServer";
+
+export default function FetchUserById() {
+  const [userId, setUserId] = useState(1);
+
+  const { isPending, error, data } = useQuery({
+    // highlight-start
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+    // highlight-end
   });
+
+  if (isPending) return <p>Loading...</p>;
+  if (error)
+    return (
+      <p>
+        Error: {error.status} - {error.message}
+      </p>
+    );
+
+  return (
+    <>
+      <h1>User Details</h1>
+      <p>
+        {data.name}, {data.age}
+      </p>
+      <button onClick={() => setUserId(userId + 1)}>Next User</button>
+    </>
+  );
 }
 ```
+
+</TabItem>
+<TabItem value="App.jsx">
+
+```jsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import FetchUserById from "./FetchUserById";
+
+const queryClient = new QueryClient();
+
+export default function TanstackApp() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <FetchUserById />
+    </QueryClientProvider>
+  );
+}
+```
+
+</TabItem>
+</Tabs>
+
+<!-- <TanstackApp app="FetchUserById" /> -->
 
 ## Updating data with mutations
 
@@ -139,6 +197,7 @@ export default function Mutations() {
   });
 
   // Mutation Function
+  // highlight-start
   const { isPending: isPosting, mutate } = useMutation({
     mutationFn: addUser,
     onSuccess: () => {
@@ -147,6 +206,7 @@ export default function Mutations() {
     },
     onError: () => console.log(error),
   });
+  // highlight-end
 
   // Check the status of the data loading
   if (isFetching) return <p>Loading...</p>;
@@ -337,6 +397,137 @@ export default function QueryHooks() {
           {user.name} {user.age}
         </p>
       ))}
+    </>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Creating a query hook with arguments
+
+<Tabs>
+
+<TabItem value="useUserById.js">
+
+```js
+import { useQuery } from "@tanstack/react-query";
+
+import { getUserById } from "../helpers/fakeServer";
+
+export function useUserById(userId) {
+  const {
+    isPending,
+    error,
+    data: user,
+  } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  });
+
+  return { isPending, error, user };
+}
+```
+
+</TabItem>
+
+<TabItem value="QueryHookWithArgs.jsx">
+
+```jsx
+import { useState } from "react";
+import { useUserById } from "./useUserById";
+
+export default function QueryHookWithArgs() {
+  const [userId, setUserId] = useState(1);
+  const { isPending, error, user } = useUserById(userId);
+
+  if (isPending) return <p>Loading...</p>;
+  if (error) return <p>{error.message}</p>;
+
+  return (
+    <>
+      <h1>Query Hook with arguments</h1>
+      <p>
+        {user.name}, {user.age}
+      </p>
+      <button onClick={() => setUserId(userId + 1)}>Next User</button>
+    </>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Dynamically Supplying Arguments to a Hook
+
+<Tabs>
+
+<TabItem value="useUserById.js">
+
+```js
+import { useQuery } from "@tanstack/react-query";
+
+import { getUserById } from "../helpers/fakeServer";
+
+export function useUserById(userId) {
+  const {
+    isPending,
+    error,
+    data: user,
+  } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  });
+
+  return { isPending, error, user };
+}
+```
+
+</TabItem>
+
+<TabItem value="UserDetails.jsx">
+
+```jsx
+import { useUserById } from "./useUserById";
+
+export default function UserDetails({ userId }) {
+  const { isPending, error, user } = useUserById(userId);
+
+  if (isPending) return <p>Loading...</p>;
+  if (error) return <p>{error.message}</p>;
+
+  return (
+    <div>
+      <p>
+        {user.name}, {user.age}
+      </p>
+    </div>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="App.jsx">
+
+```jsx
+import { useState } from "react";
+import UserDetails from "./UserDetails";
+
+export default function App() {
+  const [userId, setUserId] = useState(1);
+
+  return (
+    <>
+      <h1>User Details</h1>
+      <UserDetails userId={userId} />
+      <button onClick={() => setUserId(userId + 1)}>Next User</button>
     </>
   );
 }

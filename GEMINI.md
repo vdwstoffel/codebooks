@@ -32,6 +32,7 @@ code from other technologies or frameworks unless specifically instructed to do 
 ```mdx
 - [New Topic](./new-topic.mdx)
 ```
+- Only add the "What's Next?" section to files whose name matches their parent folder's name (e.g., `react.mdx` in the `react` folder).
 - When adding or improving a page, always add the `sidebar_label` and `sidebar_position` to the top of the file. For example:
 ```mdx
 ---
@@ -50,4 +51,5 @@ sidebar_position: 3
 ```javascript
 import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 ```
+- When an example includes both a code snippet and a visual representation (e.g., using the BrowserWindow component), the code snippet should always be presented before the visual example.
 - When showing code examples, use `// highlight-next-line` to draw attention to important lines of code.

@@ -3,28 +3,34 @@ sidebar_label: "Useful Libraries"
 sidebar_position: 9
 ---
 
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 import ToastExample from "@site/src/components/reactExamples/ToastExample";
 import HookFormExample from "@site/src/components/reactExamples/HookFormExample";
 import LeafletBasicExample from "@site/src/components/reactExamples/leaflet/BasicExample";
 import RecenterMap from "@site/src/components/reactExamples/leaflet/RecenterMap";
 import MapClickEvent from "@site/src/components/reactExamples/leaflet/MapClickEvent";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 # Useful Libraries
 
+This page provides an overview of several useful libraries that can help you build React applications more efficiently.
+
 ## React Hot Toast
 
-A super easy toast library for React
-
-[React Hot Toast](https://react-hot-toast.com/) docs
+[React Hot Toast](https://react-hot-toast.com/) is a lightweight and easy-to-use library for adding toast notifications to your application.
 
 ```bash
 npm install react-hot-toast
 ```
 
+### Basic Usage
+
+To use React Hot Toast, import the `toast` function and the `Toaster` component. The `Toaster` component renders the toasts, and the `toast` function is used to trigger them.
+
 ```jsx
 import toast, { Toaster } from "react-hot-toast";
 
-const notify = () => toast("Here is your toast.");
+const notify = () => toast.success("Here is your toast.");
 
 export default function HotToast() {
   return (
@@ -36,17 +42,21 @@ export default function HotToast() {
 }
 ```
 
-<ToastExample />
+<BrowserWindow>
+  <ToastExample />
+</BrowserWindow>
 
 ## React Hook Form
 
-Performant, flexible and extensible forms with easy-to-use validation
-
-[React Hook Form](https://react-hook-form.com/) docs
+[React Hook Form](https://react-hook-form.com/) is a performant, flexible, and extensible library for managing forms in React. It leverages hooks to manage form state and validation, which results in less code and better performance.
 
 ```bash
 npm install react-hook-form
 ```
+
+### Basic Usage
+
+The `useForm` hook provides methods for registering inputs, handling submissions, and accessing form state and errors.
 
 ```jsx
 import { useForm } from "react-hook-form";
@@ -55,76 +65,56 @@ export default function App() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
   const onSubmit = (data) => console.log(data);
 
-  console.log(watch("example")); // watch input value by passing the name of it
-
   return (
-    /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <form onSubmit={handleSubmit(onSubmit)}>
-      {/* register your input into the hook by invoking the "register" function */}
       <input defaultValue="test" {...register("example")} />
-
-      {/* include validation with required or other standard HTML validation rules */}
       <input {...register("exampleRequired", { required: true })} />
-      {/* errors will return when field validation fails  */}
       {errors.exampleRequired && <span>This field is required</span>}
-
       <input type="submit" />
     </form>
   );
 }
 ```
 
-<HookFormExample />
+<BrowserWindow>
+  <HookFormExample />
+</BrowserWindow>
 
 ## Leaflet
 
-- [Leaflet](https://leafletjs.com/) is the leading open-source JavaScript library for mobile-friendly interactive maps.
-- [React-Leaflet](https://react-leaflet.js.org/) provides a React-friendly layer on top of Leaflet.
+[Leaflet](https://leafletjs.com/) is a leading open-source JavaScript library for mobile-friendly interactive maps. [React-Leaflet](https://react-leaflet.js.org/) provides React components for Leaflet maps.
 
 ```bash
-npm install react@rc react-dom@rc leaflet
-npm install react-leaflet@next
+npm install leaflet react-leaflet
 ```
 
 ### Basic Setup
 
-```css title="leaflet.css"
-@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-```
+To get started, you need to import the Leaflet CSS and then use the `MapContainer`, `TileLayer`, and `Marker` components.
 
 ```jsx
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "./leaflet.css";
+import "leaflet/dist/leaflet.css";
 
 export default function LeafletGettingStarted() {
   return (
-    <MapContainer
-      center={[51.505, -0.09]}
-      zoom={13}
-      scrollWheelZoom={true}
-      style={{ height: "500px", width: "500px" }}
-    >
+    <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: "400px" }}>
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       <Marker position={[51.505, -0.09]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
+        <Popup>A pretty CSS3 popup. <br /> Easily customizable.</Popup>
       </Marker>
     </MapContainer>
   );
 }
 ```
-
-import BrowserOnly from '@docusaurus/BrowserOnly';
 
 <BrowserOnly>
   {() => <LeafletBasicExample />}
@@ -238,3 +228,59 @@ export default function MapClickEvent() {
 <BrowserOnly>
   {() => <MapClickEvent />}
 </BrowserOnly>
+
+## date-fns
+
+[date-fns](httpshttps://date-fns.org/) is a modern JavaScript date utility library. It provides a comprehensive set of functions for manipulating and formatting dates.
+
+```bash
+npm install date-fns
+```
+
+### Basic Usage
+
+Here are a few examples of how you can use `date-fns` to format and manipulate dates:
+
+```jsx
+import { format, addDays, differenceInDays } from 'date-fns';
+
+const today = new Date();
+
+// Format a date
+const formattedDate = format(today, 'MMMM do, yyyy'); // "July 21st, 2025"
+
+// Add 5 days to a date
+const futureDate = addDays(today, 5);
+const formattedFutureDate = format(futureDate, 'MMMM do, yyyy'); // "July 26th, 2025"
+
+// Calculate the difference between two dates
+const date1 = new Date('2025-07-21');
+const date2 = new Date('2025-07-26');
+const dayDifference = differenceInDays(date2, date1); // 5
+```
+
+## React Select
+
+[React Select](https://react-select.com/) is a flexible and beautiful Select Input control for ReactJS with multiselect, autocomplete, and ajax support.
+
+```bash
+npm install react-select
+```
+
+### Basic Usage
+
+Here is a basic example of how to use React Select with a simple list of options.
+
+```jsx
+import Select from 'react-select';
+
+const options = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' },
+];
+
+export default function App() {
+  return <Select options={options} />;
+}
+```

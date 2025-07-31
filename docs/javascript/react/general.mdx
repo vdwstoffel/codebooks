@@ -12,18 +12,21 @@ import ModalPortal from "@site/src/components/reactExamples/general/ModalPortal"
 
 Some general non specific examples
 
-## createPortal
+## `createPortal`
 
-[createPortal](https://react.dev/reference/react-dom/createPortal) lets you render some children into a different part of the DOM.
+[`createPortal`](https://react.dev/reference/react-dom/createPortal) lets you render some children into a different part of the DOM tree. This is useful for rendering modals, tooltips, and other elements that need to be outside the normal DOM flow.
 
 ```jsx
 <div>
   <SomeComponent />
+  {/* highlight-next-line */}
   {createPortal(children, domNode, key?)}
 </div>
 ```
 
-### Creating a modal with createPortal
+### Creating a Modal with createPortal
+
+This example demonstrates how to create a simple modal using `createPortal`.
 
 <Tabs>
 
@@ -54,11 +57,13 @@ export default function ModalPortal() {
           <button onClick={openModel}>Click To Open</button>
 
           {isOpen &&
+            // highlight-next-line
             createPortal(
               <div className={styles.modal}>
                 <p>This is a modal with Portal</p>
                 <button onClick={closeModel}>close</button>
               </div>,
+              // highlight-next-line
               document.body
             )}
         </div>
@@ -96,11 +101,11 @@ export default function ModalPortal() {
 
 <ModalPortal />
 
-## Upload a file
+## Upload a File
 
-This example shows how to create a React component to handle file uploads. It manages the selected file, provides user feedback during the upload process, and displays status messages.
+This example demonstrates how to create a React component to handle file uploads. It manages the selected file, provides user feedback during the upload process, and displays status messages.
 
-Note: This component is designed to send a file to a server. For this to work, you need a server endpoint ready to receive the file at the specified URL (e.g., `http://localhost:5000/upload`).
+**Note:** This component is designed to send a file to a server. For this to work, you need a server endpoint ready to receive the file at the specified URL (e.g., `http://localhost:5000/upload`).
 
 <Tabs>
 <TabItem value="JavaScript" label="JavaScript">
@@ -119,7 +124,7 @@ export default function FileUpload() {
 
   // Handles the file input change event.
   function handleFileChange(event) {
-    // Set the selected file from the input.
+    // highlight-next-line
     setFile(event.target.files[0]);
     // Clear any previous messages.
     setMessage("");
@@ -138,12 +143,15 @@ export default function FileUpload() {
     setMessage("");
 
     // Create a FormData object to package the file for the request.
+    // highlight-next-line
     const formData = new FormData();
+    // highlight-next-line
     formData.append("file", file);
 
     try {
       // Make a POST request to the server's upload endpoint.
       // The server URL should be replaced with your actual endpoint.
+      // highlight-next-line
       const response = await axios.post("http://localhost:5000/upload", formData, {
         headers: {
           // This header is important for file uploads.
@@ -195,6 +203,7 @@ export default function FileUpload(): React.ReactElement {
   // Handles the file input change event.
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files) {
+      // highlight-next-line
       setFile(event.target.files[0]);
       setMessage("");
     }
@@ -210,10 +219,13 @@ export default function FileUpload(): React.ReactElement {
     setUploading(true);
     setMessage("");
 
+    // highlight-next-line
     const formData = new FormData();
+    // highlight-next-line
     formData.append("file", file);
 
     try {
+      // highlight-next-line
       const response = await axios.post("http://localhost:5000/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",

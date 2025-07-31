@@ -25,10 +25,11 @@ import UseContextExample from "@site/src/components/reactExamples/useContext/Use
 import UseContextHookExample from "@site/src/components/reactExamples/useContext/UseContextHookExample";
 
 import UseMemoExmaple from "@site/src/components/reactExamples/UseMemoExample";
+import FactorialCalculator from "@site/src/components/reactExamples/FactorialCalculator";
 
 # Hooks
 
-## useSate
+## useState
 
 [useState](https://react.dev/reference/react/useState) is a React Hook that lets you add a state variable to your component.
 
@@ -177,7 +178,7 @@ export default function UseStateCustomHook() {
 
 </Tabs>
 
-## UseEffect
+## useEffect
 
 [useEffect](https://react.dev/reference/react/useEffect) is a React Hook that lets you synchronize a component with an external system.
 
@@ -332,17 +333,20 @@ export async function getUsers(apiController = undefined) {
 
 ## useRef
 
-[useRef](https://react.dev/reference/react/useRef) is a React Hook that lets you reference a value that’s not needed for rendering. useRef places an reference to any html element. Any normal dom manipulation can be done using useRef.
+[`useRef`](https://react.dev/reference/react/useRef) is a React Hook that lets you reference a value that’s not needed for rendering. It can be used to access and interact with DOM elements directly, or to store mutable values that don't trigger re-renders.
 
 ```jsx
 import { useRef } from "react";
 
-...
+// ...
 
+// highlight-next-line
 const ref = useRef(initialValue)
 ```
 
-### Adding styles to a box
+### Adding Styles to a Box
+
+This example demonstrates how to use `useRef` to directly manipulate the DOM, in this case, adding and removing CSS classes to an element.
 
 <Tabs>
 
@@ -354,14 +358,19 @@ import { useRef } from "react";
 import styles from "./ref.module.css";
 
 export default function RefExample() {
+  // highlight-next-line
   const redBox = useRef();
 
   function handleClick() {
+    // highlight-next-line
     redBox.current.className = redBox.current.className + " " + styles.spin;
+    // highlight-next-line
     redBox.current.textContent = "Spinning";
 
     setTimeout(() => {
+      // highlight-next-line
       redBox.current.textContent = "Stable";
+      // highlight-next-line
       redBox.current.className = `${styles.box} ${styles.red}`;
     }, 5500);
   }
@@ -372,6 +381,7 @@ export default function RefExample() {
         <button onClick={handleClick}>Red</button>
       </div>
       <div>
+        {/* highlight-next-line */}
         <div ref={redBox} className={`${styles.box} ${styles.red}`}>
           Stable
         </div>
@@ -410,20 +420,26 @@ export default function RefExample() {
 
 <UseRefExample />
 
-### Updating element Text
+### Updating Element Text
+
+This example shows how `useRef` can be used to update the text content of a paragraph and the value of an input field directly.
 
 ```jsx
 import { useRef } from "react";
 
 export default function UpdatingText() {
+  // highlight-next-line
   const para = useRef();
+  // highlight-next-line
   const inp = useRef();
 
   function updateParagraph() {
+    // highlight-next-line
     para.current.textContent = "Button click updated Paragraph";
   }
 
   function updateInput() {
+    // highlight-next-line
     inp.current.value = "Updated";
   }
 
@@ -431,7 +447,9 @@ export default function UpdatingText() {
     <div>
       <button onClick={updateParagraph}>Update Paragraph</button>
       <button onClick={updateInput}>Update Input</button>
+      {/* highlight-next-line */}
       <p ref={para}>Paragraph</p>
+      {/* highlight-next-line */}
       <input ref={inp} placeholder="Type Something" />
     </div>
   );
@@ -440,16 +458,20 @@ export default function UpdatingText() {
 
 <UpdatingText />
 
-### How to check if an element was clicked
+### How to Check if an Element Was Clicked
+
+This example demonstrates how to use `useRef` in conjunction with event listeners to determine if a click occurred inside or outside a specific element.
 
 ```jsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState }n from "react";
 
 export default function CheckIfElementWasClicked() {
+  // highlight-next-line
   const ref = useRef();
   const [lastClick, setLastClick] = useState();
 
   function handleClick(e) {
+    // highlight-next-line
     if (ref.current && ref.current.contains(e.target)) {
       setLastClick("Clicked inside div");
     } else {
@@ -457,8 +479,11 @@ export default function CheckIfElementWasClicked() {
     }
   }
 
+  // highlight-next-line
   useEffect(() => {
+    // highlight-next-line
     document.addEventListener("click", handleClick);
+    // highlight-next-line
     return () => document.removeEventListener("click", handleClick);
   });
 
@@ -468,6 +493,7 @@ export default function CheckIfElementWasClicked() {
       <div
         style={{ width: "600px", height: "600px", backgroundColor: "darkred" }}
       >
+        {/* highlight-next-line */}
         <div
           style={{ width: "300px", height: "300px", backgroundColor: "orange" }}
           ref={ref}
@@ -482,11 +508,22 @@ export default function CheckIfElementWasClicked() {
 
 <CheckIfElementWasClicked />
 
-## useReduer
+## useReducer
 
-[useReducer](https://react.dev/reference/react/useReducer) is a React Hook that lets you add a reducer to your component.
+[`useReducer`](https://react.dev/reference/react/useReducer) is a React Hook that lets you manage state with a reducer function. It's an alternative to `useState` for more complex state logic, especially when the next state depends on the previous one or when you have multiple sub-values.
+
+```jsx
+import { useReducer } from "react";
+
+// ...
+
+// highlight-next-line
+const [state, dispatch] = useReducer(reducer, initialState, init?);
+```
 
 ### Basic Usage
+
+This example demonstrates a simple counter using `useReducer`.
 
 ```jsx
 import { useReducer } from "react";
@@ -499,13 +536,16 @@ const initialState = {
 function reducerFn(state, action) {
   switch (action.type) {
     case "deposit":
+      // highlight-next-line
       return { ...state, balance: state.balance + action.payload };
 
     case "withdraw":
+      // highlight-next-line
       return { ...state, balance: state.balance - action.payload };
 
     case "takeLoan": {
       const loanAmount = action.payload;
+      // highlight-next-line
       return {
         ...state,
         balance: state.balance + loanAmount,
@@ -514,6 +554,7 @@ function reducerFn(state, action) {
     }
 
     case "payLoan":
+      // highlight-next-line
       return { ...state, loan: 0, balance: state.balance - state.loan };
 
     default:
@@ -522,12 +563,17 @@ function reducerFn(state, action) {
 }
 
 export default function UserReducerExample() {
+  // highlight-next-line
   const [state, dispatch] = useReducer(reducerFn, initialState);
   const { balance, loan } = state;
 
+  // highlight-next-line
   const makeDeposit = () => dispatch({ type: "deposit", payload: 50 });
+  // highlight-next-line
   const withdraw = () => dispatch({ type: "withdraw", payload: 30 });
+  // highlight-next-line
   const takeLoan = () => dispatch({ type: "takeLoan", payload: 100 });
+  // highlight-next-line
   const payLoan = () => dispatch({ type: "payLoan" });
 
   return (
@@ -549,7 +595,9 @@ export default function UserReducerExample() {
 
 <UseReducerExample />
 
-### Adding useReducer to a context for global management
+### Adding `useReducer` to a Context for Global Management
+
+`useReducer` can be combined with `useContext` to create a global state management solution, similar to Redux, but built with React's built-in hooks.
 
 <Tabs>
 
@@ -563,6 +611,7 @@ const initialState = {
   age: 0,
 };
 
+// highlight-next-line
 function userReducerFn(state, action) {
   switch (action.type) {
     case "updateName":
@@ -577,6 +626,7 @@ function userReducerFn(state, action) {
 }
 
 // Create the initial state and function and export
+// highlight-next-line
 export { initialState, userReducerFn };
 ```
 
@@ -592,16 +642,21 @@ import { createContext, useReducer } from "react";
 import { initialState, userReducerFn } from "./userReducer";
 
 // Export the userContext, this will be used in the custom hook
+// highlight-next-line
 export const userContext = createContext({});
 
 export default function UserContextProvider({ children }) {
+  // highlight-next-line
   const [{ name, age }, dispatch] = useReducer(userReducerFn, initialState);
 
+  // highlight-next-line
   const updateName = (name) => dispatch({ type: "updateName", payload: name });
+  // highlight-next-line
   const updateAge = () => dispatch({ type: "updateAge" });
 
   // Give all children access to the values
   return (
+    // highlight-next-line
     <userContext.Provider value={{ name, age, updateName, updateAge }}>
       {children}
     </userContext.Provider>
@@ -620,13 +675,16 @@ import { useContext } from "react";
 
 import { userContext } from "./UserContextProvider";
 
+// highlight-next-line
 export function useUser() {
+  // highlight-next-line
   const context = useContext(userContext);
 
   if (context === undefined) {
     throw new Error("userReducer used outside Provider");
   }
 
+  // highlight-next-line
   return context;
 }
 ```
@@ -641,6 +699,7 @@ import { useUser } from "./useUser";
 
 export default function WithContextExample() {
   return (
+    // highlight-next-line
     <UserContextProvider>
       <UserDetails />
       <UserEdits />
@@ -649,6 +708,7 @@ export default function WithContextExample() {
 }
 
 function UserDetails() {
+  // highlight-next-line
   const { name, age } = useUser();
 
   return (
@@ -660,8 +720,10 @@ function UserDetails() {
 }
 
 function UserEdits() {
+  // highlight-next-line
   const { updateName, updateAge } = useUser();
 
+  // highlight-next-line
   const updateNameHandler = (e) => updateName(e.target.value);
 
   return (
@@ -681,28 +743,32 @@ function UserEdits() {
 
 ## useContext
 
-[useContext](https://react.dev/reference/react/useContext) is a React Hook that lets you read and subscribe to context from your component. useContext can be used for global state management.
+[`useContext`](https://react.dev/reference/react/useContext) is a React Hook that lets you read and subscribe to context from your component. `useContext` can be used for global state management, allowing components to access shared data without prop drilling.
 
 ```jsx
 import { useContext, createContext } from 'react';
 
 const SomeContext = createContext('default value');
-...
+// ...
 
+// highlight-next-line
 const value = useContext(SomeContext)
 ```
 
 ### Basic Example
 
+This example demonstrates how to create a context and consume it in child components.
+
 <Tabs>
 
 <TabItem value="UserContextProvider.jsx">
 
-create a context Component that accepts children. The Provider exposes the values to all child components.
+Create a context Component that accepts children. The Provider exposes the values to all child components.
 
 ```jsx
 import { createContext, useState } from "react";
 
+// highlight-next-line
 export const UserContext = createContext();
 
 export default function UserContextProvider({ children }) {
@@ -711,6 +777,7 @@ export default function UserContextProvider({ children }) {
   const updateName = (name) => setUsername(name);
 
   return (
+    // highlight-next-line
     <UserContext.Provider value={{ userName, updateName }}>
       {children}
     </UserContext.Provider>
@@ -731,6 +798,7 @@ import UserContextProvider, { UserContext } from "./UserContextProvider";
 
 export default function UseContextExample() {
   return (
+    // highlight-next-line
     <UserContextProvider>
       <ComponentOne />
       <ComponentTwo />
@@ -739,6 +807,7 @@ export default function UseContextExample() {
 }
 
 function ComponentOne() {
+  // highlight-next-line
   const { updateName } = useContext(UserContext);
 
   function updateHandler(e) {
@@ -754,6 +823,7 @@ function ComponentOne() {
 }
 
 function ComponentTwo() {
+  // highlight-next-line
   const { userName } = useContext(UserContext);
 
   return (
@@ -770,7 +840,9 @@ function ComponentTwo() {
 
 <UseContextExample />
 
-### Creating a useContext Custom Hook
+### Creating a `useContext` Custom Hook
+
+Creating a custom hook for `useContext` can simplify its usage and add error handling.
 
 <Tabs>
 
@@ -779,6 +851,7 @@ function ComponentTwo() {
 ```js
 import { createContext, useState } from "react";
 
+// highlight-next-line
 export const UserContext = createContext();
 
 export default function UserContextProvider({ children }) {
@@ -787,6 +860,7 @@ export default function UserContextProvider({ children }) {
   const updateName = (name) => setUsername(name);
 
   return (
+    // highlight-next-line
     <UserContext.Provider value={{ userName, updateName }}>
       {children}
     </UserContext.Provider>
@@ -803,13 +877,16 @@ import { useContext } from "react";
 
 import { UserContext } from "./UserContextProvider";
 
+// highlight-next-line
 export function useUser() {
+  // highlight-next-line
   const context = useContext(UserContext);
 
   if (context === undefined) {
     throw new Error("UseUser is used outside the provider");
   }
 
+  // highlight-next-line
   return context;
 }
 ```
@@ -824,6 +901,7 @@ import { useUser } from "./useUser";
 
 export default function UseContextExample() {
   return (
+    // highlight-next-line
     <UserContextProvider>
       <ComponentOne />
       <ComponentTwo />
@@ -832,6 +910,7 @@ export default function UseContextExample() {
 }
 
 function ComponentOne() {
+  // highlight-next-line
   const { updateName } = useUser();
 
   function updateHandler(e) {
@@ -847,6 +926,7 @@ function ComponentOne() {
 }
 
 function ComponentTwo() {
+  // highlight-next-line
   const { userName } = useUser();
 
   return (
@@ -865,9 +945,20 @@ function ComponentTwo() {
 
 ## useMemo
 
-[useMemo](https://react.dev/reference/react/useMemo) is a React Hook that lets you cache the result of a calculation between re-renders.
+[`useMemo`](https://react.dev/reference/react/useMemo) is a React Hook that lets you cache the result of a calculation between re-renders. It helps optimize performance by avoiding expensive recalculations on every render.
+
+```jsx
+import { useMemo } from "react";
+
+// ...
+
+// highlight-next-line
+const cachedValue = useMemo(calculateValue, dependencies)
+```
 
 ### Basic Example
+
+This example demonstrates how `useMemo` can prevent a value from being re-calculated unless its dependencies change.
 
 ```jsx
 import { useState, useMemo } from "react";
@@ -876,9 +967,10 @@ export default function UseMEmoExmaple() {
   const [times, setTimes] = useState(0);
   const [force, setForce] = useState(false);
 
+  // highlight-next-line
   const date = useMemo(() => {
     return new Date().toLocaleTimeString();
-  }, [force]);
+  }, [force]); // `date` will only update when `force` changes
 
   return (
     <>
@@ -893,4 +985,105 @@ export default function UseMEmoExmaple() {
 ```
 
 <UseMemoExmaple />
+
+### Example: Memoizing a Complex Calculation
+
+This example shows how `useMemo` can be used to optimize performance by memoizing the result of a computationally expensive function (calculating factorial). The factorial is only re-calculated when the input number changes, not on every re-render caused by other state updates.
+
+```jsx
+import React, { useState, useMemo } from 'react';
+
+function factorial(n) {
+  console.log('Calculating factorial...'); // This will show when the function runs
+  if (n < 0) return -1;
+  if (n === 0) return 1;
+  return n * factorial(n - 1);
+}
+
+export default function FactorialCalculator() {
+  const [number, setNumber] = useState(1);
+  const [incrementor, setIncrementor] = useState(0);
+
+  // highlight-next-line
+  const memoizedFactorial = useMemo(() => factorial(number), [number]);
+
+  return (
+    <div>
+      <h2>Factorial Calculator</h2>
+      <input
+        type="number"
+        value={number}
+        onChange={(e) => setNumber(Number(e.target.value))}
+      />
+      <p>
+        Factorial of {number} is: {memoizedFactorial}
+      </p>
+      <button onClick={() => setIncrementor(incrementor + 1)}>
+        Re-render component ({incrementor})
+      </button>
+      <p>
+        This text updates without re-calculating factorial if number is same.
+      </p>
+    </div>
+  );
+}
+```
+
+<FactorialCalculator />
+
+## useCallback
+
+[`useCallback`](https://react.dev/reference/react/useCallback) is a React Hook that lets you cache a function definition between re-renders. It's useful for performance optimization, especially when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders.
+
+```jsx
+import { useCallback } from "react";
+
+// ...
+
+// highlight-next-line
+const cachedFn = useCallback(fn, dependencies)
+```
+
+### Preventing Unnecessary Re-renders
+
+This example demonstrates how `useCallback` prevents a child component from re-rendering. The `ChildComponent` is wrapped in `React.memo`, which means it will only re-render if its props change.
+
+When the parent's `unrelatedState` changes, the `ParentComponent` re-renders.
+- **Without `useCallback`**, a new `handleIncrement` function is created each time, causing the `ChildComponent` to re-render because its `onIncrement` prop is a new function reference.
+- **With `useCallback`**, the `handleIncrement` function is memoized. Its reference stays the same across re-renders, so the `ChildComponent` does not re-render.
+
+```jsx
+import React, { useState, useCallback } from 'react';
+
+// React.memo prevents the component from re-rendering if its props are the same.
+// It does a shallow comparison of the props.
+// highlight-next-line
+const ChildComponent = React.memo(({ onIncrement }) => {
+  return <button onClick={onIncrement}>Increment Count</button>;
+});
+
+export default function ParentComponent() {
+  const [count, setCount] = useState(0);
+  const [unrelatedState, setUnrelatedState] = useState(0);
+
+  // The handleIncrement function is memoized with useCallback.
+  // It will only be recreated if its dependencies (empty array) change.
+  // highlight-next-line
+  const handleIncrement = useCallback(() => {
+    setCount(c => c + 1);
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <ChildComponent onIncrement={handleIncrement} />
+      <hr />
+      <p>Unrelated State: {unrelatedState}</p>
+      <button onClick={() => setUnrelatedState(n => n + 1)}>
+        Change Unrelated State
+      </button>
+    </div>
+  );
+}
+```
 

@@ -10,7 +10,9 @@ import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # React Router
 
-React Router is a collection of navigational components that compose declaratively with your application. Whether you want to have bookmarkable URLs for your web app or a composable way to navigate in React Native, React Router works wherever React is rendering.
+React Router is a powerful routing library for React that enables declarative navigation in your applications. It allows you to manage application routes, handle URL synchronization, and create a seamless user experience.
+
+To get started, install React Router DOM:
 
 ```bash
 npm install react-router-dom
@@ -18,20 +20,28 @@ npm install react-router-dom
 
 ## Simple Setup
 
+To set up basic routing, you can use `createBrowserRouter` to define your routes and `RouterProvider` to provide the router to your application.
+
 ```jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+// highlight-next-line
 const router = createBrowserRouter([
+  // highlight-next-line
   { path: "/", element: <h1>Home Page</h1> },
+  // highlight-next-line
   { path: "/menu", element: <h1>Menu Page</h1> },
 ]);
 
 export default function App() {
+  // highlight-next-line
   return <RouterProvider router={router} />;
 }
 ```
 
-## Creating App layout with navbar
+## Creating an App Layout with Navbar
+
+React Router allows you to create nested layouts. The `Outlet` component renders the matched child route's element, and `NavLink` is used for navigation links that automatically apply an `active` class when the route matches.
 
 :::info
 `NavLink` adds a class `active` to the link when the link is active.
@@ -44,7 +54,7 @@ export default function App() {
 :::
 
 :::info
-Link can also be used instead of `NavLink` to navigate to a different page.
+`Link` can also be used instead of `NavLink` to navigate to a different page. `Link` does not apply an `active` class.
 
 ```jsx
 import { Link } from "react-router-dom";
@@ -64,7 +74,9 @@ import { NavLink } from "react-router-dom";
 export default function Navbar() {
   return (
     <nav>
+      {/* highlight-next-line */}
       <NavLink to="/">Home</NavLink>
+      {/* highlight-next-line */}
       <NavLink to="/menu">Menu</NavLink>
     </nav>
   );
@@ -83,7 +95,8 @@ export default function RootLayout() {
   return (
     <>
       <Navbar />
-      {/* Acts as children for the rest of the app */}
+      {/* highlight-next-line */}
+      {/* The Outlet component renders the matched child route's element */}
       <Outlet />
     </>
   );
@@ -103,7 +116,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
+      // highlight-next-line
       { index: true, element: <h1>Home Component</h1> },
+      // highlight-next-line
       { path: "/menu", element: <h1>Menu Component</h1> },
     ],
   },
@@ -120,6 +135,8 @@ export default function App() {
 
 ## Adding an Error Boundary Page
 
+React Router allows you to define `errorElement` for routes, which will render when an error occurs during rendering, data loading, or action submission. The `useRouteError` hook provides access to the error that was thrown.
+
 <Tabs>
 
 <TabItem value="Error.jsx">
@@ -128,6 +145,7 @@ export default function App() {
 import { useRouteError } from "react-router-dom";
 
 export default function ErrorPage() {
+  // highlight-next-line
   const error = useRouteError();
 
   return (
@@ -155,6 +173,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <h1>Home</h1>,
+    // highlight-next-line
     errorElement: <Error />,
   },
 ]);
@@ -168,7 +187,9 @@ export default function App() {
 
 </Tabs>
 
-## How to get the dynamic route parameter
+## Getting Dynamic Route Parameters
+
+To access dynamic parameters from the URL (e.g., `:id` in `/products/:id`), you can use the `useParams` hook.
 
 <Tabs>
 
@@ -180,6 +201,7 @@ import Product from "./Product";
 
 const router = createBrowserRouter([
   {
+    // highlight-next-line
     path: "/products/:id",
     element: <Product />,
   },
@@ -212,13 +234,17 @@ export default function Product() {
   <h1>Product: 3</h1>
 </BrowserWindow>
 
-## How to get the query parameter from the url
+## Getting Query Parameters from the URL
+
+To read query parameters from the URL (e.g., `?name=table`), you can use the `useSearchParams` hook.
 
 ```jsx
 import { useSearchParams } from "react-router-dom";
 
 export default function Product() {
+  // highlight-next-line
   const [searchParams] = useSearchParams();
+  // highlight-next-line
   const productName = searchParams.get("name");
   return <h1>Product: {productName}</h1>;
 }
@@ -228,13 +254,15 @@ export default function Product() {
   <h1>Product: table</h1>
 </BrowserWindow>
 
-## How to set the query parameter in the url
+## Setting Query Parameters in the URL
+
+To programmatically set query parameters in the URL, you can use the `setSearchParams` function returned by the `useSearchParams` hook.
 
 ```jsx
 import { useSearchParams } from "react-router-dom";
 
 export default function User() {
-  //highlight-next-line
+  // highlight-next-line
   const [searchParams, setSearchParams] = useSearchParams();
 
   const username = searchParams.get("name");
@@ -267,14 +295,15 @@ export default function User() {
   <button>Update Params</button>
 </BrowserWindow>
 
-## How to navigate programmatically
+## Navigating Programmatically
 
-`useNavigate` is a hook that returns a navigate function. Use it to navigate programmatically.
+`useNavigate` is a hook that returns a navigate function, allowing you to programmatically change the URL.
 
 ```jsx title="ProductItems.jsx"
 import { useNavigate } from "react-router-dom";
 
 export default function ProductItems() {
+  // highlight-next-line
   const navigate = useNavigate();
   return (
     <>
@@ -285,45 +314,52 @@ export default function ProductItems() {
 }
 ```
 
-## Navigate away after a certain time
+## Navigating After a Certain Time
+
+You can combine `useNavigate` with `useEffect` to navigate to a different route after a certain condition is met or a time delay.
 
 ```jsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useEffect } from "react-router-dom";
 
 function useLogoutTimer() {
-  const userIsInactive = useFakeInactiveUser();
+  const userIsInactive = useFakeInactiveUser(); // Assume this hook provides a boolean
+  // highlight-next-line
   const navigate = useNavigate();
 
+  // highlight-next-line
   useEffect(() => {
     if (userIsInactive) {
-      fake.logout();
+      fake.logout(); // Assume this logs out the user
+      // highlight-next-line
       navigate("/login-screen");
     }
-  }, [userIsInactive]);
+  }, [userIsInactive, navigate]); // `navigate` function is stable and won't cause re-renders
 }
 ```
 
-## Redirect back to previous page
+## Redirecting to a Previous Page
 
-`useNavigate` can be used to navigate back to the previous page. Pass `-x` to navigate back `x` number of pages. of `x` to move foreware `x` number of pages.
+The `useNavigate` hook can also be used to navigate back or forward in the browser's history. Pass a negative number to go back, or a positive number to go forward.
 
 ```jsx
 import { useNavigate } from "react-router-dom";
 
 export default function ProductItems() {
+  // highlight-next-line
   const navigate = useNavigate();
   return (
     <>
       <h1>Product</h1>
+      {/* highlight-next-line */}
       <button onClick={() => navigate(-1)}>Go back</button>
     </>
   );
 }
 ```
 
-## Fetch data while navigating using loader
+## Fetching Data with Loaders
 
-useLoader fetches data as the components loads as opposed to useEffect the loads data after the component is rendered.
+React Router's `loader` function allows you to fetch data *before* the component renders, ensuring that your component has the necessary data from the start. This is different from `useEffect`, which fetches data after the component has rendered.
 
 <Tabs>
 
@@ -335,6 +371,7 @@ import { useLoaderData } from "react-router-dom";
 import { getUsers } from "../../helpers/fakeServer";
 
 export default function UserData() {
+  // highlight-next-line
   const users = useLoaderData();
   return (
     <ul>
@@ -345,8 +382,11 @@ export default function UserData() {
   );
 }
 
+// highlight-next-line
 export async function loader() {
+  // highlight-next-line
   const user = await getUsers();
+  // highlight-next-line
   return user;
 }
 ```
@@ -361,6 +401,7 @@ import RemoteData, { loader as userLoader } from "./UserData";
 
 const router = createBrowserRouter([
   { path: "/", element: <h1>Home</h1> },
+  // highlight-next-line
   { path: "/users", element: <RemoteData />, loader: userLoader },
 ]);
 
@@ -373,54 +414,60 @@ export default function App() {
 
 </Tabs>
 
-## How to get the url path in a loader
+## Getting URL Path in a Loader
 
-Since `useParams` is only available in a component you can use `params` from the loader function to get the current url param
+While `useParams` is a hook and can only be used within components, you can access URL parameters directly within a loader function through the `params` object passed to it.
 
-- To get the current url path
+### Getting Current URL Path
 
 ```jsx
 export async function loader({ params }) {
+  // highlight-next-line
   console.log(params);
 }
 ```
 
 ```jsx
 const router = createBrowserRouter([
+  // highlight-next-line
   { path: "/order", element: <Order />, loader: orderLoader },
 ]);
 ```
 
-- To get dynamic route params
+### Getting Dynamic Route Parameters
 
 ```jsx
 export async function loader({ params }) {
+  // highlight-next-line
   console.log(params.orderId);
 }
 ```
 
 ```jsx
 const router = createBrowserRouter([
+  // highlight-next-line
   { path: "/order/:orderId", element: <Order />, loader: orderLoader },
 ]);
 ```
 
-## Add global check to see if a page is loading
+## Global Loading State Check
 
-useNavigation returns the current loading state of the global navigation.
+The `useNavigation` hook returns the current navigation state, which can be used to display a global loading indicator while a page is transitioning or data is being loaded.
 
 ```jsx
 import { Outlet, useNavigation } from "react-router-dom";
 
-import Loader from "./Loader";
+import Loader from "./Loader"; // Assuming you have a Loader component
 
 export default function AppLayout() {
-  //highlight-start
+  // highlight-next-line
   const navigation = useNavigation();
+  // highlight-next-line
   const isLoading = navigation.state === "loading";
-  //highlight-end
+
   return (
     <>
+      {/* highlight-next-line */}
       {isLoading && <Loader />}
       <Outlet />
     </>

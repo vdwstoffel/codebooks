@@ -14,7 +14,7 @@ function HomepageHeader() {
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">A personal codebook and reference for various programming topics</p>
         <div className={styles.buttons}>
         </div>
       </div>

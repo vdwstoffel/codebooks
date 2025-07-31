@@ -1,298 +1,246 @@
 ---
-sidebar_label: Redux
+sidebar_label: "Redux"
 sidebar_position: 7
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
 
 # Redux Toolkit
 
-[Redux](https://redux.js.org/introduction/getting-started) is a JS library for predictable and maintainable global state management.
+[Redux](https://redux.js.org/introduction/getting-started) is a powerful JavaScript library for managing global application state in a predictable and maintainable way. Redux Toolkit is the official, recommended approach for writing Redux logic, as it simplifies store setup, reduces boilerplate, and includes helpful utilities like `createSlice` and `createAsyncThunk`.
+
+To get started, install Redux Toolkit and the React-Redux bindings:
 
 ```bash
 npm install @reduxjs/toolkit react-redux
 ```
 
-## Setup Redux Toolkit
+## Setting Up the Store
+
+A Redux store is the single source of truth for your application's state. With Redux Toolkit, you can create a store and define "slices" of state, which represent different features or domains of your application.
+
+### Examples
 
 <Tabs>
+  <TabItem value="accountSlice.js" label="accountSlice.js">
+    A slice is a collection of reducer logic and actions for a single feature.
+    The `createSlice` function automatically generates action creators and action types.
 
-<TabItem value="accountSlice.js">
+    ```jsx
+    import { createSlice } from "@reduxjs/toolkit";
 
-Setup the account slice and export the actions and reducer
+    const initialState = {
+      balance: 0,
+      loan: 0,
+      loanReason: "",
+    };
 
-```jsx
-import { createSlice } from "@reduxjs/toolkit";
+    const accountSlice = createSlice({
+      name: "account",
+      initialState,
+      reducers: {
+        deposit(state, action) {
+          state.balance += action.payload;
+        },
+        withdraw(state, action) {
+          state.balance -= action.payload;
+        },
+        takeLoan: {
+          prepare(amount, reason) {
+            return {
+              payload: { amount, reason },
+            };
+          },
+          reducer(state, action) {
+            if (state.loan > 0) return;
+            state.balance += action.payload.amount;
+            state.loan = action.payload.amount;
+            state.loanReason = action.payload.reason;
+          },
+        },
+        payLoan(state) {
+          if (state.loan === 0) return;
+          state.balance -= state.loan;
+          state.loan = 0;
+          state.loanReason = "";
+        },
+      },
+    });
 
-const initialState = {
-  balance: 0,
-  loan: 0,
-  loanReason: "",
-};
+    export const { deposit, withdraw, takeLoan, payLoan } = accountSlice.actions;
+    export default accountSlice.reducer;
+    ```
+  </TabItem>
+  <TabItem value="store.js" label="store.js">
+    The store brings together all the different reducers from your slices.
 
-const accountSlice = createSlice({
-  name: "account",
-  initialState: initialState,
-  reducers: {
-    deposit(state, action) {
-      state.balance += action.payload;
-    },
-    withdraw(state, action) {
-      state.balance -= action.payload;
-    },
-    takeLoan(state, action) {
-      state.balance += action.payload.amount;
-      state.loan += action.payload.amount;
-      state.loanReason = action.payload.reason;
-    },
-    payLoan(state) {
-      if (state.loan === 0) return;
+    ```js
+    import { configureStore } from "@reduxjs/toolkit";
+    import accountReducer from "./accountSlice";
 
-      state.balance -= state.loan;
-      state.loan = 0;
-      state.loanReason = "";
-    },
-  },
-});
+    const store = configureStore({
+      reducer: {
+        account: accountReducer,
+      },
+    });
 
-export const { deposit, withdraw, takeLoan, payLoan } = accountSlice.actions;
-export default accountSlice.reducer;
-```
+    export default store;
+    ```
+  </TabItem>
+  <TabItem value="App.jsx" label="App.jsx">
+    To connect your React components to the Redux store, you'll use the `useSelector` hook to read state and the `useDispatch` hook to dispatch actions.
 
-</TabItem>
 
-<TabItem value="store.js">
+    ```jsx
+    // App.jsx
+    import AccountDetails from "./AccountDetails";
+    import AccountActions from "./AccountActions";
 
-The store will take care of naming the reducer and use to configure the global state
+    export default function App() {
+      return (
+        <>
+          <AccountDetails />
+          <AccountActions />
+        </>
+      );
+    }
 
-```js
-import { configureStore } from "@reduxjs/toolkit";
+    // AccountDetails.jsx
+    import { useSelector } from "react-redux";
 
-import accountSlice from "./accountSlice";
+    function AccountDetails() {
+      const { balance, loan, loanReason } = useSelector((state) => state.account);
 
-export default configureStore({
-  reducer: {
-    account: accountSlice,
-  },
-});
-```
+      return (
+        <div>
+          <h2>Account Details</h2>
+          <p>Balance: {balance}</p>
+          <p>Loan: {loan}</p>
+          {loan > 0 && <p>Loan Reason: {loanReason}</p>}
+        </div>
+      );
+    }
 
-</TabItem>
+    // AccountActions.jsx
+    import { useDispatch } from "react-redux";
+    import { deposit, withdraw, takeLoan, payLoan } from "./accountSlice";
 
-<TabItem value="App.jsx">
+    function AccountActions() {
+      const dispatch = useDispatch();
 
-Add state and dispatch to your component
+      const depositHandler = () => dispatch(deposit(50));
+      const withdrawHandler = () => dispatch(withdraw(30));
+      const takeLoanHandler = () => dispatch(takeLoan(100, "Buy a car"));
+      const payLoanHandler = () => dispatch(payLoan());
 
-```jsx
-import { useSelector, useDispatch } from "react-redux";
-import { deposit, payLoan, takeLoan, withdraw } from "./accountSlice";
+      return (
+        <div>
+          <h2>Actions</h2>
+          <button onClick={depositHandler}>Deposit $50</button>
+          <button onClick={withdrawHandler}>Withdraw $30</button>
+          <button onClick={takeLoanHandler}>Take Loan ($100)</button>
+          <button onClick={payLoanHandler}>Pay Loan</button>
+        </div>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem value="main.jsx" label="main.jsx">
+    Finally, wrap your entire application with the `Provider` component to make the store available to all components.
 
-export default function App() {
-  return (
-    <>
-      <ShowDetails />
-      <EditDetails />
-    </>
-  );
-}
+    ```jsx
+    import { createRoot } from "react-dom/client";
+    import { Provider } from "react-redux";
+    import App from "./App.jsx";
+    import store from "./store.js";
 
-function ShowDetails() {
-  const { balance, loan, loanReason } = useSelector((state) => state.account);
-
-  return (
-    <>
-      <p>Balance: {balance}</p>
-      <p>Loan: {loan}</p>
-      <p>Loan Reason: {loanReason}</p>
-    </>
-  );
-}
-
-function EditDetails() {
-  const dispatch = useDispatch();
-
-  const depositHandler = () => dispatch(deposit(50));
-  const withdrawHandler = () => dispatch(withdraw(30));
-  const takeLoanHandler = () =>
-    dispatch(takeLoan({ amount: 100, reason: "Buy Card" }));
-  const payloanHnadler = () => dispatch(payLoan());
-
-  return (
-    <>
-      <button onClick={depositHandler}>Make Deposit</button>
-      <button onClick={withdrawHandler}>Withdraw</button>
-      <button onClick={takeLoanHandler}>Take Loan</button>
-      <button onClick={payloanHnadler}>Pay Loan</button>
-    </>
-  );
-}
-```
-
-</TabItem>
-
-<TabItem value="main.jsx">
-
-Wrap your app in the Store provider
-
-```jsx
-import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-
-import { Provider } from "react-redux";
-import store from "./store.js";
-
-createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <App />
-  </Provider>
-);
-```
-
-</TabItem>
-
+    createRoot(document.getElementById("root")).render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+    ```
+  </TabItem>
 </Tabs>
 
-## Preparing a reducer
+## Async Operations with `createAsyncThunk`
 
-when a payload is dispatched in an unwanted way, we can use the `prepare` method to prepare the payload before it is dispatched.
+Redux Toolkit provides `createAsyncThunk` to handle asynchronous logic, such as fetching data from an API. It dispatches actions based on the promise lifecycle (`pending`, `fulfilled`, `rejected`), which you can handle in your slice's `extraReducers`.
 
-<Tabs>
-
-<TabItem value="slice.js">
-
-```js
-import { createSlice } from "@reduxjs/toolkit";
-
-const initialState = {
-  value: 0,
-  clicks: 0,
-};
-
-const prepareReducerSlice = createSlice({
-  name: "prepareReducerExample",
-  initialState,
-  reducers: {
-    increaseValue: {
-      prepare(value, clicks) {
-        return { payload: { value, clicks } };
-      },
-      reducer(state, action) {
-        state.value += action.payload.value;
-        state.clicks += action.payload.clicks;
-      },
-    },
-  },
-});
-
-export const { increaseValue } = prepareReducerSlice.actions;
-export default prepareReducerSlice.reducer;
-```
-
-</TabItem>
-
-<TabItem value="app.jsx">
-
-```jsx
-import { useSelector, useDispatch } from "react-redux";
-
-import { increaseValue } from "./prepareReducer";
-
-export default function PrepareReducer() {
-  const dispatch = useDispatch();
-  const { value, clicks } = useSelector((state) => state.prepareExample);
-
-  const handleUpdate = () => dispatch(increaseValue(50, 2));
-
-  return (
-    <div>
-      <p>Value: {value}</p>
-      <p>Clicks: {clicks}</p>
-      <button onClick={handleUpdate}>Click Me</button>
-    </div>
-  );
-}
-```
-
-</TabItem>
-
-</Tabs>
-
-## Async functions with Redux toolkit
-
-Using the `createAsyncThunk` function, we can create async functions that will dispatch actions when the async function is completed.
+### Examples
 
 <Tabs>
+  <TabItem value="userSlice.js" label="userSlice.js">
+    Here, we define an async thunk to fetch user data and handle the different states of the request.
 
-<TabItem value="slice.js">
+    ```js
+    import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+    import { getUserByName } from "../helpers/fakeServer";
 
-```js
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+    const initialState = {
+      data: [],
+      status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+      error: null,
+    };
 
-import { getUserByName } from "../helpers/fakeServer";
+    // highlight-next-line
+    export const fetchUser = createAsyncThunk("user/fetchUser", async (name) => {
+      const response = await getUserByName(name);
+      return response;
+    });
 
-const initialState = {
-  data: [""],
-  status: "",
-  error: "",
-};
+    const userSlice = createSlice({
+      name: "user",
+      initialState,
+      reducers: {},
+      // highlight-start
+      extraReducers: (builder) => {
+        builder
+          .addCase(fetchUser.pending, (state) => {
+            state.status = "loading";
+          })
+          .addCase(fetchUser.fulfilled, (state, action) => {
+            state.status = "succeeded";
+            state.data = action.payload;
+          })
+          .addCase(fetchUser.rejected, (state, action) => {
+            state.status = "failed";
+            state.error = action.error.message;
+          });
+      },
+      // highlight-end
+    });
 
-export const fetchData = createAsyncThunk("fetchData", async (name) => {
-  const response = await getUserByName(name);
-  return response;
-});
+    export default userSlice.reducer;
+    ```
+  </TabItem>
+  <TabItem value="UserComponent.jsx" label="UserComponent.jsx">
+    In your component, you can dispatch the async thunk and use `useSelector` to display the data, loading status, or error message.
 
-const userSlice = createSlice({
-  name: "userData",
-  initialState,
-  reducers: {
-    // normal reducers
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchData.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchData.fulfilled, (state, action) => {
-        (state.status = "done"), (state.data = action.payload);
-      })
-      .addCase(fetchData.rejected, (state, action) => {
-        state.status = "error";
-        state.error = action.error.message;
-      });
-  },
-});
+   
 
-// export const { otherReducers } = userSlice.actions;
-export default userSlice.reducer;
-```
+    ```jsx
+    import { useDispatch, useSelector } from "react-redux";
+    import { fetchUser } from "./userSlice";
 
-</TabItem>
+    export default function UserComponent() {
+      const { data, status, error } = useSelector((state) => state.user);
+      const dispatch = useDispatch();
 
-<TabItem value="app.jsx">
+      const loadDataHandler = () => dispatch(fetchUser("John"));
 
-```jsx
-import { useDispatch, useSelector } from "react-redux";
-
-import { fetchData } from "./thunkExampleSlice";
-
-export default function ThunkExample() {
-  const { data, status, error } = useSelector((state) => state.thunkExample);
-  const dispatch = useDispatch();
-
-  const loadDataHandler = () => dispatch(fetchData("John"));
-
-  return (
-    <>
-      {data.map((user) => (
-        <p>{user.name}</p>
-      ))}
-      <button onClick={loadDataHandler}> Load Data</button>
-    </>
-  );
-}
-```
-
-</TabItem>
-
+      return (
+        <div>
+          <button onClick={loadDataHandler} disabled={status === 'loading'}>
+            {status === 'loading' ? 'Loading...' : 'Load User Data'}
+          </button>
+          {status === 'succeeded' && data.map((user) => <p key={user.name}>{user.name}</p>)}
+          {status === 'failed' && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
+      );
+    }
+    ```
+  </TabItem>
 </Tabs>

@@ -220,6 +220,110 @@ axios.post('https://jsonplaceholder.typicode.com/posts', {
 </TabItem>
 </Tabs>
 
+### Adding Headers to a Request
+
+You can add headers to a request by passing a `headers` object in the Axios config.
+
+```javascript
+import axios from 'axios';
+
+async function getDataWithHeaders() {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts/1', {
+      // highlight-start
+      headers: {
+        'Authorization': 'Bearer YOUR_TOKEN',
+        'X-Custom-Header': 'my-custom-value'
+      }
+      // highlight-end
+    });
+    console.log("Data with headers:", response.data);
+  } catch (error) {
+    console.error("Error with headers:", error.message);
+  }
+}
+
+getDataWithHeaders();
+```
+
+### Error Handling
+
+Axios provides a structured way to handle errors through its `catch` block. The `error` object contains detailed information about what went wrong, whether it was a network error, a server error, or a request setup issue.
+
+<Tabs>
+<TabItem value="js" label="JavaScript">
+
+```javascript
+import axios from 'axios';
+
+async function getUser() {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users/999'); // Non-existent user
+    console.log('User data:', response.data);
+  } catch (error) {
+    // highlight-start
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error('Data:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('Request:', error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('Error:', error.message);
+    }
+    // highlight-end
+  }
+}
+
+getUser();
+```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript">
+
+```typescript
+import axios from 'axios';
+
+interface User {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+}
+
+async function getUser() {
+  try {
+    const response = await axios.get<User>('https://jsonplaceholder.typicode.com/users/999'); // Non-existent user
+    console.log('User data:', response.data);
+  } catch (error) {
+    // highlight-start
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error('Data:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('Request:', error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('Error:', error.message);
+    }
+    // highlight-end
+  }
+}
+
+getUser();
+```
+
+</TabItem>
+</Tabs>
+
 ## Choosing Between Fetch and Axios
 
 -   **Fetch API**: Built-in, no installation needed. Good for simple requests. Requires more manual error handling and JSON parsing.

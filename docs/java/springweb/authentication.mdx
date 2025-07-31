@@ -159,6 +159,7 @@ createRoot(document.getElementById("root")!).render(
 ```
 
 Replace `YOUR_AUTH0_DOMAIN`, `YOUR_AUTH0_CLIENT_ID`, and `YOUR_API_AUDIENCE` with your actual Auth0 application settings.
+
 </TabItem>
 
 <TabItem value="Component">
@@ -226,3 +227,36 @@ export default function App() {
 </TabItem>
 
 </Tabs>
+
+## CSRF Configuration
+
+While CSRF protection is crucial for web applications to prevent cross-site request forgery attacks, it might be disabled for specific API endpoints that are intended to be consumed by non-browser clients (e.g., mobile apps, other services). However, completely disabling CSRF protection for all endpoints is generally not recommended due to the security risks involved.
+
+```java title="SecurityConfig.java"
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+@Configuration
+public class SecurityConfig {
+
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                return http
+                    .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/private/**").authenticated()
+                        .anyRequest().authenticated())
+                    .cors(withDefaults())
+                    .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+                    //highlight-next-line
+                    .csrf(csrf -> csrf
+                    //highlight-next-line
+                      .ignoringRequestMatchers("/api/public/**"))
+                    .build();
+        }
+}
+```

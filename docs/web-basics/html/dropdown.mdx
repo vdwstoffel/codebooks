@@ -1,0 +1,118 @@
+---
+sidebar_label: "Dropdown Menus"
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# HTML Dropdown Menus
+
+A dropdown menu is a common way to allow users to select a single option from a list. In HTML, you can create a dropdown menu using the `<select>` and `<option>` elements.
+
+## Basic Dropdown Menu
+
+The `<select>` element creates the dropdown container, and each `<option>` element represents an item in the list.
+
+### Example
+
+```html
+<label for="cars">Choose a car:</label>
+<select id="cars" name="cars">
+  <option value="volvo">Volvo</option>
+  <option value="saab">Saab</option>
+  <option value="mercedes">Mercedes</option>
+  <option value="audi">Audi</option>
+</select>
+```
+
+<div style={{'border': '1px solid #ccc', 'padding': '1rem'}}>
+  <label for="cars">Choose a car:</label>
+  <select id="cars" name="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+  </select>
+</div>
+
+## Pre-selected Option
+
+You can use the `selected` attribute to specify which option should be selected by default when the page loads.
+
+### Example
+
+```html
+<label for="cars-selected">Choose a car:</label>
+<select id="cars-selected" name="cars-selected">
+  <option value="volvo">Volvo</option>
+  <option value="saab">Saab</option>
+  <option value="mercedes" selected>Mercedes</option>
+  <option value="audi">Audi</option>
+</select>
+```
+
+<div style={{'border': '1px solid #ccc', 'padding': '1rem'}}>
+  <label for="cars-selected">Choose a car:</label>
+  <select id="cars-selected" name="cars-selected">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes" selected>Mercedes</option>
+    <option value="audi">Audi</option>
+  </select>
+</div>
+
+## Capturing the Selected Value
+
+Here’s how you can get the value of the selected option using both plain JavaScript and React.
+
+<Tabs>
+  <TabItem value="js" label="JavaScript (DOM)">
+    You can listen for the `input` event on the `<select>` element to get the value whenever the user makes a selection.
+
+    ```html
+    <label for="js-cars">Choose a car:</label>
+    <select id="js-cars">
+      <option value="volvo">Volvo</option>
+      <option value="saab">Saab</option>
+    </select>
+    <p>Selected car: <span id="selected-car">volvo</span></p>
+
+    <script>
+      const select = document.getElementById('js-cars');
+      const result = document.getElementById('selected-car');
+      select.addEventListener('input', (event) => {
+        result.textContent = event.target.value;
+      });
+    </script>
+    ```
+
+  </TabItem>
+  <TabItem value="react" label="React">
+    In React, you control the dropdown's value using state. The `onChange` event is used to update the state whenever a new option is selected.
+
+    ```jsx
+    import { useState } from 'react';
+
+    export default function CarSelector() {
+      const [selectedCar, setSelectedCar] = useState('volvo');
+
+      const handleChange = (event) => {
+        setSelectedCar(event.target.value);
+      };
+
+      return (
+        <div>
+          <label htmlFor="react-cars">Choose a car:</label>
+          <select id="react-cars" value={selectedCar} onChange={handleChange}>
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+          </select>
+          <p>Selected car: {selectedCar}</p>
+        </div>
+      );
+    }
+    ```
+  </TabItem>
+</Tabs>
