@@ -1,0 +1,62 @@
+.terminalContainer {
+  background-color: #000000 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  color: #ffffff !important;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.terminalHeader {
+  background-color: #3c4048 !important;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #4b5058 !important;
+}
+
+.terminalButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.terminalButton {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.close {
+  background-color: #ff5f56 !important;
+}
+
+.minimize {
+  background-color: #ffbd2e !important;
+}
+
+.maximize {
+  background-color: #27c93f !important;
+}
+
+.terminalTitle {
+  flex-grow: 1;
+  text-align: center;
+  color: #e0e0e0 !important;
+  font-size: 0.9rem;
+}
+
+.terminalBody {
+  padding: 10px;
+  overflow-x: auto;
+}
+
+.terminalContent {
+  margin: 0;
+  white-space: pre-wrap; /* Ensures long lines wrap */
+  word-break: break-all; /* Breaks words if necessary */
+  font-size: 0.85rem;
+  line-height: 1.4;
+  background-color: #000000;
+}
