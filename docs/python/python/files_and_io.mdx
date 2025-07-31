@@ -1,0 +1,99 @@
+---
+sidebar_label: "Files and I/O"
+sidebar_position: 9
+---
+
+# Python Files and I/O
+
+Working with files is a common task in programming. Python provides built-in functions to handle file input/output (I/O) operations easily.
+
+## Reading Files
+
+You can read a file using the `open()` function, which returns a file object. It's best practice to use the `with` statement, as it automatically handles closing the file.
+
+### Reading the Entire File
+
+```python
+# Assuming you have a file named "example.txt" with the content:
+# Hello, this is a test file.
+# It has multiple lines.
+
+with open("example.txt", "r") as file:
+    content = file.read()
+    print(content)
+# Output:
+# Hello, this is a test file.
+# It has multiple lines.
+```
+
+### Reading Line by Line
+
+You can iterate over the file object to read it line by line.
+
+```python
+with open("example.txt", "r") as file:
+    for line in file:
+        print(line.strip()) # .strip() removes leading/trailing whitespace, including the newline character
+# Output:
+# Hello, this is a test file.
+# It has multiple lines.
+```
+
+## Writing Files
+
+To write to a file, you open it in write mode (`"w"`). If the file already exists, its contents will be overwritten. If it doesn't exist, a new file will be created.
+
+```python
+with open("output.txt", "w") as file:
+    file.write("This is the first line.\n")
+    file.write("This is the second line.\n")
+
+# After running, "output.txt" will contain:
+# This is the first line.
+# This is the second line.
+```
+
+## Appending to Files
+
+To add content to the end of an existing file, open it in append mode (`"a"`).
+
+```python
+with open("output.txt", "a") as file:
+    file.write("This line is appended.\n")
+
+# "output.txt" will now contain:
+# This is the first line.
+# This is the second line.
+# This line is appended.
+```
+
+## File Modes
+
+The second argument to the `open()` function is the mode. Here are the most common ones:
+
+-   `"r"`: Read (default). Throws an error if the file doesn't exist.
+-   `"w"`: Write. Overwrites the file if it exists, creates it if it doesn't.
+-   `"a"`: Append. Adds content to the end of the file.
+-   `"x"`: Create. Creates a new file, but throws an error if it already exists.
+-   `"b"`: Binary mode (e.g., `"rb"`, `"wb"`). For non-text files like images.
+-   `"+"`: Read and Write (e.g., `"r+"`, `"w+"`).
+
+## The `with` Statement
+
+The `with` statement is highly recommended for file operations because it ensures that the file is automatically closed even if errors occur. Without `with`, you would need to manually call `file.close()`.
+
+```python
+# The old way (less safe)
+file = open("example.txt", "r")
+try:
+    content = file.read()
+    # ... do something with content
+finally:
+    file.close()
+
+# The modern, Pythonic way
+with open("example.txt", "r") as file:
+    content = file.read()
+    # ... do something with content
+# File is automatically closed here
+```
