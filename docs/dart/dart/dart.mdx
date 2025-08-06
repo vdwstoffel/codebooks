@@ -1,0 +1,46 @@
+---
+sidebar_label: 'Dart'
+sidebar_position: 1
+---
+
+import DisplayLogo from '@site/src/components/DisplayLogo/DisplayLogo';
+
+# Dart
+
+<DisplayLogo logo={"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Dart_programming_language_logo.svg/1920px-Dart_programming_language_logo.svg.png"}/>
+
+Dart is a client-optimized programming language for apps on multiple platforms. It is developed by Google and is used to build mobile, desktop, server, and web applications. Dart is an object-oriented, class-based, garbage-collected language with C-style syntax.
+
+## Installation
+
+To install Dart, you can use the following command:
+
+```bash
+sudo apt-get update && sudo apt-get install apt-transport-https
+
+wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
+  | sudo gpg  --dearmor -o /usr/share/keyrings/dart.gpg
+
+echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' \
+  | sudo tee /etc/apt/sources.list.d/dart_stable.list
+
+sudo apt-get update && sudo apt-get install dart
+```
+
+## Hello World
+
+Here is a simple Hello World program in Dart:
+
+```dart
+void main() {
+  print('Hello, World!');
+}
+```
+
+To run the program, save it as `hello.dart` and run the following command:
+
+```bash
+dart hello.dart
+```
+
+## What's Next?

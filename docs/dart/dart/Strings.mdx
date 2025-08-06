@@ -1,0 +1,88 @@
+---
+sidebar_label: 'Strings'
+sidebar_position: 2
+---
+
+# Strings
+
+In Dart, a string is a sequence of UTF-16 code units. You can use either single or double quotes to create a string.
+
+## Creating a String
+
+You can use single or double quotes to create a string.
+
+```dart
+var s1 = 'Single quotes work well for string literals.';
+var s2 = "Double quotes work just as well.";
+```
+
+## String Interpolation
+
+You can embed the value of an expression inside a string by using `${expression}`. If the expression is an identifier, you can skip the `{}`.
+
+```dart
+var s = 'string interpolation';
+
+var msg1 = 'Dart has $s.'; // "Dart has string interpolation."
+var msg2 = 'The sum of 2 and 2 is ${2 + 2}.'; // "The sum of 2 and 2 is 4."
+```
+
+## Concatenation
+
+You can concatenate strings using the `+` operator.
+
+```dart
+var s1 = 'Hello';
+var s2 = 'World';
+
+var s3 = s1 + ' ' + s2; // "Hello World"
+```
+
+## Multiline Strings
+
+You can create multiline strings using triple quotes (either single or double).
+
+```dart
+var s1 = '''
+You can create
+multi-line strings like this one.
+''';
+
+var s2 = """This is also a
+multi-line string.""";
+```
+
+## Common String Properties and Methods
+
+Here are some common properties and methods you can use with strings:
+
+```dart
+var s = '  Hello Dart  ';
+
+// Get the length of the string
+s.length; // 14
+
+// Convert to lowercase
+s.toLowerCase(); // "  hello dart  "
+
+// Convert to uppercase
+s.toUpperCase(); // "  HELLO DART  "
+
+// Trim whitespace from both ends
+s.trim(); // "Hello Dart"
+
+// Check if a string contains another string
+s.contains('Dart'); // true
+
+// Check if a string starts with another string
+s.startsWith('  Hello'); // true
+
+// Check if a string ends with another string
+s.endsWith('Dart  '); // true
+
+// Get the index of a substring
+s.indexOf('Dart'); // 8
+
+// Get a substring
+s.substring(8, 12); // "Dart"
+```

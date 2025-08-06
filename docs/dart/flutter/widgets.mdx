@@ -1,0 +1,34 @@
+---
+sidebar_label: 'Widgets'
+sidebar_position: 2
+---
+
+# Flutter Widgets
+
+Flutter widgets are the basic building blocks of a Flutter app's user interface. Each widget is an immutable declaration of part of the user interface.
+
+| Category | Widgets |
+| :--- | :--- |
+| Layout | Row, Column, Scaffold, Stack |
+| Structures | Button, Toast, MenuDrawer |
+| Styles | TextStyle, Color, Padding |
+| Animations | FadeInPhoto, transformations |
+| Positioning and alignment | Center, Padding |
+
+## Basic Stateless Widget Example
+
+Here is an example of a bare minimum Flutter widget that displays "Hello, world!":
+
+```dart
+import 'package:flutter/material.dart';
+
+class HelloWorld extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('Hello, world!'),
+    );
+  }
+}
+```
+

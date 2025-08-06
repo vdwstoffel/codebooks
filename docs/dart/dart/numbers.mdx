@@ -1,0 +1,116 @@
+---
+sidebar_label: 'Numbers'
+sidebar_position: 3
+---
+
+# Dart Numbers
+
+In Dart, numbers are of two types: `int` for integers and `double` for floating-point numbers. Both `int` and `double` are subtypes of `num`.
+
+## Creating Numbers
+
+Here's how you can create `int` and `double` variables:
+
+```dart
+// Integer
+int x = 1;
+
+// Double
+double y = 1.1;
+```
+
+You can also declare a variable as a `num`, which can hold both integer and floating-point values.
+
+```dart
+num a = 1;    // a is an int
+num b = 1.1;  // b is a double
+```
+
+## Common Operations
+
+Here are some common operations you can perform with numbers:
+
+```dart
+int a = 2;
+double b = 3.5;
+
+// Addition
+var sum = a + b; // 5.5
+
+// Subtraction
+var difference = b - a; // 1.5
+
+// Multiplication
+var product = a * b; // 7.0
+
+// Division
+var quotient = b / a; // 1.75
+```
+
+## Type Conversion
+
+You can convert between different number types.
+
+### String to Number
+
+Use `parse()` to convert a string to a number.
+
+```dart
+var one = int.parse('1');       // 1
+var onePointOne = double.parse('1.1'); // 1.1
+```
+
+### Number to String
+
+Use `toString()` to convert a number to a string.
+
+```dart
+String oneAsString = 1.toString(); // "1"
+String piAsString = 3.14159.toStringAsFixed(2); // "3.14"
+```
+
+## Common Number Properties and Methods
+
+Here are some useful properties and methods for numbers:
+
+```dart
+int n = -5;
+
+// Check if a number is negative
+n.isNegative; // true
+
+// Get the absolute value
+n.abs(); // 5
+
+double d = 3.7;
+
+// Round to the nearest integer
+d.round(); // 4
+
+// Round down to the nearest integer
+d.floor(); // 3
+
+// Round up to the nearest integer
+d.ceil(); // 4
+```
+
+## Generating Random Numbers
+
+To generate random numbers in Dart, you need to use the `Random` class from the `dart:math` library.
+
+```dart
+import 'dart:math';
+
+void main() {
+  var random = Random();
+
+  // Generate a random integer between 0 and 9
+  var randomNumber = random.nextInt(10);
+
+  // Generate a random double between 0.0 and 1.0
+  var randomDouble = random.nextDouble();
+
+  // Generate a random boolean
+  var randomBool = random.nextBool();
+}
+```

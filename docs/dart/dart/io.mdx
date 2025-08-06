@@ -1,0 +1,28 @@
+---
+sidebar_label: 'I/O'
+sidebar_position: 5
+---
+
+# Dart I/O
+
+In Dart, you can perform I/O operations using the `dart:io` library. This library provides classes for working with files, directories, sockets, processes, and more.
+
+## Reading User Input from the Console
+
+To read input from the console, you can use the `stdin.readLineSync()` function from the `dart:io` library. This is a synchronous call that blocks execution until the user provides input.
+
+### Example
+
+Here's an example of how to read a line of text from the user:
+
+```dart
+import 'dart:io';
+
+void main() {
+  print('Enter your name:');
+  String? name = stdin.readLineSync();
+  print('Hello, $name!');
+}
+```
+
+Since `stdin.readLineSync()` can return `null` if there's no more input, the variable `name` is of type `String?`.
