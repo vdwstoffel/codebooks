@@ -3,6 +3,8 @@ sidebar_label: "Files and I/O"
 sidebar_position: 9
 ---
 
+import Terminal from "@site/src/components/Terminal";
+
 # Python Files and I/O
 
 Working with files is a common task in programming. Python provides built-in functions to handle file input/output (I/O) operations easily.
@@ -21,10 +23,12 @@ You can read a file using the `open()` function, which returns a file object. It
 with open("example.txt", "r") as file:
     content = file.read()
     print(content)
-# Output:
-# Hello, this is a test file.
-# It has multiple lines.
 ```
+
+<Terminal>
+  Hello, this is a test file.
+  It has multiple lines.
+</Terminal>
 
 ### Reading Line by Line
 
@@ -34,10 +38,12 @@ You can iterate over the file object to read it line by line.
 with open("example.txt", "r") as file:
     for line in file:
         print(line.strip()) # .strip() removes leading/trailing whitespace, including the newline character
-# Output:
-# Hello, this is a test file.
-# It has multiple lines.
 ```
+
+<Terminal>
+  Hello, this is a test file.
+  It has multiple lines.
+</Terminal>
 
 ## Writing Files
 
