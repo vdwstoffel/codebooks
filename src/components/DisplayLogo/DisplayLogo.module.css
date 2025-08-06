@@ -1,0 +1,9 @@
+.logo_container {
+    text-align: center;
+    margin: 1em;
+}
+
+.logo {
+    width: 150px;
+    border-radius: 5%;
+}

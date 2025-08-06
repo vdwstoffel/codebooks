@@ -114,6 +114,11 @@ const config = {
               },
               {
                 type: "doc",
+                label: "Dart",
+                docId: "dart/dart/dart",
+              },
+              {
+                type: "doc",
                 label: "SQL",
                 docId: "sql/sql",
               },
@@ -230,6 +235,7 @@ const config = {
           "typescript",
           "java",
           "csharp",
+          "dart"
         ],
       },
       docs: {
