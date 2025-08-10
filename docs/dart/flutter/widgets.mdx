@@ -3,51 +3,12 @@ sidebar_label: "Widgets"
 sidebar_position: 2
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 # Flutter Widgets
 
 Flutter widgets are the basic building blocks of a Flutter app's user interface. Each widget is an immutable declaration of part of the user interface.
-
-## Common Widgets
-
-### Layout
-
-| Widget    | Description                                                                          |
-| :-------- | :----------------------------------------------------------------------------------- |
-| Scaffold  | Implements the basic material design visual layout structure.                        |
-| Row       | A widget that displays its children in a horizontal array.                           |
-| Column    | A widget that displays its children in a vertical array.                             |
-| Stack     | A widget that positions its children relative to the edges of its box.               |
-| Container | A convenience widget that combines common painting, positioning, and sizing widgets. |
-
-### Positioning and alignment
-
-| Widget  | Description                                        |
-| :------ | :------------------------------------------------- |
-| Center  | A widget that centers its child within itself.     |
-| Padding | A widget that insets its child by a given padding. |
-
-### Structures
-
-| Widget     | Description                                                                                                                 |
-| :--------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| Button     | A material design button. Ex, `TextButton`, `ElevatedButton`, `OutlinedButton`                                              |
-| Toast      | A lightweight message that briefly appears on screen.                                                                       |
-| MenuDrawer | A material design panel that slides in horizontally from the edge of a Scaffold to show navigation links in an application. |
-| Text       | A run of text with a single style.                                                                                          |
-
-### Styles
-
-| Widget    | Description                                                 |
-| :-------- | :---------------------------------------------------------- |
-| TextStyle | An immutable style describing how to format and paint text. |
-| Color     | An immutable 32-bit color value in ARGB format.             |
-
-### Animations
-
-| Widget          | Description                                                                                  |
-| :-------------- | :------------------------------------------------------------------------------------------- |
-| FadeInPhoto     | A widget that displays a placeholder while an image is loading, then fades in the new image. |
-| Transformations | A widget that applies a transformation to its child.                                         |
 
 ## Basic Stateless Widget Example
 
@@ -105,6 +66,47 @@ To use this `CustomCard` widget, you would pass another widget to its `child` pr
 CustomCard(
   child: Text('This is inside the card'),
 )
+```
+
+## Basic Stateful Widget Example
+
+Here is an example of a bare minimum Flutter widget that displays a counter:
+
+<p>We use two classes for a StatefulWidget to separate the immutable widget configuration from the mutable state. The `Counter` class is the widget, and it's immutable. The `_CounterState` class is the state, and it can change over time. This separation allows Flutter to be more efficient by reusing the widget object even when the state changes.</p>
+
+```dart
+import 'package:flutter/material.dart';
+
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+
+  @override
+  State<Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int _counter = 0;
+
+  void _increment() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        ElevatedButton(
+          onPressed: _increment,
+          child: Text('Increment'),
+        ),
+        SizedBox(width: 16),
+        Text('Count: $_counter'),
+      ],
+    );
+  }
+}
 ```
 
 ## Combining Widgets
@@ -188,3 +190,139 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+
+## Common Widgets
+
+<Tabs>
+  <TabItem value="layout" label="Layout">
+    - **Scaffold**
+    <p>Implements the basic material design visual layout structure.</p>
+    ```dart
+    Scaffold(
+      appBar: AppBar(title: Text('My App')),
+      body: Center(child: Text('Hello')),
+    );
+    ```
+    - **Row**
+    <p>A widget that displays its children in a horizontal array.</p>
+    ```dart
+    Row(
+      children: <Widget>[
+        Text('Hello'),
+        Text('World'),
+      ],
+    );
+    ```
+    - **Column**
+    <p>A widget that displays its children in a vertical array.</p>
+    ```dart
+    Column(
+      children: <Widget>[
+        Text('Hello'),
+        Text('World'),
+      ],
+    );
+    ```
+    - **Stack**
+    <p>A widget that positions its children relative to the edges of its box.</p>
+    ```dart
+    Stack(
+      children: <Widget>[
+        Container(color: Colors.blue),
+        Center(child: Text('Hello')),
+      ],
+    );
+    ```
+    - **Container**
+    <p>A convenience widget that combines common painting, positioning, and sizing widgets.</p>
+    ```dart
+    Container(
+      color: Colors.blue,
+      padding: EdgeInsets.all(16.0),
+      child: Text('Hello'),
+    );
+    ```
+  </TabItem>
+  <TabItem value="positioning" label="Positioning">
+    - **Center**
+    <p>A widget that centers its child within itself.</p>
+    ```dart
+    Center(
+      child: Text('Hello'),
+    );
+    ```
+    - **Padding**
+    <p>A widget that insets its child by a given padding.</p>
+    ```dart
+    Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Text('Hello'),
+    );
+    ```
+  </TabItem>
+  <TabItem value="structures" label="Structures">
+    - **Button**
+    <p>A material design button. Ex, `TextButton`, `ElevatedButton`, `OutlinedButton`</p>
+    ```dart
+    ElevatedButton(
+      onPressed: () {},
+      child: Text('Click Me'),
+    );
+    ```
+    <p>Outlined Button</p>
+    ```dart
+    OutlinedButton(
+      onPressed: () {},
+      child: Text('Click Me'),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: Colors.blue),
+      ),
+    );
+    ```
+    <p>Text Button</p>
+    ```dart
+    TextButton(
+      onPressed: () {},
+      child: Text('Click Me'),
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.red,
+      ),
+    );
+    ```
+    <p>Elevated Button with custom style</p>
+    ```dart
+    ElevatedButton(
+      onPressed: () {},
+      child: Text('Click Me'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+    );
+    ```
+    - **Text**
+    <p>A run of text with a single style.</p>
+    ```dart
+    Text('Hello, world!');
+    ```
+  </TabItem>
+  <TabItem value="styles" label="Styles">
+    - **TextStyle**
+    <p>An immutable style describing how to format and paint text.</p>
+    ```dart
+    Text(
+      'Hello',
+      style: TextStyle(fontSize: 24.0),
+    );
+    ```
+    - **Color**
+    <p>An immutable 32-bit color value in ARGB format.</p>
+    ```dart
+    Container(
+      color: Colors.blue,
+    );
+    ```
+  </TabItem>
+</Tabs>
