@@ -1,0 +1,81 @@
+---
+sidebar_label: 'Generics'
+sidebar_position: 6
+---
+
+# Generics
+
+Generics are a way to create reusable code that can work with different types. This allows you to write a single function or class that can operate on various data types without sacrificing type safety.
+
+## Why Use Generics?
+
+Generics are essential for creating flexible and type-safe collections. For example, instead of creating a `List` that can only hold `String`s, you can create a generic `List<T>` that can hold any type `T`. This ensures that you don't accidentally mix different types in the same collection.
+
+## Generic Functions
+
+You can create generic functions that work with different types.
+
+Here's a generic function that takes a value and returns it. This function can work with any type.
+
+```dart
+T identity<T>(T value) {
+  return value;
+}
+
+void main() {
+  String name = identity('Dart');
+  int number = identity(123);
+  
+  print(name); // "Dart"
+  print(number); // 123
+}
+```
+
+## Generic Classes
+
+You can also create generic classes. A common use case is for creating custom data structures.
+
+Here's a generic `Box` class that can hold a value of any type.
+
+```dart
+class Box<T> {
+  T _value;
+
+  Box(this._value);
+
+  T getValue() {
+    return _value;
+  }
+}
+
+void main() {
+  var stringBox = Box<String>('A string');
+  var intBox = Box<int>(42);
+
+  print(stringBox.getValue()); // "A string"
+  print(intBox.getValue()); // 42
+}
+```
+
+## Bounded Generics
+
+Sometimes, you may want to restrict the types that can be used with a generic. You can do this using the `extends` keyword.
+
+Here's a generic function that only works with types that are subtypes of `num`.
+
+```dart
+T sum<T extends num>(T a, T b) {
+  return a + b as T;
+}
+
+void main() {
+  var result1 = sum(5, 10);
+  var result2 = sum(3.5, 7.2);
+  
+  print(result1); // 15
+  print(result2); // 10.7
+  
+  // This would cause a compile-time error because String is not a subtype of num
+  // var result3 = sum('hello', 'world');
+}
+```

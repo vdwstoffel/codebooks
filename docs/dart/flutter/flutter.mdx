@@ -4,12 +4,14 @@ sidebar_position: 1
 ---
 
 import DisplayLogo from "@site/src/components/DisplayLogo/DisplayLogo";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/Tabs";
 
 # Flutter
 
 <DisplayLogo logo="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Google-flutter-logo.svg/1920px-Google-flutter-logo.svg.png" />
 
-Flutter is an open-source UI software development kit created by Google. It is used to develop applications for Android, iOS, Linux, macOS, Windows, Google Fuchsia, and the web from a single codebase.
+[Flutter](https://docs.flutter.dev/) is an open-source UI software development kit created by Google. It is used to develop applications for Android, iOS, Linux, macOS, Windows, Google Fuchsia, and the web from a single codebase.
 
 The first version of Flutter was known as "Sky" and ran on the Android operating system. It was unveiled at the 2015 Dart developer summit, with the stated intent of being able to render consistently at 120 frames per second.
 
@@ -47,3 +49,82 @@ flutter run
 
 This will launch the app in a simulator or on a connected device.
 
+## Hello World
+
+Here is an example of a bare-bones Flutter app that displays the text "Hello World".
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Hello World'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Importing Files
+
+As your app grows, it's a good practice to split your code into multiple files. Here is an example of how to create a separate file for a widget and import it into your main file.
+
+<Tabs>
+
+  <TabItem value="main.dart" label="main.dart" default>
+
+    ```dart title="main.dart"
+    import 'package:flutter/material.dart';
+    import 'my_widget.dart'; // highlight-next-line
+
+    void main() {
+      runApp(const MyApp());
+    }
+
+    class MyApp extends StatelessWidget {
+      const MyApp({super.key});
+
+      @override
+      Widget build(BuildContext context) {
+        return const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: MyWidget(),
+            ),
+          ),
+        );
+      }
+    }
+    ```
+
+  </TabItem>
+
+  <TabItem value="my_widget.dart" label="my_widget.dart">
+
+    ```dart title="my_widget.dart"
+    import 'package:flutter/material.dart';
+
+    class MyWidget extends StatelessWidget {
+      const MyWidget({super.key});
+
+      @override
+      Widget build(BuildContext context) {
+        return const Text('Hello from a separate file!');
+      }
+    }
+    ```
+
+  </TabItem>
+
+</Tabs>

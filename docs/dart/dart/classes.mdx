@@ -1,0 +1,98 @@
+---
+sidebar_label: 'Classes'
+sidebar_position: 4
+---
+
+# Classes
+
+Dart is an object-oriented language, and as such, it uses classes to define objects. A class is a blueprint for creating objects, providing initial values for state (member variables or properties), and implementations of behavior (member functions or methods).
+
+## Basic Class
+
+Here's a simple class with properties, a constructor, and a method.
+
+```dart
+class Dog {
+  String name;
+  int age;
+
+  // Constructor
+  Dog(this.name, this.age);
+
+  // Method
+  void bark() {
+    print('Woof!');
+  }
+}
+
+void main() {
+  var myDog = Dog('Rex', 3);
+  print(myDog.name); // Rex
+  myDog.bark(); // Woof!
+}
+```
+
+## Inheritance
+
+Dart supports single inheritance. You can use the `extends` keyword to create a subclass.
+
+```dart
+class Animal {
+  void makeSound() {
+    print('Some generic animal sound');
+  }
+}
+
+class Cat extends Animal {
+  @override
+  void makeSound() {
+    print('Meow!');
+  }
+}
+
+void main() {
+  var cat = Cat();
+  cat.makeSound(); // Meow!
+}
+```
+
+## Mixins
+
+Mixins are a way of reusing a class's code in multiple class hierarchies. You can use the `with` keyword to apply a mixin to a class.
+
+```dart
+mixin Flyer {
+  void fly() {
+    print('I can fly!');
+  }
+}
+
+class Bird with Flyer {}
+
+void main() {
+  var bird = Bird();
+  bird.fly(); // I can fly!
+}
+```
+
+## Abstract Classes
+
+Abstract classes cannot be instantiated. They are useful for defining interfaces. You can use the `abstract` keyword to declare an abstract class.
+
+```dart
+abstract class Shape {
+  void draw(); // Abstract method
+}
+
+class Circle extends Shape {
+  @override
+  void draw() {
+    print('Drawing a circle');
+  }
+}
+
+void main() {
+  var circle = Circle();
+  circle.draw(); // Drawing a circle
+}
+```
