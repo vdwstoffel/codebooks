@@ -5,7 +5,7 @@ sidebar_position: 1
 
 import DisplayLogo from "@site/src/components/DisplayLogo/DisplayLogo";
 import Tabs from "@theme/Tabs";
-import TabItem from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # Flutter
 
@@ -86,7 +86,8 @@ As your app grows, it's a good practice to split your code into multiple files. 
 
     ```dart title="main.dart"
     import 'package:flutter/material.dart';
-    import 'my_widget.dart'; // highlight-next-line
+    // highlight-next-line
+    import 'package:myAppName/my_widget.dart';
 
     void main() {
       runApp(const MyApp());
