@@ -1,0 +1,89 @@
+---
+sidebar_label: 'Maps'
+sidebar_position: 5
+---
+
+# Dart Maps
+
+Maps in Dart are used to store data as key-value pairs. Each key must be unique.
+
+## Creating a Map
+
+You can create a map using a map literal or the `Map` constructor.
+
+```dart
+// Using a map literal
+var aMap = {'key1': 'value1', 'key2': 'value2'};
+// aMap is a Map<String, String>
+
+// Using the Map constructor
+var anotherMap = Map<int, String>();
+anotherMap[1] = 'one';
+anotherMap[2] = 'two';
+// anotherMap is {1: 'one', 2: 'two'}
+```
+
+## Accessing Values
+
+You can access map values using the key.
+
+```dart
+var aMap = {'key1': 'value1', 'key2': 'value2'};
+var value = aMap['key1']; // 'value1'
+```
+
+## Adding and Updating Entries
+
+You can add a new entry or update an existing one using the key.
+
+```dart
+var aMap = {'key1': 'value1'};
+aMap['key2'] = 'value2'; // Adds a new entry
+aMap['key1'] = 'new value'; // Updates an existing entry
+```
+
+## Removing Entries
+
+You can remove an entry using the `remove` method.
+
+```dart
+var aMap = {'key1': 'value1', 'key2': 'value2'};
+aMap.remove('key1'); // aMap is now {'key2': 'value2'}
+```
+
+## Iterating Over a Map
+
+You can iterate over the keys, values, or entries of a map.
+
+```dart
+var aMap = {'key1': 'value1', 'key2': 'value2'};
+
+// Iterate over keys
+for (var key in aMap.keys) {
+  print(key); // 'key1', 'key2'
+}
+
+// Iterate over values
+for (var value in aMap.values) {
+  print(value); // 'value1', 'value2'
+}
+
+// Iterate over entries
+for (var entry in aMap.entries) {
+  print('${entry.key}: ${entry.value}'); // 'key1: value1', 'key2: value2'
+}
+```
+
+## Common Properties
+
+- `length`: Returns the number of key-value pairs in the map.
+- `isEmpty`: Returns `true` if the map is empty.
+- `isNotEmpty`: Returns `true` if the map is not empty.
+- `keys`: Returns an iterable of the map's keys.
+- `values`: Returns an iterable of the map's values.
+
+```dart
+var aMap = {'key1': 'value1', 'key2': 'value2'};
+var len = aMap.length; // 2
+var isEmpty = aMap.isEmpty; // false
+```

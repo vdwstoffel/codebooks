@@ -1,0 +1,50 @@
+---
+sidebar_label: "Loops"
+sidebar_position: 6
+---
+
+# Dart Loops
+
+Loops are used to execute a block of code repeatedly.
+
+## For Loop
+
+A `for` loop is used to iterate over a sequence of numbers.
+
+```dart
+for (int i = 0; i < 5; i++) {
+  print(i); // 0 1 2 3 4
+}
+```
+
+## For-In Loop
+
+A `for-in` loop is used to iterate over the elements of a collection.
+
+```dart
+List<String> fruits = ['Apple', 'Banana', 'Orange'];
+for (String fruit in fruits) {
+  print(fruit); // Apple Banana Orange
+}
+```
+
+## ForEach Loop
+
+The `forEach` method can be used to iterate over the elements of a collection.
+
+```dart
+List<String> fruits = ['Apple', 'Banana', 'Orange'];
+fruits.forEach((fruit) => print(fruit)); // Apple Banana Orange
+```
+
+## While Loop
+
+A `while` loop executes a block of code as long as a specified condition is true.
+
+```dart
+int i = 0;
+while (i < 5) {
+  print(i); // 0 1 2 3 4
+  i++;
+}
+```

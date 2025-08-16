@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 Flutter widgets are the basic building blocks of a Flutter app's user interface. Each widget is an immutable declaration of part of the user interface.
 
-## Basic Stateless Widget Example
+## Stateless Widget Example
 
 Here is an example of a bare minimum Flutter widget that displays "Hello, world!":
 
@@ -27,7 +27,7 @@ class HelloWorld extends StatelessWidget {
 }
 ```
 
-## Stateless Widget with a Widget Argument
+### Stateless Widget with a Widget Argument
 
 Here is an example of a stateless widget that takes another widget as an argument in its constructor. This is a common pattern for creating reusable layout components.
 
@@ -68,7 +68,7 @@ CustomCard(
 )
 ```
 
-## Basic Stateful Widget Example
+## Stateful Widget Example
 
 Here is an example of a bare minimum Flutter widget that displays a counter:
 
@@ -107,6 +107,46 @@ class _CounterState extends State<Counter> {
     );
   }
 }
+```
+
+## Widget with Multiple Constructors
+
+Here is an example of a widget that has multiple constructors.
+
+```dart
+import 'package:flutter/material.dart';
+
+class MyButton extends StatelessWidget {
+  final String text;
+  final Color color;
+
+  const MyButton({super.key, required this.text, required this.color});
+
+  const MyButton.primary({super.key, required this.text}) : color = Colors.blue;
+
+  const MyButton.secondary({super.key, required this.text}) : color = Colors.grey;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(backgroundColor: color),
+      child: Text(text),
+    );
+  }
+}
+```
+
+To use this widget, you can call the appropriate constructor:
+
+```dart
+Column(
+  children: [
+    MyButton(text: 'Custom', color: Colors.red),
+    MyButton.primary(text: 'Primary'),
+    MyButton.secondary(text: 'Secondary'),
+  ],
+)
 ```
 
 ## Combining Widgets
@@ -237,10 +277,21 @@ class MyApp extends StatelessWidget {
     <p>A convenience widget that combines common painting, positioning, and sizing widgets.</p>
     ```dart
     Container(
+      width: double.infinity,
+      height: double.infinity,
       color: Colors.blue,
       padding: EdgeInsets.all(16.0),
       child: Text('Hello'),
     );
+    ```
+    - **SizedBox**
+    <p>A box with a specified size. It can be used to add space between widgets.</p>
+    ```dart
+    SizedBox(
+      width: 200.0,
+      height: 300.0,
+      child: const Card(child: Text('Hello World')),
+    )
     ```
   </TabItem>
   <TabItem value="positioning" label="Positioning">

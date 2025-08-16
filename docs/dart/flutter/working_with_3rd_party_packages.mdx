@@ -1,0 +1,35 @@
+---
+sidebar_label: 'Working with 3rd Party Packages'
+sidebar_position: 4
+---
+
+# Working with 3rd Party Packages
+
+To add a package to your Flutter app, you can use the `flutter pub add` command. For example, to add the `google_fonts` package, you would run the following command:
+
+## Google Fonts
+
+
+```bash title="terminal"
+flutter pub add google_fonts
+```
+
+This will add the following line to your `pubspec.yaml` file:
+
+```yaml title="pubspec.yaml"
+dependencies:
+  google_fonts: ^2.1.0
+```
+
+To use the `google_fonts` package, you first need to import it in your Dart file.
+
+```dart
+import 'package:google_fonts/google_fonts.dart';
+
+// rest of the code
+
+Text(
+  'This is Google Fonts',
+  style: GoogleFonts.lato(),
+);
+```

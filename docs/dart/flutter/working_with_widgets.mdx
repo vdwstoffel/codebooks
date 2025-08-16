@@ -1,0 +1,220 @@
+---
+sidebar_label: "Working with Widgets"
+sidebar_position: 3
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Working with Widgets
+
+In Flutter, you'll often need to share state between widgets. One common pattern for this is called "lifting state up". This means that a parent widget manages the state and passes it down to its children. The children can then notify the parent when the state needs to change.
+
+## Lifting State Up Example
+
+Here's an example of how to lift state up to manage which screen is currently active. We'll have a parent widget that holds the state and two child widgets that represent the screens.
+
+<Tabs>
+  <TabItem value="main" label="main.dart">
+    <p>The main file manages which screen to show based on the <code>_activeScreen</code> state.</p>
+    ```dart title="main.dart"
+    import 'package:flutter/material.dart';
+    import './start_screen.dart';
+    import './questions_screen.dart';
+
+    class App extends StatefulWidget {
+      const App({super.key});
+
+      @override
+      State<App> createState() => _AppState();
+    }
+
+    class _AppState extends State<App> {
+      String _activeScreen = 'start-screen';
+
+      void _switchScreen() {
+        setState(() {
+          _activeScreen = 'questions-screen';
+        });
+      }
+
+      @override
+      Widget build(BuildContext context) {
+        return MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: _activeScreen == 'start-screen'
+                  ? StartScreen(_switchScreen)
+                  : const QuestionsScreen(),
+            ),
+          ),
+        );
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="start" label="start_screen.dart">
+    <p>The start screen widget takes the <code>_switchScreen</code> function as an argument and calls it when the button is pressed.</p>
+    ```dart title="start_screen.dart"
+    import 'package:flutter/material.dart';
+
+    class StartScreen extends StatelessWidget {
+      const StartScreen(this.startQuiz, {super.key});
+
+      final void Function() startQuiz;
+
+      @override
+      Widget build(BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Learn Flutter the fun way!',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+            const SizedBox(height: 30),
+            OutlinedButton.icon(
+              onPressed: startQuiz,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+              ),
+              icon: const Icon(Icons.arrow_right_alt),
+              label: const Text('Start Quiz'),
+            )
+          ],
+        );
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="questions" label="questions_screen.dart">
+    <p>The questions screen is a simple stateless widget that displays a message.</p>
+    ```dart title="questions_screen.dart"
+    import 'package:flutter/material.dart';
+
+    class QuestionsScreen extends StatelessWidget {
+      const QuestionsScreen({super.key});
+
+      @override
+      Widget build(BuildContext context) {
+        return const Text('Questions Screen');
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+In this example, the `App` widget holds the `_activeScreen` state. It passes the `_switchScreen` function to the `StartScreen` widget. When the button in `StartScreen` is pressed, it calls `_switchScreen`, which updates the state in the `App` widget, causing the UI to rebuild and show the `QuestionsScreen`.
+
+## Creating Widgets from a List
+
+Here's an example of how to create a list of widgets from a list of data.
+
+<Tabs>
+  <TabItem value="for-in" label="For-in loop">
+    ```dart
+    import 'package:flutter/material.dart';
+
+    class NamesList extends StatelessWidget {
+      const NamesList({super.key});
+
+      @override
+      Widget build(BuildContext context) {
+        const names = ['Alice', 'Bob', 'Charlie'];
+
+        return Column(
+          children: [
+            for (final name in names) Text(name),
+          ],
+        );
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="map" label=".map()">
+    ```dart
+    import 'package:flutter/material.dart';
+
+    class NamesList extends StatelessWidget {
+      const NamesList({super.key});
+
+      @override
+      Widget build(BuildContext context) {
+        const names = ['Alice', 'Bob', 'Charlie'];
+
+        return Column(
+          children: [
+            // The spread operator (...) is used to insert all the elements 
+            // from an iterable into a list.
+            // highlight-next-line
+            ...names.map((name) => Text(name)),
+          ],
+        );
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Passing a Function as an Argument to a Stateful Widget
+
+Here's an example of how to pass a function as an argument to a stateful widget.
+
+<Tabs>
+  <TabItem value="main" label="main.dart">
+    ```dart title="main.dart"
+    import 'package:flutter/material.dart';
+    import './my_button.dart';
+
+    class App extends StatelessWidget {
+      const App({super.key});
+
+      // highlight-next-line
+      void _myFunction() {
+        print('Button pressed!');
+      }
+
+      @override
+      Widget build(BuildContext context) {
+        return MaterialApp(
+          home: Scaffold(
+            body: Center(
+              // highlight-next-line
+              child: MyButton(onPressed: _myFunction),
+            ),
+          ),
+        );
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="my_button" label="my_button.dart">
+    ```dart title="my_button.dart"
+    import 'package:flutter/material.dart';
+
+    class MyButton extends StatefulWidget {
+      const MyButton({super.key, required this.onPressed});
+
+      // highlight-next-line
+      final void Function() onPressed;
+
+      @override
+      State<MyButton> createState() => _MyButtonState();
+    }
+
+    class _MyButtonState extends State<MyButton> {
+      @override
+      Widget build(BuildContext context) {
+        return ElevatedButton(
+          // highlight-next-line
+          onPressed: widget.onPressed,
+          child: const Text('Press Me'),
+        );
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>

@@ -1,6 +1,6 @@
 ---
 sidebar_label: 'Classes'
-sidebar_position: 4
+sidebar_position: 8
 ---
 
 # Classes
@@ -29,6 +29,40 @@ void main() {
   var myDog = Dog('Rex', 3);
   print(myDog.name); // Rex
   myDog.bark(); // Woof!
+}
+```
+
+## Multiple Constructors
+
+Dart allows you to have multiple constructors in a class. You can create a named constructor by using the `ClassName.constructorName()` syntax.
+
+```dart
+class Car {
+  String make;
+  String model;
+  int year;
+
+  // Main constructor
+  Car(this.make, this.model, this.year);
+
+  // Named constructor for a new car
+  Car.newCar(this.make, this.model) : year = DateTime.now().year;
+
+  // Named constructor from a map
+  Car.fromMap(Map<String, dynamic> map)
+      : make = map['make'],
+        model = map['model'],
+        year = map['year'];
+}
+
+void main() {
+  var myCar = Car('Toyota', 'Camry', 2022);
+  var newCar = Car.newCar('Honda', 'Civic');
+  var carFromMap = Car.fromMap({'make': 'Ford', 'model': 'Mustang', 'year': 2021});
+
+  print(myCar.make); // Toyota
+  print(newCar.year); // 2025
+  print(carFromMap.model); // Mustang
 }
 ```
 
