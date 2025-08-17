@@ -91,3 +91,21 @@ var evens = numbers.where((n) => n.isEven).toList(); // [2, 4]
 // Calculate the sum of the list
 var sum = numbers.reduce((value, element) => value + element); // 10
 ```
+
+## Spread Operator
+
+The spread operator (`...`) allows you to insert all the elements of a list into another list.
+
+```dart
+var list1 = [1, 2, 3];
+var list2 = [4, 5, 6];
+var combined = [...list1, ...list2]; // [1, 2, 3, 4, 5, 6]
+```
+
+You can also use the null-aware spread operator (`...?`) to add elements only if the list is not `null`.
+
+```dart
+List<int>? list1;
+var list2 = [4, 5, 6];
+var combined = [...?list1, ...list2]; // [4, 5, 6]
+```

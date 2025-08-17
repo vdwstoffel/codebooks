@@ -1,0 +1,42 @@
+---
+sidebar_label: 'Types'
+sidebar_position: 11
+---
+
+# Dart Types
+
+Dart is a statically-typed language, which means that the type of a variable is known at compile time. However, you can also declare variables without a type and let Dart infer it.
+
+## Type Casting
+
+Type casting is the process of converting a variable from one type to another. In Dart, you can use the `as` keyword to perform a type cast.
+
+```dart
+Object maybeString = 'hello';
+String myString = maybeString as String;
+```
+
+If the object is not of the specified type, a `CastError` will be thrown.
+
+## Type Checking
+
+You can check the type of an object at runtime using the `is` keyword. This is a safe way to check a type before casting.
+
+```dart
+Object maybeInt = 123;
+
+if (maybeInt is int) {
+  int myInt = maybeInt;
+  print(myInt); // 123
+}
+```
+
+You can also use `is!` to check if an object is *not* of a certain type.
+
+```dart
+Object maybeDouble = 45.6;
+
+if (maybeDouble is! String) {
+  print('Not a string!'); // Not a string!
+}
+```

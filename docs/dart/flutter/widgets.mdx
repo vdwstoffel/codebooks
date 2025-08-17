@@ -293,6 +293,20 @@ class MyApp extends StatelessWidget {
       child: const Card(child: Text('Hello World')),
     )
     ```
+    - **SingleChildScrollView**
+    <p>A box that can be scrolled. This widget is useful when you have a single widget that is too large to fit on the screen.</p>
+    ```dart
+    SingleChildScrollView(
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => ListTile(
+            title: Text('Item $index'),
+          ),
+        ),
+      ),
+    )
+    ```
   </TabItem>
   <TabItem value="positioning" label="Positioning">
     - **Center**
@@ -308,6 +322,25 @@ class MyApp extends StatelessWidget {
     Padding(
       padding: EdgeInsets.all(16.0),
       child: Text('Hello'),
+    );
+    ```
+    - **Expanded**
+    <p>A widget that expands a child of a `Row`, `Column`, or `Flex` so that the child fills the available space.</p>
+    ```dart
+    Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            color: Colors.blue,
+            height: 100,
+          ),
+        ),
+        Container(
+          color: Colors.red,
+          width: 100,
+          height: 100,
+        ),
+      ],
     );
     ```
   </TabItem>
