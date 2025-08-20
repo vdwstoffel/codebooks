@@ -3,6 +3,8 @@ sidebar_label: 'Classes'
 sidebar_position: 8
 ---
 
+import Terminal from "@site/src/components/Terminal/Terminal";
+
 # Classes
 
 Dart is an object-oriented language, and as such, it uses classes to define objects. A class is a blueprint for creating objects, providing initial values for state (member variables or properties), and implementations of behavior (member functions or methods).
@@ -41,22 +43,30 @@ Constructors are special methods used to create, or instantiate, an object of a 
 You can use an initializer list to initialize instance variables before the constructor body runs. This is useful for final variables.
 
 ```dart
-class Point {
-  final double x;
-  final double y;
-  final double distanceFromOrigin;
+import 'dart:math';
 
-  Point(double x, double y)
-      : x = x,
-        y = y,
-        distanceFromOrigin = x * x + y * y;
+class Expense {
+  final String id;
+  final String name;
+  final double amount;
+
+  Expense(this.name, this.amount)
+      : id = Random().nextInt(1000000).toString(); // Random ID generated in initializer list
 }
 
 void main() {
-  var p = Point(2, 3);
-  print(p.distanceFromOrigin); // 13
+  var expense1 = Expense('Groceries', 50.0);
+  print('Expense ID: ${expense1.id}, Name: ${expense1.name}, Amount: ${expense1.amount}');
+
+  var expense2 = Expense('Dinner', 35.50);
+  print('Expense ID: ${expense2.id}, Name: ${expense2.name}, Amount: ${expense2.amount}');
 }
 ```
+
+<Terminal>
+Expense ID: 123456, Name: Groceries, Amount: 50.0
+Expense ID: 789012, Name: Dinner, Amount: 35.5
+</Terminal>
 
 ## Simulating an Init Method
 
