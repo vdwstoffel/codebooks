@@ -1,0 +1,138 @@
+---
+sidebar_label: "Type Hinting"
+sidebar_position: 10
+---
+
+# Python Type Hinting
+
+Type hinting is a feature in Python that allows you to indicate the expected data types of variables, function parameters, and return values. It was introduced in Python 3.5 and helps improve code clarity, readability, and maintainability. Type hints are not enforced by the Python interpreter at runtime, but they can be used by static analysis tools and IDEs to catch type-related errors.
+
+## Basic Type Hinting
+
+You can add type hints to variables and function arguments using a colon `:`, followed by the type. For function return types, you use an arrow `->` followed by the type.
+
+### Example: Basic Function
+
+```python
+def greeting(name: str) -> str:
+    return f"Hello, {name}"
+
+# IDEs and type checkers will know that 'name' should be a string
+# and the function should return a string.
+message = greeting("Alice")
+print(message) # "Hello, Alice"
+```
+
+## Type Hinting for Common Types
+
+The `typing` module provides a rich set of types that you can use for more complex scenarios.
+
+### `List`, `Tuple`, `Dict`, `Set`
+
+For collections, you can specify the types of their elements.
+
+```python
+from typing import List, Tuple, Dict, Set
+
+# A list of integers
+numbers: List[int] = [1, 2, 3]
+
+# A tuple containing a string and an integer
+person: Tuple[str, int] = ("Alice", 30)
+
+# A dictionary with string keys and integer values
+scores: Dict[str, int] = {"Alice": 95, "Bob": 88}
+
+# A set of strings
+names: Set[str] = {"Alice", "Bob"}
+```
+
+### `Union` and `Optional`
+
+-   `Union[X, Y]`: Indicates that a value can be one of several types.
+-   `Optional[X]`: Is a shorthand for `Union[X, None]`, meaning a value can either be of type `X` or `None`.
+
+```python
+from typing import Union, Optional
+
+def process_data(data: Union[int, str]) -> str:
+    return f"Processed: {data}"
+
+def find_user(user_id: int) -> Optional[str]:
+    if user_id == 1:
+        return "Alice"
+    return None # It's valid to return None here
+```
+
+### `Any`
+
+`Any` is a special type that can represent any type. It's a way to opt-out of type checking for a particular part of your code.
+
+```python
+from typing import Any
+
+def process_anything(item: Any) -> None:
+    # This function can accept any type of argument
+    print(f"Processing item: {item}")
+```
+
+### `Literal`
+
+When you want to indicate that a variable or a function parameter can only have specific literal values, you can use `Literal` from the `typing` module. This is useful for constraining string values, enums, or any other literal values.
+
+```python
+from typing import Literal
+
+def set_alignment(align: Literal["left", "center", "right"]) -> None:
+    # This function will only accept "left", "center", or "right" as values for the 'align' parameter.
+    print(f"Alignment set to {align}")
+
+set_alignment("center") # Valid
+# set_alignment("top")    # Invalid, will be flagged by a type checker
+```
+
+## Type Hinting for Functions and Callables
+
+You can specify the types for function arguments and return values, even for functions passed as arguments.
+
+```python
+from typing import Callable
+
+# Defines a type for a function that takes two integers and returns an integer
+Operation = Callable[[int, int], int]
+
+def add(a: int, b: int) -> int:
+    return a + b
+
+def subtract(a: int, b: int) -> int:
+    return a - b
+
+def perform_operation(operation: Operation, x: int, y: int) -> int:
+    return operation(x, y)
+
+result_add = perform_operation(add, 5, 3)
+# 8
+result_subtract = perform_operation(subtract, 10, 4)
+# 6
+```
+
+## Type Hinting for Classes
+
+You can use classes as type hints, and you can also hint the types of class attributes.
+
+```python
+class Person:
+    def __init__(self, name: str, age: int):
+        self.name: str = name
+        self.age: int = age
+
+    def introduce(self) -> str:
+        return f"Hi, I'm {self.name} and I'm {self.age} years old."
+
+# The 'person' variable is expected to be an instance of the Person class
+def greet_person(person: Person) -> None:
+    print(person.introduce())
+
+alice = Person("Alice", 30)
+greet_person(alice) # "Hi, I'm Alice and I'm 30 years old."
+```
