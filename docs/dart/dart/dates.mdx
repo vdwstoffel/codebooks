@@ -1,0 +1,133 @@
+---
+sidebar_label: 'Dates'
+sidebar_position: 10
+---
+
+import Terminal from "@site/src/components/Terminal/Terminal";
+
+# Dates
+
+Dart's `DateTime` class provides a way to work with dates and times. It represents a point in time, and you can perform various operations like getting the current time, creating specific dates, and calculating differences.
+
+## Getting Current Date and Time
+
+You can get the current date and time using `DateTime.now()`.
+
+```dart
+void main() {
+  DateTime now = DateTime.now();
+  print(now); // Example: 2023-10-27 10:30:00.123456
+}
+```
+
+<Terminal>
+2023-10-27 10:30:00.123456
+</Terminal>
+
+## Creating a Specific Date and Time
+
+You can create a `DateTime` object for a specific date and time.
+
+```dart
+void main() {
+  DateTime specificDate = DateTime(2023, 1, 1, 10, 30, 0);
+  print(specificDate); // 2023-01-01 10:30:00.000
+
+  DateTime utcDate = DateTime.utc(2023, 1, 1);
+  print(utcDate); // 2023-01-01 00:00:00.000Z
+}
+```
+
+<Terminal>
+2023-01-01 10:30:00.000
+2023-01-01 00:00:00.000Z
+</Terminal>
+
+## Accessing Date and Time Components
+
+You can access individual components of a `DateTime` object.
+
+```dart
+void main() {
+  DateTime now = DateTime.now();
+  print('Year: ${now.year}');
+  print('Month: ${now.month}');
+  print('Day: ${now.day}');
+  print('Hour: ${now.hour}');
+  print('Minute: ${now.minute}');
+  print('Second: ${now.second}');
+  print('Weekday: ${now.weekday}'); // 1 for Monday, 7 for Sunday
+}
+```
+
+<Terminal>
+Year: 2023
+Month: 10
+Day: 27
+Hour: 10
+Minute: 30
+Second: 0
+Weekday: 5
+</Terminal>
+
+## Adding and Subtracting Durations
+
+You can add or subtract durations using `Duration` objects.
+
+```dart
+void main() {
+  DateTime now = DateTime.now();
+  DateTime futureDate = now.add(Duration(days: 7, hours: 2));
+  print('Future Date: $futureDate');
+
+  DateTime pastDate = now.subtract(Duration(minutes: 30));
+  print('Past Date: $pastDate');
+}
+```
+
+<Terminal>
+Future Date: 2023-11-03 12:30:00.123456
+Past Date: 2023-10-27 10:00:00.123456
+</Terminal>
+
+## Calculating Difference Between Dates
+
+You can calculate the difference between two `DateTime` objects, which returns a `Duration` object.
+
+```dart
+void main() {
+  DateTime date1 = DateTime(2023, 1, 1);
+  DateTime date2 = DateTime(2023, 1, 31);
+
+  Duration difference = date2.difference(date1);
+  print('Difference in days: ${difference.inDays}'); // 30
+  print('Difference in hours: ${difference.inHours}'); // 720
+}
+```
+
+<Terminal>
+Difference in days: 30
+Difference in hours: 720
+</Terminal>
+
+## Comparing Dates
+
+You can compare `DateTime` objects using `isBefore`, `isAfter`, and `isAtSameMomentAs`.
+
+```dart
+void main() {
+  DateTime date1 = DateTime(2023, 1, 1);
+  DateTime date2 = DateTime(2023, 1, 15);
+  DateTime date3 = DateTime(2023, 1, 1);
+
+  print('date1 is before date2: ${date1.isBefore(date2)}'); // true
+  print('date2 is after date1: ${date2.isAfter(date1)}'); // true
+  print('date1 is at same moment as date3: ${date1.isAtSameMomentAs(date3)}'); // true
+}
+```
+
+<Terminal>
+date1 is before date2: true
+date2 is after date1: true
+date1 is at same moment as date3: true
+</Terminal>

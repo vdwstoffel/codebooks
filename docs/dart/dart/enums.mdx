@@ -1,0 +1,70 @@
+---
+sidebar_label: 'Enums'
+sidebar_position: 9
+---
+
+# Enums
+
+Enums (enumerations) are a special kind of class used to represent a fixed number of constant values. In Dart, enums are typically used to define a set of named constants, making your code more readable and less prone to errors than using raw strings or integers.
+
+## Basic Enum
+
+Here's a basic example of an enum representing days of the week:
+
+```dart
+enum Day {
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+
+void main() {
+  Day today = Day.monday;
+  print(today); // Day.monday
+  print(today.index); // 0
+
+  // Iterating over enum values
+  for (Day day in Day.values) {
+    print(day);
+  }
+  // Day.monday
+  // Day.tuesday
+  // ...
+}
+```
+
+## Enum with Enhanced Features (Dart 2.17+)
+
+Dart 2.17 introduced enhanced enums, allowing them to have members (fields, methods, and constructors), just like classes. This makes enums much more powerful and flexible.
+
+```dart
+enum Status {
+  pending('Pending'),
+  approved('Approved'),
+  rejected('Rejected');
+
+  final String description;
+
+  const Status(this.description);
+
+  bool get isApproved => this == Status.approved;
+
+  void displayStatus() {
+    print('Current status: $description');
+  }
+}
+
+void main() {
+  Status orderStatus = Status.pending;
+  orderStatus.displayStatus(); // Current status: Pending
+  print(orderStatus.isApproved); // false
+
+  Status paymentStatus = Status.approved;
+  paymentStatus.displayStatus(); // Current status: Approved
+  print(paymentStatus.isApproved); // true
+}
+```

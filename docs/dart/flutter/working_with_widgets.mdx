@@ -218,3 +218,257 @@ Here's an example of how to pass a function as an argument to a stateful widget.
     ```
   </TabItem>
 </Tabs>
+
+## ListView in a Column
+
+When embedding a `ListView` inside a `Column` (or `Row`), the `ListView` needs constrained dimensions. Without explicit constraints, a `ListView` will try to take up infinite space, leading to a rendering error. You can use `Expanded` or `SizedBox` to provide these constraints.
+
+### Using Expanded
+
+`Expanded` is useful when you want the `ListView` to take up all the remaining available space within the `Column`.
+
+```dart
+import 'package:flutter/material.dart';
+
+class ListViewInColumnExpanded extends StatelessWidget {
+  const ListViewInColumnExpanded({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ListView in Column (Expanded)')),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Header Content',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          // highlight-next-line
+          Expanded(
+            child: ListView.builder(
+              itemCount: 50,
+              itemBuilder: (context, index) {
+                return ListTile(title: Text('Item $index'));
+              },
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('Footer Content'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Using SizedBox
+
+`SizedBox` is useful when you want to give the `ListView` a fixed height (or width in a `Row`).
+
+```dart
+import 'package:flutter/material.dart';
+
+class ListViewInColumnSizedBox extends StatelessWidget {
+  const ListViewInColumnSizedBox({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ListView in Column (SizedBox)')),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Header Content',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          // highlight-next-line
+          SizedBox(
+            height: 200, // Fixed height for the ListView
+            child: ListView.builder(
+              itemCount: 50,
+              itemBuilder: (context, index) {
+                return ListTile(title: Text('Item $index'));
+              },
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('Footer Content'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Show Modal Bottom Sheet
+
+A modal bottom sheet is a panel that slides up from the bottom of the screen to reveal more content. It's a great way to display extra options or information without cluttering the main screen.
+
+Here's how to implement a `showModalBottomSheet`:
+
+```dart
+import 'package:flutter/material.dart';
+
+class MyModalBottomSheet extends StatelessWidget {
+  const MyModalBottomSheet({super.key});
+
+  void _showSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return const SizedBox(
+          height: 200,
+          child: Center(
+            child: Text('This is a modal bottom sheet'),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Modal Bottom Sheet Demo'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => _showSheet(context),
+          child: const Text('Show Sheet'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Getting User Input
+
+To get user input, you can use a `TextField` widget and a `TextEditingController`. The controller allows you to read the text that the user has entered.
+
+Here's an example of how to get user input and print it to the console:
+
+```dart
+import 'package:flutter/material.dart';
+
+class UserInput extends StatefulWidget {
+  const UserInput({super.key});
+
+  @override
+  State<UserInput> createState() => _UserInputState();
+}
+
+class _UserInputState extends State<UserInput> {
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  // highlight-next-line
+  final _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    _textController.dispose();
+    super.dispose();
+  }
+
+  void _printInputValue() {
+    // highlight-next-line
+    print('User input: ${_textController.text}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextField(
+            // highlight-next-line
+            controller: _textController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Enter your text',
+            ),
+            // highlight-next-line
+            keyboardType: TextInputType.text,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _printInputValue,
+            child: const Text('Print Input'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Showing a Date Picker
+
+To show a date picker, you can use the `showDatePicker` function. This function returns a `Future`, so it's best to use it with `async/await`.
+
+Here's an example of how to show a date picker and display the selected date:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class MyDatePicker extends StatefulWidget {
+  const MyDatePicker({super.key});
+
+  @override
+  State<MyDatePicker> createState() => _MyDatePickerState();
+}
+
+class _MyDatePickerState extends State<MyDatePicker> {
+  DateTime? _selectedDate;
+
+  // highlight-next-line
+  Future<void> _selectDate(BuildContext context) async {
+    // highlight-next-line
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          _selectedDate == null
+              ? 'No date selected!'
+              // Format the date
+              : 'Selected date: ${DateFormat.yMd().format(_selectedDate!)}',
+        ),
+        const SizedBox(height: 20.0),
+        ElevatedButton(
+          onPressed: () => _selectDate(context),
+          child: const Text('Select date'),
+        ),
+      ],
+    );
+  }
+}
+```

@@ -27,6 +27,19 @@ Row(
 );
 ```
 
+The `Spacer` widget takes up any available space, pushing adjacent widgets to opposite ends of the main axis.
+```dart
+Row(
+  children: <Widget>[
+    Text('Begin'),
+    Spacer(), // use Spacer
+    Text('Middle'),
+    Spacer(), // use Spacer
+    Text('End'),
+  ],
+);
+```
+
 ### Column
 A widget that displays its children in a vertical array.
 ```dart
@@ -80,11 +93,34 @@ SingleChildScrollView(
     children: List.generate(
       20,
       (index) => ListTile(
-        title: Text('Item $index'),
+            title: Text('Item $index'),
+          ),
+        ),
       ),
-    ),
-  ),
-)
+    )
+```
+
+### ListView
+A scrollable list of widgets arranged linearly. It is suitable for displaying a long list of items.
+```dart
+ListView(
+  children: <Widget>[
+    ListTile(title: Text('Item 1')),
+    ListTile(title: Text('Item 2')),
+    ListTile(title: Text('Item 3')),
+  ],
+);
+```
+
+**ListView.builder**
+A scrollable, linear list of widgets that are created on demand. This is efficient for very long lists as it only builds the widgets that are visible on screen.
+```dart
+ListView.builder(
+  itemCount: 100,
+  itemBuilder: (BuildContext context, int index) {
+    return ListTile(title: Text('Item $index'));
+  },
+);
 ```
 
 ## Positioning
@@ -102,6 +138,12 @@ A widget that insets its child by a given padding.
 ```dart
 Padding(
   padding: EdgeInsets.all(16.0),
+  child: Text('Hello'),
+);
+```
+```dart
+Padding(
+  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
   child: Text('Hello'),
 );
 ```
@@ -174,6 +216,16 @@ ElevatedButton(
 A run of text with a single style.
 ```dart
 Text('Hello, world!');
+```
+
+### Icon
+A graphical icon widget drawn from a font described in an `IconData` class.
+```dart
+Icon(
+  Icons.favorite,
+  color: Colors.pink,
+  size: 24.0,
+);
 ```
 
 ## Styles
