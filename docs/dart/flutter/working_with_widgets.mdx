@@ -472,3 +472,131 @@ class _MyDatePickerState extends State<MyDatePicker> {
   }
 }
 ```
+
+## Show Alert Dialog
+
+An `AlertDialog` is a pop-up dialog that informs the user about situations that require acknowledgment. It can have an optional title, optional content, and an optional list of actions.
+
+Here's how to show an `AlertDialog`:
+
+```dart
+import 'package:flutter/material.dart';
+
+class MyAlertDialog extends StatelessWidget {
+  const MyAlertDialog({super.key});
+
+  Future<void> _showMyDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('AlertDialog Title'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This is a demo alert dialog.'),
+                Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // This button should be placed within a Scaffold body.
+    return ElevatedButton(
+      onPressed: () => _showMyDialog(context),
+      child: const Text('Show Dialog'),
+    );
+  }
+}
+```
+
+## Removing List Items with Dismissible
+
+The `Dismissible` widget allows you to swipe to dismiss a widget from the screen. This is commonly used for deleting items from a list.
+
+Here's an example of how to use `Dismissible` to remove items from a list of strings:
+
+```dart
+import 'package:flutter/material.dart';
+
+class DismissibleList extends StatefulWidget {
+  const DismissibleList({super.key});
+
+  @override
+  State<DismissibleList> createState() => _DismissibleListState();
+}
+
+class _DismissibleListState extends State<DismissibleList> {
+  final List<String> _items = ['Item 1', 'Item 2', 'Item 3'];
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: _items.length,
+      itemBuilder: (context, index) {
+        final String item = _items[index];
+        // highlight-start
+        return Dismissible(
+          key: Key(item),
+          onDismissed: (direction) {
+            setState(() {
+              _items.removeAt(index);
+            });
+          },
+          background: Container(color: Colors.red),
+          child: ListTile(
+            title: Text(item),
+          ),
+        );
+        // highlight-end
+      },
+    );
+  }
+}
+```
+
+## Showing a SnackBar
+
+A `SnackBar` is a lightweight message that briefly appears at the bottom of the screen. It can be used to provide feedback to the user. A `SnackBar` can also have an optional action, such as an "Undo" button. To prevent `SnackBar`s from queuing up, you can use `ScaffoldMessenger.of(context).clearSnackBars()` before showing a new one.
+
+Here's how to show a basic `SnackBar` with custom content and duration:
+
+```dart
+import 'package:flutter/material.dart';
+
+class SnackBarExample extends StatelessWidget {
+  const SnackBarExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          // highlight-start
+          final snackBar = SnackBar(
+            content: const Text('This is a SnackBar!'),
+            duration: const Duration(seconds: 3),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          // highlight-end
+        },
+        child: const Text('Show SnackBar'),
+      ),
+    );
+  }
+}
+```

@@ -212,6 +212,29 @@ ElevatedButton(
 );
 ```
 
+### DropdownButton
+A material design button for selecting from a list of items. The `value` property must be one of the items in the `items` list. The `onChanged` callback is called when the user selects an item.
+
+```dart
+List<String> options = ['Option 1', 'Option 2', 'Option 3'];
+String? selectedValue = 'Option 1';
+
+DropdownButton<String>(
+  value: selectedValue,
+  onChanged: (String? newValue) {
+    // setState(() {
+    //   selectedValue = newValue;
+    // });
+  },
+  items: options.map<DropdownMenuItem<String>>((String value) {
+    return DropdownMenuItem<String>(
+      value: value,
+      child: Text(value),
+    );
+  }).toList(),
+);
+```
+
 ### Text
 A run of text with a single style.
 ```dart
