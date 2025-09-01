@@ -325,6 +325,7 @@ class MyModalBottomSheet extends StatelessWidget {
   void _showSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true, // Ensures content doesn't overlap system UI (notches, status bar)
       builder: (BuildContext context) {
         return const SizedBox(
           height: 200,

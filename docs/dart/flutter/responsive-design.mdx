@@ -1,0 +1,190 @@
+---
+sidebar_label: "Responsive Design"
+sidebar_position: 6
+---
+
+# Responsive Design
+
+## Lock Screen Orientation
+
+Control the orientation of your Flutter app to provide a consistent user experience. This example locks the app to portrait mode only.
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+void main() {
+  // Lock to portrait orientation
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) {
+    runApp(const MyApp());
+  });
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('App locked to portrait mode'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Available Orientation Options
+
+1. **DeviceOrientation.portraitUp** - Portrait orientation with the device upright
+2. **DeviceOrientation.portraitDown** - Portrait orientation with the device upside down  
+3. **DeviceOrientation.landscapeLeft** - Landscape orientation rotated left
+4. **DeviceOrientation.landscapeRight** - Landscape orientation rotated right
+
+You can combine multiple orientations in the list to allow specific orientations, or use all four to allow any orientation (system default).
+
+## Responsive Layout Based on Orientation
+
+Create layouts that adapt to screen orientation using MediaQuery to check the screen width and conditionally render different widgets.
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const ResponsiveApp());
+}
+
+class ResponsiveApp extends StatelessWidget {
+  const ResponsiveApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: ResponsiveLayout(),
+    );
+  }
+}
+
+class ResponsiveLayout extends StatelessWidget {
+  const ResponsiveLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // highlight-next-line
+    double width = MediaQuery.of(context).size.width;
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Responsive Layout'),
+      ),
+      body: Center(
+        // highlight-next-line
+        child: width > 600 
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text('Text 1', style: TextStyle(fontSize: 24)),
+                SizedBox(width: 20),
+                Text('Text 2', style: TextStyle(fontSize: 24)),
+              ],
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text('Text 1', style: TextStyle(fontSize: 24)),
+                SizedBox(height: 20),
+                Text('Text 2', style: TextStyle(fontSize: 24)),
+              ],
+            ),
+      ),
+    );
+  }
+}
+```
+
+In this example:
+- When screen width > 600 pixels (typically landscape), texts appear side by side in a Row
+- When screen width ≤ 600 pixels (typically portrait), texts appear stacked in a Column
+- The ternary operator `width > 600 ? Row(...) : Column(...)` handles the conditional rendering
+
+## LayoutBuilder
+
+`LayoutBuilder` is a widget that builds its child based on the parent widget's constraints (available width and height). Unlike `MediaQuery` which gives you the entire screen size, `LayoutBuilder` provides the exact space available for the current widget, making it perfect for creating responsive components that adapt to their container size.
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const LayoutBuilderApp());
+}
+
+class LayoutBuilderApp extends StatelessWidget {
+  const LayoutBuilderApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: LayoutBuilderExample(),
+    );
+  }
+}
+
+class LayoutBuilderExample extends StatelessWidget {
+  const LayoutBuilderExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('LayoutBuilder Example'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Container(
+              height: 200,
+              color: Colors.grey[300],
+              // highlight-next-line
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // constraints.maxWidth gives the available width
+                  // highlight-next-line
+                  if (constraints.maxWidth > 300) {
+                    return const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.star, size: 50, color: Colors.blue),
+                        Icon(Icons.favorite, size: 50, color: Colors.red),
+                        Icon(Icons.thumb_up, size: 50, color: Colors.green),
+                      ],
+                    );
+                  } else {
+                    return const Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.star, size: 40, color: Colors.blue),
+                        Icon(Icons.favorite, size: 40, color: Colors.red),
+                        Icon(Icons.thumb_up, size: 40, color: Colors.green),
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Resize the container to see LayoutBuilder in action!',
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```

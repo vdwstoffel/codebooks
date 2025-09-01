@@ -81,3 +81,47 @@ Configured Prism languages: bash, docker, yaml, json, typescript, java, csharp, 
 - Examples progress from basic to advanced concepts
 - Interactive components demonstrate practical usage
 - Documentation focuses on common patterns and snippets rather than comprehensive tutorials
+
+## File Structure Guidelines
+
+### MDX Files
+All MDX files should include proper frontmatter:
+```yaml
+---
+sidebar_label: "Display Name"
+sidebar_position: [number]
+---
+```
+
+### Code Examples
+- Use descriptive titles for code blocks: `\`\`\`dart title="main.dart"`
+- Include minimal, working examples when possible
+- Provide context and brief explanations for complex concepts
+- Always test code examples before committing
+- **Highlight important code**: Use `// highlight-next-line` to draw attention to key lines of code that demonstrate the main concept or feature being explained
+
+### Imports and Components
+- Import necessary Docusaurus components at the top of MDX files:
+  - `import Tabs from "@theme/Tabs";`
+  - `import TabItem from "@theme/TabItem";`
+- Use consistent component imports for interactive examples
+
+## Best Practices
+
+### Code Quality
+- Follow language-specific conventions and best practices
+- Use proper error handling where applicable
+- Handle async operations correctly (e.g., Futures in Dart/Flutter)
+- Include necessary imports and dependencies
+
+### Documentation Style
+- Keep explanations concise but informative
+- Use headings to organize content logically
+- Include practical examples that developers can immediately use
+- Reference related topics when appropriate
+
+### Maintenance
+- Update examples when dependencies change
+- Verify all interactive components work after updates
+- Keep navigation structure clean and logical
+- Regular testing of build process
