@@ -62,6 +62,25 @@ Within the `services` section, you can define various configurations for each se
       - redis
     ```
 
+### Loading Environment Variables from a .env File
+
+You can load environment variables for a service from a file, typically named `.env`. This is useful for keeping configuration separate from your `docker-compose.yml` file.
+
+-   **`env_file`**: Specifies a file from which to load environment variables.
+
+    ```yaml
+    env_file:
+      - ./my-app.env
+    ```
+
+    And the `my-app.env` file would look like this:
+
+    ```env
+    DB_HOST=localhost
+    DB_USER=myuser
+    DB_PASSWORD=mysecretpassword
+    ```
+
 ## Basic Example: Web Application with Database
 
 Here's a common setup for a web application (`app`) that connects to a database (`db`).

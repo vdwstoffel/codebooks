@@ -1,0 +1,190 @@
+---
+sidebar_label: 'Theming'
+sidebar_position: 6
+---
+
+# Theming
+
+Creating a consistent look and feel for your application can be achieved by defining a global color scheme and applying it to your theme. This approach makes it easy to manage your app's colors from a single source.
+
+## Global Color Scheme
+
+By defining a global `ColorScheme` variable, you can easily reuse it throughout your theme. You can then use the `copyWith` method to apply this color scheme and customize specific components.
+
+Here is an example of how to set up a theme with a global color scheme:
+
+```dart
+import 'package:flutter/material.dart';
+
+// highlight-next-line
+final kColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // highlight-start
+      theme: ThemeData().copyWith(
+        colorScheme: kColorScheme,
+        appBarTheme: const AppBarTheme().copyWith(
+          backgroundColor: kColorScheme.onPrimary,
+          foregroundColor: kColorScheme.primaryContainer,
+        ),
+      ),
+      // highlight-end
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Theming Example'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('This is a themed app.'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Themed Button'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Using the Theme in Widgets
+
+Once you have defined a theme, you can easily access its properties from any widget in your app using `Theme.of(context)`. This allows you to apply consistent styling to your widgets.
+
+Here is an example of a widget that uses the theme's color scheme to style a `Text` and a `Card`:
+
+```dart
+import 'package:flutter/material.dart';
+
+final kColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData().copyWith(
+        colorScheme: kColorScheme,
+      ),
+      home: const Scaffold(
+        body: Center(
+          child: ThemedWidget(),
+        ),
+      ),
+    );
+  }
+}
+
+class ThemedWidget extends StatelessWidget {
+  const ThemedWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      color: theme.colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'This widget uses the theme!',
+          style: theme.textTheme.bodyLarge,
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Adding a Dark Mode
+
+Supporting both light and dark themes is crucial for a good user experience. You can define separate themes for light and dark modes and use the `themeMode` property to let the system decide which theme to use.
+
+Here is an example of how to add a dark mode to your app:
+
+```dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // highlight-start
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+    );
+
+    final darkColorScheme = ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.dark,
+    );
+
+    final lightTheme = ThemeData().copyWith(
+      colorScheme: colorScheme,
+    );
+
+    final darkTheme = ThemeData.dark().copyWith(
+      colorScheme: darkColorScheme,
+    );
+    // highlight-end
+
+    return MaterialApp(
+      // highlight-start
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
+      // highlight-end
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Theming Example'),
+      ),
+      body: const Center(
+        child: Text('This app supports dark mode!'),
+      ),
+    );
+  }
+}
+```

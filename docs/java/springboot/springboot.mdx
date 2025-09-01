@@ -88,3 +88,51 @@ public class DemoApplication implements CommandLineRunner {
 
 }
 ```
+
+## Generating a UUID
+
+In Spring Boot, you can generate a UUID using the `java.util.UUID` class. Here is an example of how to generate a UUID in a Spring Boot service.
+
+```java
+package com.example.demo;
+
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+public class UuidService {
+
+    public UUID generateUuid() {
+        return UUID.randomUUID();
+    }
+}
+```
+
+To use this service, you can inject it into another component, like a controller:
+
+```java
+package com.example.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
+
+@RestController
+public class MyController {
+
+    private final UuidService uuidService;
+
+    @Autowired
+    public MyController(UuidService uuidService) {
+        this.uuidService = uuidService;
+    }
+
+    @GetMapping("/uuid")
+    public UUID getUuid() {
+        return uuidService.generateUuid();
+    }
+}
+```
