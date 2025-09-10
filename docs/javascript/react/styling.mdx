@@ -1,0 +1,544 @@
+---
+sidebar_label: "Styling"
+sidebar_position: 9
+---
+
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# React Styling
+
+React offers multiple ways to style your components. Each approach has its own benefits and use cases. Here's a comprehensive overview of different styling methods in React.
+
+## Inline Styles
+
+Inline styles are applied directly to elements using the `style` prop with a JavaScript object.
+
+```jsx title="InlineStyles.jsx"
+function InlineStyles() {
+  // highlight-start
+  const containerStyle = {
+    backgroundColor: '#f0f0f0',
+    padding: '20px',
+    borderRadius: '8px',
+    textAlign: 'center'
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '4px',
+    cursor: 'pointer'
+  };
+  // highlight-end
+
+  return (
+    <div style={containerStyle}>
+      <h2 style={{ color: '#333', marginBottom: '15px' }}>Inline Styles</h2>
+      <button 
+        style={buttonStyle}
+        onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
+        onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
+      >
+        Hover Me
+      </button>
+    </div>
+  );
+}
+```
+
+**Pros:** Dynamic styling, component-scoped, no external files
+**Cons:** No pseudo-classes, no media queries, verbose for complex styles
+
+## CSS Stylesheets
+
+Traditional CSS files imported into your React components.
+
+<Tabs>
+<TabItem value="component" label="Component">
+
+```jsx title="CSSStylesheet.jsx"
+// highlight-next-line
+import './CSSStylesheet.css';
+
+function CSSStylesheet() {
+  return (
+    <div className="css-container">
+      <h2 className="css-title">CSS Stylesheet</h2>
+      <button className="css-button">Click Me</button>
+      <div className="css-card">
+        <p>This card is styled with external CSS</p>
+      </div>
+    </div>
+  );
+}
+
+export default CSSStylesheet;
+```
+
+</TabItem>
+<TabItem value="css" label="CSS File">
+
+```css title="CSSStylesheet.css"
+.css-container {
+  background-color: #e8f4f8;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.css-title {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.css-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto 15px;
+  transition: background-color 0.3s;
+}
+
+/* highlight-start */
+.css-button:hover {
+  background-color: #218838;
+}
+
+.css-button:active {
+  transform: translateY(1px);
+}
+/* highlight-end */
+
+.css-card {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Pros:** Full CSS features, familiar syntax, good for global styles
+**Cons:** Global scope, potential naming conflicts
+
+## CSS Modules
+
+CSS Modules provide locally scoped CSS to avoid naming conflicts.
+
+<Tabs>
+<TabItem value="component" label="Component">
+
+```jsx title="CSSModules.jsx"
+// highlight-next-line
+import styles from './CSSModules.module.css';
+
+function CSSModules() {
+  return (
+    // highlight-next-line
+    <div className={styles.container}>
+      // highlight-next-line
+      <h2 className={styles.title}>CSS Modules</h2>
+      <button 
+        // highlight-next-line
+        className={`${styles.button} ${styles.primary}`}
+      >
+        Primary Button
+      </button>
+      // highlight-next-line
+      <div className={styles.card}>
+        <p>This uses CSS Modules for scoped styling</p>
+      </div>
+    </div>
+  );
+}
+
+export default CSSModules;
+```
+
+</TabItem>
+<TabItem value="css" label="CSS Module">
+
+```css title="CSSModules.module.css"
+.container {
+  background-color: #fff3cd;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ffeaa7;
+}
+
+.title {
+  color: #856404;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s;
+}
+
+.primary {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.primary:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Pros:** Scoped styles, no naming conflicts, works with existing CSS
+**Cons:** Requires build configuration, class name syntax
+
+## Styled Components (CSS-in-JS)
+
+CSS-in-JS library that allows writing CSS directly in your JavaScript.
+
+First install styled-components:
+```bash
+npm install styled-components
+```
+
+```jsx title="StyledComponents.jsx"
+import styled from 'styled-components';
+
+// highlight-start
+const Container = styled.div`
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+`;
+
+const Title = styled.h2`
+  color: #495057;
+  text-align: center;
+  margin-bottom: 15px;
+`;
+
+const StyledButton = styled.button`
+  background-color: ${props => props.variant === 'danger' ? '#dc3545' : '#6c757d'};
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: ${props => props.variant === 'danger' ? '#c82333' : '#5a6268'};
+    transform: scale(1.05);
+  }
+`;
+
+const Card = styled.div`
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+`;
+// highlight-end
+
+function StyledComponents() {
+  return (
+    <Container>
+      <Title>Styled Components</Title>
+      <StyledButton>Default Button</StyledButton>
+      <StyledButton variant="danger">Danger Button</StyledButton>
+      <Card>
+        <p>This card is created with styled-components</p>
+      </Card>
+    </Container>
+  );
+}
+
+export default StyledComponents;
+```
+
+**Pros:** Component-scoped, dynamic styling, no external files, full CSS features
+**Cons:** Runtime overhead, learning curve, bundle size
+
+## Emotion
+
+Another popular CSS-in-JS library with excellent performance.
+
+First install Emotion:
+```bash
+npm install @emotion/react @emotion/styled
+```
+
+<Tabs>
+<TabItem value="styled" label="Styled API">
+
+```jsx title="EmotionStyled.jsx"
+import styled from '@emotion/styled';
+
+// highlight-start
+const Container = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+`;
+
+const GradientButton = styled.button`
+  background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+`;
+// highlight-end
+
+function EmotionStyled() {
+  return (
+    <Container>
+      <Title>Emotion Styled</Title>
+      <GradientButton>Gradient Button</GradientButton>
+    </Container>
+  );
+}
+```
+
+</TabItem>
+<TabItem value="css" label="CSS Prop">
+
+```jsx title="EmotionCSS.jsx"
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
+
+function EmotionCSS() {
+  // highlight-start
+  const containerStyle = css`
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid #2196f3;
+  `;
+
+  const buttonStyle = css`
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #1976d2;
+    }
+  `;
+  // highlight-end
+
+  return (
+    <div css={containerStyle}>
+      <h2 css={{ color: '#1565c0', textAlign: 'center' }}>Emotion CSS Prop</h2>
+      <button css={buttonStyle}>CSS Prop Button</button>
+    </div>
+  );
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Pros:** Excellent performance, flexible API, TypeScript support
+**Cons:** Bundle size, learning curve
+
+## Tailwind CSS
+
+Utility-first CSS framework for rapid development.
+
+First install and configure Tailwind:
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+```jsx title="TailwindExample.jsx"
+function TailwindExample() {
+  return (
+    // highlight-start
+    <div className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-6 rounded-lg shadow-lg">
+      <h2 className="text-white text-2xl font-bold text-center mb-4">
+        Tailwind CSS
+      </h2>
+      <button className="bg-white text-purple-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 hover:scale-105 transform transition duration-200 shadow-md">
+        Tailwind Button
+      </button>
+      <div className="bg-white bg-opacity-20 backdrop-blur-sm p-4 mt-4 rounded-lg">
+        <p className="text-white">
+          This card uses Tailwind's utility classes for styling
+        </p>
+      </div>
+    </div>
+    // highlight-end
+  );
+}
+```
+
+**Pros:** Rapid development, consistent design system, small production builds
+**Cons:** Learning curve, verbose class names, requires build setup
+
+## Dynamic Styling
+
+Combining different approaches for dynamic, conditional styling:
+
+```jsx title="DynamicStyling.jsx"
+import { useState } from 'react';
+import styles from './Dynamic.module.css';
+
+function DynamicStyling() {
+  const [theme, setTheme] = useState('light');
+  const [isActive, setIsActive] = useState(false);
+
+  // highlight-start
+  const dynamicStyles = {
+    backgroundColor: theme === 'dark' ? '#2c3e50' : '#ecf0f1',
+    color: theme === 'dark' ? '#ecf0f1' : '#2c3e50',
+    transition: 'all 0.3s ease'
+  };
+
+  const buttonClass = `${styles.dynamicButton} ${
+    isActive ? styles.active : ''
+  } ${theme === 'dark' ? styles.dark : styles.light}`;
+  // highlight-end
+
+  return (
+    <div style={dynamicStyles} className={styles.container}>
+      <h2>Dynamic Styling</h2>
+      
+      <button 
+        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        className={styles.themeToggle}
+      >
+        Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
+      </button>
+
+      <button
+        className={buttonClass}
+        onClick={() => setIsActive(!isActive)}
+      >
+        {isActive ? 'Active' : 'Inactive'} Button
+      </button>
+    </div>
+  );
+}
+```
+
+## Styling Best Practices
+
+### Choose the Right Approach
+- **Inline styles**: Simple, dynamic styles
+- **CSS Modules**: Component-specific styles without conflicts
+- **Styled Components**: Complex, dynamic styling with props
+- **Tailwind**: Rapid prototyping and consistent design systems
+
+### Performance Considerations
+```jsx
+// ❌ Avoid creating objects in render
+function BadExample() {
+  return <div style={{ padding: '20px', margin: '10px' }} />;
+}
+
+// ✅ Define styles outside component or use useMemo
+const containerStyle = { padding: '20px', margin: '10px' };
+
+function GoodExample() {
+  return <div style={containerStyle} />;
+}
+```
+
+### Conditional Styling
+```jsx
+function ConditionalStyling({ isActive, variant }) {
+  return (
+    <button 
+      className={`
+        base-button 
+        ${isActive ? 'active' : 'inactive'}
+        ${variant === 'primary' ? 'btn-primary' : 'btn-secondary'}
+      `.trim()}
+    >
+      Button
+    </button>
+  );
+}
+```
+
+### CSS Variables for Theming
+```css
+/* Global CSS */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --background-color: #ffffff;
+}
+
+[data-theme="dark"] {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --background-color: #121212;
+}
+
+.themed-component {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+}
+```
+
+## Comparison Summary
+
+| Method | Scope | Performance | Learning Curve | Bundle Size |
+|--------|-------|-------------|----------------|-------------|
+| Inline Styles | Component | Good | Easy | None |
+| CSS Stylesheets | Global | Excellent | Easy | Small |
+| CSS Modules | Component | Excellent | Medium | Small |
+| Styled Components | Component | Good | Medium | Large |
+| Emotion | Component | Excellent | Medium | Medium |
+| Tailwind | Utility | Excellent | Medium | Small* |
+
+*Small after purging unused styles

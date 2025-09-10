@@ -55,6 +55,32 @@ dart hello.dart
 | `Map` | `Map<String, int> scores = {'Player 1': 100, 'Player 2': 85};` |
 | `dynamic` | `dynamic anything = 'can be a string';` |
 
+## Variable Declaration Keywords
+
+Dart provides three keywords for declaring variables: `var`, `final`, and `const`. Each serves a different purpose:
+
+- **`var`** - Creates a mutable variable that can be reassigned after initialization
+- **`final`** - Creates an immutable variable that can only be assigned once at runtime
+- **`const`** - Creates a compile-time constant that must be known at compile time
+
+```dart title="Variable Declaration Examples"
+// var - mutable, can be reassigned
+var name = 'John';
+name = 'Jane'; // This is allowed
+
+// final - immutable at runtime, assigned once
+final age = 25;
+// age = 26; // This would cause an error
+
+// const - compile-time constant
+const pi = 3.14159;
+const greeting = 'Hello, World!';
+// const currentTime = DateTime.now(); // Error: not compile-time constant
+
+// final can be assigned at runtime
+final timestamp = DateTime.now(); // This is allowed
+```
+
 ## What's Next?
 
 - [Numbers](./numbers.mdx)

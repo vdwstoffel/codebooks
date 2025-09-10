@@ -1,0 +1,203 @@
+---
+sidebar_label: "CSS Variables"
+sidebar_position: 12
+---
+
+import BrowserWindow from "@site/src/components/BrowserWindow/BrowserWindow";
+
+# CSS Variables
+
+CSS variables (also known as CSS custom properties) allow you to store values that can be reused throughout your stylesheet. They make your CSS more maintainable and easier to update.
+
+## Basic Syntax
+
+CSS variables are defined using the `--` prefix and accessed using the `var()` function:
+
+```css title="styles.css"
+:root {
+  // highlight-next-line
+  --primary-color: #007bff;
+  // highlight-next-line
+  --font-size: 16px;
+}
+
+.button {
+  // highlight-next-line
+  background-color: var(--primary-color);
+  // highlight-next-line
+  font-size: var(--font-size);
+}
+```
+
+## Example: Theme Colors
+
+<BrowserWindow>
+
+```html title="index.html"
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    :root {
+      // highlight-start
+      --primary-color: #3498db;
+      --secondary-color: #2ecc71;
+      --accent-color: #e74c3c;
+      --text-color: #2c3e50;
+      --background-color: #ecf0f1;
+      --border-radius: 8px;
+      --spacing: 20px;
+      // highlight-end
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+      padding: var(--spacing);
+    }
+
+    .card {
+      background: white;
+      padding: var(--spacing);
+      margin: var(--spacing) 0;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn {
+      padding: 10px var(--spacing);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .btn-primary {
+      // highlight-next-line
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-secondary {
+      // highlight-next-line
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-accent {
+      // highlight-next-line
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .highlight {
+      // highlight-next-line
+      border-left: 4px solid var(--primary-color);
+      padding-left: var(--spacing);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>CSS Variables Demo</h2>
+    <p class="highlight">This content uses CSS variables for consistent theming.</p>
+    
+    <button class="btn btn-primary">Primary Button</button>
+    <button class="btn btn-secondary">Secondary Button</button>
+    <button class="btn btn-accent">Accent Button</button>
+  </div>
+</body>
+</html>
+```
+
+</BrowserWindow>
+
+## Scope and Inheritance
+
+Variables defined in `:root` are global, but you can also define them locally:
+
+```css title="scoped-variables.css"
+:root {
+  --global-color: blue;
+}
+
+.component {
+  // highlight-start
+  --local-color: red;
+  --component-spacing: 15px;
+  // highlight-end
+  
+  color: var(--local-color);
+  padding: var(--component-spacing);
+}
+
+.nested {
+  // highlight-next-line
+  color: var(--local-color); /* Inherits from parent */
+  // highlight-next-line
+  background: var(--global-color); /* Uses global variable */
+}
+```
+
+## Fallback Values
+
+You can provide fallback values in case a variable is not defined:
+
+```css title="fallbacks.css"
+.element {
+  // highlight-next-line
+  color: var(--undefined-color, #333); /* Falls back to #333 */
+  // highlight-next-line
+  font-size: var(--font-size, var(--default-font, 16px)); /* Nested fallbacks */
+}
+```
+
+## Dynamic Updates with JavaScript
+
+CSS variables can be updated dynamically with JavaScript:
+
+```html title="dynamic-variables.html"
+<style>
+  :root {
+    --theme-color: #007bff;
+  }
+  
+  .dynamic-box {
+    background-color: var(--theme-color);
+    width: 100px;
+    height: 100px;
+    transition: background-color 0.3s;
+  }
+</style>
+
+<div class="dynamic-box"></div>
+<button onclick="changeTheme()">Change Theme</button>
+
+<script>
+function changeTheme() {
+  const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107'];
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  
+  // highlight-next-line
+  document.documentElement.style.setProperty('--theme-color', randomColor);
+}
+</script>
+```
+
+## Benefits of CSS Variables
+
+1. **Maintainability**: Change values in one place to update them everywhere
+2. **Consistency**: Ensure consistent values across your stylesheet
+3. **Dynamic Updates**: Modify values with JavaScript for interactive themes
+4. **Inheritance**: Variables cascade down the DOM tree
+5. **Fallbacks**: Provide backup values for better browser support
+
+## Common Use Cases
+
+- **Theme colors and branding**
+- **Typography scales** (font sizes, line heights)
+- **Spacing systems** (margins, paddings)
+- **Component variants** (button sizes, card styles)
+- **Responsive breakpoints** and layout values
+- **Animation durations** and timing functions

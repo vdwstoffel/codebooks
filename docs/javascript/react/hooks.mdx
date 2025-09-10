@@ -597,13 +597,19 @@ export default function UserReducerExample() {
 
 ### Adding `useReducer` to a Context for Global Management
 
-`useReducer` can be combined with `useContext` to create a global state management solution, similar to Redux, but built with React's built-in hooks.
+`useReducer` can be combined with `useContext` to create a powerful global state management solution, similar to Redux but built with React's native hooks. This pattern is especially useful for complex application state that needs to be shared across multiple components without prop drilling.
+
+The examples below demonstrate complete implementations in both JavaScript and TypeScript. This approach provides predictable state updates through actions while maintaining excellent developer experience.
 
 <Tabs>
 
-<TabItem value="UserReducer.js">
+<TabItem value="javascript" label="JavaScript">
 
-- Create and export the reducer function and initial state. This will be used by the context provider to allow all components to access the state and dispatch function.
+<Tabs>
+
+<TabItem value="userReducer.js">
+
+Create and export the reducer function and initial state. This will be used by the context provider to allow all components to access the state and dispatch function.
 
 ```js
 const initialState = {
@@ -621,11 +627,11 @@ function userReducerFn(state, action) {
       return { ...state, age: state.age + 1 };
 
     default:
-      throw new Error("Unknow action: ", action.type);
+      throw new Error("Unknown action: " + action.type);
   }
 }
 
-// Create the initial state and function and export
+// Export the initial state and reducer function
 // highlight-next-line
 export { initialState, userReducerFn };
 ```
@@ -634,14 +640,13 @@ export { initialState, userReducerFn };
 
 <TabItem value="UserContextProvider.jsx">
 
-- Create the context provider, that has the reducer variables and functrion, it will take child components as prop and give them global acess
+Creates the context provider with reducer variables and functions, providing global access to child components.
 
 ```jsx
 import { createContext, useReducer } from "react";
-
 import { initialState, userReducerFn } from "./userReducer";
 
-// Export the userContext, this will be used in the custom hook
+// Export the userContext for use in the custom hook
 // highlight-next-line
 export const userContext = createContext({});
 
@@ -649,12 +654,13 @@ export default function UserContextProvider({ children }) {
   // highlight-next-line
   const [{ name, age }, dispatch] = useReducer(userReducerFn, initialState);
 
+  // Action creators that wrap dispatch calls
   // highlight-next-line
   const updateName = (name) => dispatch({ type: "updateName", payload: name });
   // highlight-next-line
   const updateAge = () => dispatch({ type: "updateAge" });
 
-  // Give all children access to the values
+  // Provide state and actions to all children
   return (
     // highlight-next-line
     <userContext.Provider value={{ name, age, updateName, updateAge }}>
@@ -668,11 +674,10 @@ export default function UserContextProvider({ children }) {
 
 <TabItem value="useUser.js">
 
-- Create a custom hook
+Simplifies context usage and provides error handling for components used outside the provider.
 
 ```js
 import { useContext } from "react";
-
 import { userContext } from "./UserContextProvider";
 
 // highlight-next-line
@@ -681,7 +686,7 @@ export function useUser() {
   const context = useContext(userContext);
 
   if (context === undefined) {
-    throw new Error("userReducer used outside Provider");
+    throw new Error("useUser must be used within a UserContextProvider");
   }
 
   // highlight-next-line
@@ -692,6 +697,8 @@ export function useUser() {
 </TabItem>
 
 <TabItem value="WithContextExample.jsx">
+
+Shows how multiple components can access and modify the shared state without prop drilling.
 
 ```jsx
 import UserContextProvider from "./UserContextProvider";
@@ -712,8 +719,8 @@ function UserDetails() {
   const { name, age } = useUser();
 
   return (
-    <div>
-      <span>Name: {name}</span>
+    <div style={{ display: "flex", gap: "2em", marginBottom: "1em" }}>
+      <span>Name: {name || "Not set"}</span>
       <span>Age: {age}</span>
     </div>
   );
@@ -727,13 +734,199 @@ function UserEdits() {
   const updateNameHandler = (e) => updateName(e.target.value);
 
   return (
-    <div>
-      <input onChange={updateNameHandler} />
-      <button onClick={updateAge}>increment</button>
+    <div style={{ display: "flex", gap: "1em" }}>
+      <input 
+        onChange={updateNameHandler} 
+        placeholder="Enter name"
+      />
+      <button onClick={updateAge}>Increment Age</button>
     </div>
   );
 }
 ```
+
+</TabItem>
+
+</Tabs>
+
+</TabItem>
+
+<TabItem value="typescript" label="TypeScript">
+
+<Tabs>
+
+<TabItem value="userReducer.ts">
+
+Define types for state, actions, and the reducer function. This provides excellent IntelliSense and catches errors at compile time.
+
+```ts
+// Define the shape of our user state
+export interface UserState {
+  name: string;
+  age: number;
+}
+
+// Define all possible actions using discriminated unions
+export type UserAction = 
+  | { type: "updateName"; payload: string }
+  | { type: "updateAge" };
+
+// Initial state with proper typing
+export const initialState: UserState = {
+  name: "",
+  age: 0,
+};
+
+// highlight-next-line
+export function userReducerFn(state: UserState, action: UserAction): UserState {
+  switch (action.type) {
+    case "updateName":
+      // highlight-next-line
+      return { ...state, name: action.payload };
+
+    case "updateAge":
+      // highlight-next-line
+      return { ...state, age: state.age + 1 };
+
+    default:
+      // TypeScript ensures this is exhaustive
+      return state;
+  }
+}
+```
+
+</TabItem>
+
+<TabItem value="UserContextProvider.tsx">
+
+Creates a strongly-typed context that provides both state values and action dispatchers to child components.
+
+```tsx
+import { createContext, useReducer, ReactNode } from "react";
+import { UserState, UserAction, initialState, userReducerFn } from "./userReducer";
+
+// Define the context value type
+interface UserContextType {
+  name: string;
+  age: number;
+  updateName: (name: string) => void;
+  updateAge: () => void;
+}
+
+// Create context with proper typing
+// highlight-next-line
+export const userContext = createContext<UserContextType | undefined>(undefined);
+
+interface UserContextProviderProps {
+  children: ReactNode;
+}
+
+export default function UserContextProvider({ children }: UserContextProviderProps) {
+  // highlight-next-line
+  const [{ name, age }, dispatch] = useReducer(userReducerFn, initialState);
+
+  // Action creators with proper typing
+  // highlight-next-line
+  const updateName = (name: string) => dispatch({ type: "updateName", payload: name });
+  // highlight-next-line
+  const updateAge = () => dispatch({ type: "updateAge" });
+
+  const contextValue: UserContextType = {
+    name,
+    age,
+    updateName,
+    updateAge,
+  };
+
+  return (
+    // highlight-next-line
+    <userContext.Provider value={contextValue}>
+      {children}
+    </userContext.Provider>
+  );
+}
+```
+
+</TabItem>
+
+<TabItem value="useUser.ts">
+
+Provides type-safe access to the user context with runtime error checking.
+
+```ts
+import { useContext } from "react";
+import { userContext } from "./UserContextProvider";
+
+// highlight-next-line
+export function useUser() {
+  // highlight-next-line
+  const context = useContext(userContext);
+
+  if (context === undefined) {
+    throw new Error("useUser must be used within a UserContextProvider");
+  }
+
+  // highlight-next-line
+  return context;
+}
+```
+
+</TabItem>
+
+<TabItem value="WithContextExample.tsx">
+
+Demonstrates how components consume the context using the custom hook, with full type safety.
+
+```tsx
+import UserContextProvider from "./UserContextProvider";
+import { useUser } from "./useUser";
+
+export default function WithContextExample() {
+  return (
+    // highlight-next-line
+    <UserContextProvider>
+      <UserDetails />
+      <UserEdits />
+    </UserContextProvider>
+  );
+}
+
+function UserDetails() {
+  // highlight-next-line
+  const { name, age } = useUser();
+
+  return (
+    <div style={{ display: "flex", gap: "2em", marginBottom: "1em" }}>
+      <span>Name: {name || "Not set"}</span>
+      <span>Age: {age}</span>
+    </div>
+  );
+}
+
+function UserEdits() {
+  // highlight-next-line
+  const { updateName, updateAge } = useUser();
+
+  // highlight-next-line
+  const updateNameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateName(e.target.value);
+  };
+
+  return (
+    <div style={{ display: "flex", gap: "1em" }}>
+      <input 
+        onChange={updateNameHandler} 
+        placeholder="Enter name"
+      />
+      <button onClick={updateAge}>Increment Age</button>
+    </div>
+  );
+}
+```
+
+</TabItem>
+
+</Tabs>
 
 </TabItem>
 
