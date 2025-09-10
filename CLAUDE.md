@@ -117,6 +117,7 @@ sidebar_position: [number]
 ### Documentation Style
 - Keep explanations concise but informative
 - Use headings to organize content logically
+- **Do not use numbers in headings** - Use descriptive names instead (e.g., "## Inline Styles" not "## 1. Inline Styles")
 - Include practical examples that developers can immediately use
 - Reference related topics when appropriate
 
