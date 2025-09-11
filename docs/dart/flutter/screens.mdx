@@ -1,0 +1,284 @@
+---
+sidebar_label: "Screens"
+sidebar_position: 4
+---
+
+# Screens
+
+Screens (also called pages or views) are full-page widgets that represent complete user interfaces in your Flutter app. They typically contain an `AppBar`, a `body`, and other structural elements that make up a complete page.
+
+## Screens vs Widgets
+
+**Screens** are top-level UI components that:
+- Represent complete pages or views in your app
+- Usually contain `Scaffold` with `AppBar` and `body`
+- Are navigated to using routing
+- Handle page-level state and logic
+
+**Widgets** are smaller, reusable UI components that:
+- Can be used within screens or other widgets
+- Focus on specific functionality (buttons, cards, forms)
+- Are composed together to build screens
+- Are highly reusable across different parts of the app
+
+## Basic Screen Example
+
+Here's a simple screen with an app bar and body:
+
+```dart title="home_screen.dart"
+import 'package:flutter/material.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome to the Home Screen',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            Text('This is the main content area'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+To use this screen in your app, reference it in your main MaterialApp:
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:myapp/screens/home_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomeScreen(),
+    );
+  }
+}
+```
+
+This pattern includes:
+- `Scaffold` - Provides the basic layout structure
+- `AppBar` - Top navigation bar with title
+- `body` - Main content area with centered text
+- Screens return `Scaffold`, while `MaterialApp` is defined once in main.dart
+
+## Screen Navigation
+
+Navigation allows users to move between different screens in your app. Flutter uses `Navigator.push()` to go to a new screen and `Navigator.pop()` to go back.
+
+### Stateless Widget Navigation
+
+Here's a simple example with two stateless widgets:
+
+```dart title="first_screen.dart"
+import 'package:flutter/material.dart';
+import 'package:myapp/screens/second_screen.dart';
+
+class FirstScreen extends StatelessWidget {
+  const FirstScreen({super.key});
+
+  // highlight-next-line
+  void _navigateToSecondScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SecondScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('First Screen'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          // highlight-next-line
+          onPressed: () => _navigateToSecondScreen(context),
+          child: const Text('Go to Second Screen'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+```dart title="second_screen.dart"
+import 'package:flutter/material.dart';
+
+class SecondScreen extends StatelessWidget {
+  const SecondScreen({super.key});
+
+  // highlight-next-line
+  void _goBack(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Screen'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          // highlight-next-line
+          onPressed: () => _goBack(context),
+          child: const Text('Go Back'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Stateful Widget Navigation
+
+Here's an example with stateful widgets that can manage their own state:
+
+```dart title="counter_screen.dart"
+import 'package:flutter/material.dart';
+import 'package:myapp/screens/settings_screen.dart';
+
+class CounterScreen extends StatefulWidget {
+  const CounterScreen({super.key});
+
+  @override
+  State<CounterScreen> createState() => _CounterScreenState();
+}
+
+class _CounterScreenState extends State<CounterScreen> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  // highlight-next-line
+  void _navigateToSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Counter Screen'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Counter: $_counter',
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _incrementCounter,
+              child: const Text('Increment'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              // highlight-next-line
+              onPressed: () => _navigateToSettings(context),
+              child: const Text('Go to Settings'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+```dart title="settings_screen.dart"
+import 'package:flutter/material.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isDarkMode = false;
+
+  // highlight-next-line
+  void _goBack(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Dark Mode'),
+                const SizedBox(width: 10),
+                Switch(
+                  value: _isDarkMode,
+                  onChanged: (value) {
+                    setState(() {
+                      _isDarkMode = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              // highlight-next-line
+              onPressed: () => _goBack(context),
+              child: const Text('Back to Counter'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Key Navigation Methods
+
+- `Navigator.push()` - Navigate to a new screen
+- `Navigator.pop()` - Go back to the previous screen
+- `MaterialPageRoute` - Creates a platform-adaptive route transition

@@ -601,3 +601,140 @@ class SnackBarExample extends StatelessWidget {
   }
 }
 ```
+
+## Adding a tap effect
+
+`InkWell` is a material design widget that creates a rectangular area that responds to touch with an ink splash effect. It's perfect for adding tap interactions to any widget with visual feedback.
+
+Here's a simple example showing `onTap` and `splashColor`:
+
+```dart
+import 'package:flutter/material.dart';
+
+class InkWellExample extends StatelessWidget {
+  const InkWellExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      // highlight-next-line
+      onTap: () {
+        print('Container tapped!');
+      },
+      // highlight-next-line
+      splashColor: Colors.blue.withOpacity(0.3),
+      child: Container(
+        width: 200,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Center(
+          child: Text(
+            'Tap me!',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+Key properties:
+- `onTap` - Called when the user taps the widget
+- `splashColor` - Color of the ink splash effect when tapped
+- `borderRadius` - Can be added to match the child's border radius
+- `child` - The widget to wrap with tap functionality
+
+## Stacking Widgets
+
+The `Stack` widget allows you to layer widgets on top of each other. Widgets are stacked in the order they appear in the children list, with the last widget being on top.
+
+Here's a simple example showing how to overlay text on an image:
+
+```dart
+import 'package:flutter/material.dart';
+
+class StackExample extends StatelessWidget {
+  const StackExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Background widget (bottom layer)
+        Container(
+          width: 300,
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        // Positioned text (top layer)
+        // highlight-next-line
+        Positioned(
+          bottom: 16,
+          left: 16,
+          right: 16,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              'Overlay Text',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Positioning Options
+
+You can use `Positioned` widget to control exactly where widgets appear:
+
+```dart
+Stack(
+  children: [
+    Container(width: 200, height: 200, color: Colors.grey),
+    // Top-left corner
+    Positioned(
+      top: 10,
+      left: 10,
+      child: Container(width: 50, height: 50, color: Colors.red),
+    ),
+    // Bottom-right corner
+    Positioned(
+      bottom: 10,
+      right: 10,
+      child: Container(width: 50, height: 50, color: Colors.green),
+    ),
+    // Centered
+    Positioned.fill(
+      child: Center(
+        child: Container(width: 30, height: 30, color: Colors.yellow),
+      ),
+    ),
+  ],
+)
+```
+
+Key properties:
+- `children` - List of widgets to stack (first = bottom, last = top)
+- `Positioned` - Controls exact placement within the stack
+- `Positioned.fill` - Makes a widget fill the entire stack area
+- `alignment` - Default alignment for non-positioned children

@@ -49,6 +49,49 @@ flutter run
 
 This will launch the app in a simulator or on a connected device.
 
+## Project Structure
+
+A well-organized Flutter app typically follows this folder structure within the `lib/` directory:
+
+```
+lib/
+├── main.dart                   # App entry point
+├── models/                     # Data models and entities
+│   ├── user.dart
+│   ├── product.dart
+│   └── category.dart
+├── views/                      # UI screens and pages
+│   ├── home_view.dart
+│   ├── profile_view.dart
+│   └── settings_view.dart
+├── widgets/                    # Reusable UI components
+│   ├── custom_button.dart
+│   ├── loading_spinner.dart
+│   └── app_drawer.dart
+├── services/                   # Business logic and external services
+│   ├── api_service.dart
+│   ├── auth_service.dart
+│   └── database_service.dart
+├── providers/                  # State management (Provider/Riverpod)
+│   ├── auth_provider.dart
+│   ├── theme_provider.dart
+│   └── user_provider.dart
+├── utils/                      # Helper functions and utilities
+│   ├── constants.dart
+│   ├── validators.dart
+│   └── helpers.dart
+└── routes/                     # Navigation and routing
+    ├── app_routes.dart
+    └── route_generator.dart
+```
+
+Alternative common folder names:
+- `screens/` or `pages/` instead of `views/`
+- `components/` instead of `widgets/`
+- `api/` instead of `services/`
+- `state/` or `bloc/` for state management
+- `core/` for essential app functionality
+
 ## Hello World
 
 Here is an example of a bare-bones Flutter app that displays the text "Hello World".
