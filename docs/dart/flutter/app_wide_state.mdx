@@ -1,0 +1,395 @@
+---
+sidebar_label: "App-Wide State (Riverpod)"
+sidebar_position: 8
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# App-Wide State Management with Riverpod
+
+Riverpod is a reactive caching and data-binding framework for Flutter. It's a complete rewrite of the Provider package that offers compile-time safety, improved testability, and better error handling. Riverpod allows you to manage state across your entire application without depending on the widget tree.
+
+## Key Benefits
+- **Compile-time safety** - Catch errors at compile time instead of runtime
+- **No BuildContext dependency** - Access providers from anywhere
+- **Better testing** - Easy to mock and test providers
+- **Auto-disposal** - Automatically clean up resources when no longer needed
+
+## Installation
+
+Add Riverpod to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_riverpod: ^2.4.9
+```
+
+## Basic Example
+
+<Tabs>
+<TabItem value="provider" label="Provider Definition">
+
+```dart title="providers.dart"
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Simple provider that returns a string
+final messageProvider = Provider<String>((ref) {
+  return "Hello from Riverpod!";
+});
+
+// StateProvider for mutable state
+final counterProvider = StateProvider<int>((ref) {
+  return 0;
+});
+```
+
+</TabItem>
+
+<TabItem value="consumer" label="Consumer Widget">
+
+```dart title="message_widget.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'providers.dart';
+
+class MessageWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // highlight-next-line
+    final message = ref.watch(messageProvider);
+    
+    return Text(message);
+  }
+}
+```
+
+</TabItem>
+
+<TabItem value="counter" label="Counter Widget">
+
+```dart title="counter_widget.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'providers.dart';
+
+class CounterWidget extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<CounterWidget> createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends ConsumerState<CounterWidget> {
+  int _localCounter = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    // highlight-next-line
+    final count = ref.watch(counterProvider);
+    
+    return Column(
+      children: [
+        Text('Provider count: $count'),
+        Text('Local count: $_localCounter'),
+        ElevatedButton(
+          onPressed: () {
+            // highlight-next-line
+            ref.read(counterProvider.notifier).state++;
+          },
+          child: Text('Provider +'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _localCounter++;
+            });
+          },
+          child: Text('Local +'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+</TabItem>
+
+<TabItem value="main" label="Main App Setup">
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'message_widget.dart';
+import 'counter_widget.dart';
+
+void main() {
+  runApp(
+    // highlight-next-line
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Riverpod Demo',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Riverpod State Management'),
+        ),
+        body: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              MessageWidget(),
+              SizedBox(height: 16),
+              CounterWidget(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## StateNotifier Example
+
+StateNotifier is used for more complex state management when you need to handle lists, custom objects, or perform multiple state operations. Unlike StateProvider which is for simple values, StateNotifier gives you full control over how state changes.
+
+<Tabs>
+<TabItem value="statenotifier" label="StateNotifier Provider">
+
+```dart title="todo_provider.dart"
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// StateNotifier manages a List<String> state
+class TodoListNotifier extends StateNotifier<List<String>> {
+  // Initialize with empty list
+  TodoListNotifier() : super([]);
+
+  void addTodo(String todo) {
+    // Create new list with added item (immutable update)
+    state = [...state, todo];
+  }
+
+  void removeTodo(int index) {
+    // Create new list without the item at index
+    state = [
+      for (int i = 0; i < state.length; i++)
+        if (i != index) state[i]
+    ];
+  }
+}
+
+// Provider that exposes the TodoListNotifier
+final todoListProvider = StateNotifierProvider<TodoListNotifier, List<String>>((ref) {
+  return TodoListNotifier();
+});
+```
+
+</TabItem>
+
+<TabItem value="todowidget" label="Todo Widget">
+
+```dart title="todo_widget.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'todo_provider.dart';
+
+class TodoWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the list of todos - rebuilds when list changes
+    // highlight-next-line
+    final todos = ref.watch(todoListProvider);
+    
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            // Access the notifier to call methods
+            // highlight-next-line
+            ref.read(todoListProvider.notifier).addTodo('New Todo');
+          },
+          child: Text('Add Todo'),
+        ),
+        // Display each todo with remove button
+        for (int i = 0; i < todos.length; i++)
+          Row(
+            children: [
+              Text(todos[i]),
+              ElevatedButton(
+                onPressed: () {
+                  // Remove todo at specific index
+                  // highlight-next-line
+                  ref.read(todoListProvider.notifier).removeTodo(i);
+                },
+                child: Text('Remove'),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+```
+
+</TabItem>
+
+<TabItem value="statemain" label="Main App">
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'todo_widget.dart';
+
+void main() {
+  runApp(
+    // highlight-next-line
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'StateNotifier Demo',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Todo List'),
+        ),
+        body: const TodoWidget(),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Dependent Providers
+
+You can create providers that depend on other providers. This is useful for computed values or filtered data:
+
+<Tabs>
+<TabItem value="providers" label="Dependent Providers">
+
+```dart title="providers.dart"
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Base provider with a list of numbers
+final numbersProvider = StateProvider<List<int>>((ref) {
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+});
+
+// Provider that depends on numbersProvider - filters even numbers
+final evenNumbersProvider = Provider<List<int>>((ref) {
+  // highlight-next-line
+  final numbers = ref.watch(numbersProvider);
+  return numbers.where((num) => num % 2 == 0).toList();
+});
+
+// Provider that depends on numbersProvider - counts total
+final numberCountProvider = Provider<int>((ref) {
+  // highlight-next-line
+  final numbers = ref.watch(numbersProvider);
+  return numbers.length;
+});
+```
+
+</TabItem>
+
+<TabItem value="widget" label="Consumer Widget">
+
+```dart title="numbers_widget.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'providers.dart';
+
+class NumbersWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // highlight-next-line
+    final allNumbers = ref.watch(numbersProvider);
+    // highlight-next-line
+    final evenNumbers = ref.watch(evenNumbersProvider);
+    // highlight-next-line
+    final count = ref.watch(numberCountProvider);
+    
+    return Column(
+      children: [
+        Text('All numbers: ${allNumbers.join(', ')}'),
+        Text('Even numbers: ${evenNumbers.join(', ')}'),
+        Text('Total count: $count'),
+        ElevatedButton(
+          onPressed: () {
+            // Adding a number updates all dependent providers
+            ref.read(numbersProvider.notifier).state = [
+              ...ref.read(numbersProvider),
+              ref.read(numbersProvider).length + 1
+            ];
+          },
+          child: Text('Add Number'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+</TabItem>
+
+<TabItem value="main" label="Main App">
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'numbers_widget.dart';
+
+void main() {
+  runApp(
+    // highlight-next-line
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Dependent Providers Demo',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Dependent Providers'),
+        ),
+        body: const NumbersWidget(),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Key Concepts
+
+- **Provider**: Immutable data that can be computed from other providers
+- **StateProvider**: Simple mutable state for basic types
+- **StateNotifier**: Complex state management for lists and custom objects
+- **Dependent Providers**: Providers that watch and compute values from other providers
+- **ConsumerWidget**: Widget that can listen to providers
+- **WidgetRef**: Reference to read and watch providers
+- **ProviderScope**: Root widget that enables Riverpod in your app

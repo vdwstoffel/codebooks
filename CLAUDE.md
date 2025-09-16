@@ -99,6 +99,7 @@ sidebar_position: [number]
 - Provide context and brief explanations for complex concepts
 - Always test code examples before committing
 - **Highlight important code**: Use `// highlight-next-line` to draw attention to key lines of code that demonstrate the main concept or feature being explained
+- **Make snippets independent**: Each code example should be self-contained and not rely on other snippets in the same document. Include all necessary imports, setup code, and context needed to run the example.
 
 ### Imports and Components
 - Import necessary Docusaurus components at the top of MDX files:
