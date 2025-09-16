@@ -738,3 +738,98 @@ Key properties:
 - `Positioned` - Controls exact placement within the stack
 - `Positioned.fill` - Makes a widget fill the entire stack area
 - `alignment` - Default alignment for non-positioned children
+
+## Images
+
+To add assets like images to your Flutter application, you need to declare them in your `pubspec.yaml` file.
+
+First, create an `assets` folder in the root of your project and add your images to it. For example, you can create a folder `assets/images` and add a file named `my_image.png`.
+
+Then, open your `pubspec.yaml` file and add the following to the `flutter` section:
+
+```yaml
+flutter:
+  assets:
+    - assets/images/
+```
+
+This will make all the images in the `assets/images` folder available in your application.
+
+### Using the Image
+
+Once you have added the assets to your `pubspec.yaml` file, you can use them in your application using the `Image` widget in two ways:
+
+1.  `Image(image: AssetImage('path/to/image.png'))`
+2.  `Image.asset('path/to/image.png')`
+
+Here is an example of how to use both:
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(image: AssetImage('assets/images/dice-1.png')),
+              Image.asset('assets/images/dice-2.png'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Loading Images from the Web
+
+You can also load images directly from the internet using `Image.network()`. This is useful for displaying profile pictures, product images, or any dynamic content from a web API.
+
+```dart title="web_image_example.dart"
+import 'package:flutter/material.dart';
+
+class WebImageExample extends StatelessWidget {
+  const WebImageExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Web Images')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // highlight-next-line
+            Image.network(
+              'https://picsum.photos/200/300',
+              width: 200,
+              height: 300,
+              // Optional: Show a loading indicator while image loads
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const CircularProgressIndicator();
+              },
+              // Optional: Show an error icon if image fails to load
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.error, size: 50);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```

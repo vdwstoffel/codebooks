@@ -3,6 +3,9 @@ sidebar_label: "Screens"
 sidebar_position: 4
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 # Screens
 
 Screens (also called pages or views) are full-page widgets that represent complete user interfaces in your Flutter app. They typically contain an `AppBar`, a `body`, and other structural elements that make up a complete page.
@@ -24,6 +27,9 @@ Screens (also called pages or views) are full-page widgets that represent comple
 ## Basic Screen Example
 
 Here's a simple screen with an app bar and body:
+
+<Tabs>
+<TabItem value="screen" label="HomeScreen" default>
 
 ```dart title="home_screen.dart"
 import 'package:flutter/material.dart';
@@ -56,7 +62,8 @@ class HomeScreen extends StatelessWidget {
 }
 ```
 
-To use this screen in your app, reference it in your main MaterialApp:
+</TabItem>
+<TabItem value="main" label="Main">
 
 ```dart title="main.dart"
 import 'package:flutter/material.dart';
@@ -79,6 +86,9 @@ class MyApp extends StatelessWidget {
 }
 ```
 
+</TabItem>
+</Tabs>
+
 This pattern includes:
 - `Scaffold` - Provides the basic layout structure
 - `AppBar` - Top navigation bar with title
@@ -93,6 +103,9 @@ Navigation allows users to move between different screens in your app. Flutter u
 
 Here's a simple example with two stateless widgets:
 
+<Tabs>
+<TabItem value="first" label="FirstScreen" default>
+
 ```dart title="first_screen.dart"
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/second_screen.dart';
@@ -102,8 +115,7 @@ class FirstScreen extends StatelessWidget {
 
   // highlight-next-line
   void _navigateToSecondScreen(BuildContext context) {
-    Navigator.push(
-      context,
+    Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const SecondScreen()),
     );
   }
@@ -126,6 +138,9 @@ class FirstScreen extends StatelessWidget {
 }
 ```
 
+</TabItem>
+<TabItem value="second" label="SecondScreen">
+
 ```dart title="second_screen.dart"
 import 'package:flutter/material.dart';
 
@@ -134,7 +149,7 @@ class SecondScreen extends StatelessWidget {
 
   // highlight-next-line
   void _goBack(BuildContext context) {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -155,9 +170,15 @@ class SecondScreen extends StatelessWidget {
 }
 ```
 
+</TabItem>
+</Tabs>
+
 ### Stateful Widget Navigation
 
 Here's an example with stateful widgets that can manage their own state:
+
+<Tabs>
+<TabItem value="counter" label="CounterScreen" default>
 
 ```dart title="counter_screen.dart"
 import 'package:flutter/material.dart';
@@ -181,8 +202,7 @@ class _CounterScreenState extends State<CounterScreen> {
 
   // highlight-next-line
   void _navigateToSettings(BuildContext context) {
-    Navigator.push(
-      context,
+    Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const SettingsScreen()),
     );
   }
@@ -220,6 +240,9 @@ class _CounterScreenState extends State<CounterScreen> {
 }
 ```
 
+</TabItem>
+<TabItem value="settings" label="SettingsScreen">
+
 ```dart title="settings_screen.dart"
 import 'package:flutter/material.dart';
 
@@ -235,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // highlight-next-line
   void _goBack(BuildContext context) {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -277,8 +300,376 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 ```
 
+</TabItem>
+</Tabs>
+
 ### Key Navigation Methods
 
 - `Navigator.push()` - Navigate to a new screen
 - `Navigator.pop()` - Go back to the previous screen
 - `MaterialPageRoute` - Creates a platform-adaptive route transition
+
+## Navigation Drawer
+
+A navigation drawer is a panel that slides in from the left side of the screen and displays navigation options. It's perfect for apps with multiple sections that don't fit well in a bottom navigation bar.
+
+Here's a simple drawer example:
+
+```dart title="drawer_screen.dart"
+import 'package:flutter/material.dart';
+
+class DrawerScreen extends StatelessWidget {
+  const DrawerScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Drawer Example'),
+        backgroundColor: Colors.blue,
+      ),
+      // highlight-start
+      drawer: Drawer(
+        child: Column(
+          children: [
+            // Drawer header
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: const Text('Menu'),
+            ),
+            // First menu item
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.of(context).pop(); // Close drawer
+                // Add navigation logic here
+              },
+            ),
+            // Second menu item
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.of(context).pop(); // Close drawer
+                // Add navigation logic here
+              },
+            ),
+          ],
+        ),
+      ),
+      // highlight-end
+      body: const Center(
+        child: Text(
+          'Tap the menu icon to open the drawer',
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Drawer Components
+
+- **Drawer**: The main container that slides in from the left
+- **DrawerHeader**: A styled header section at the top of the drawer
+- **ListTile**: Menu items with icons and text
+- **leading**: Icon displayed on the left side of each menu item
+- **title**: Text label for each menu item
+- **onTap**: Function called when a menu item is tapped
+
+The drawer automatically includes a hamburger menu icon in the AppBar and handles opening/closing animations.
+
+## PopScope - Controlling Back Navigation
+
+PopScope allows you to control what happens when a user tries to navigate back from a screen. Here's a simple example showing how to save a value when leaving one screen and access it on another:
+
+<Tabs>
+<TabItem value="input" label="InputScreen" default>
+
+```dart title="input_screen.dart"
+import 'package:flutter/material.dart';
+
+class InputScreen extends StatefulWidget {
+  const InputScreen({super.key});
+
+  @override
+  State<InputScreen> createState() => _InputScreenState();
+}
+
+class _InputScreenState extends State<InputScreen> {
+  final TextEditingController _controller = TextEditingController();
+  String _savedText = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      // highlight-next-line
+      canPop: false, // Prevent automatic back navigation
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          // Save the text before going back
+          _savedText = _controller.text;
+          // highlight-next-line
+          Navigator.of(context).pop(_savedText); // Return the saved value
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Input Screen'),
+        ),
+        body: Column(
+          children: [
+            TextField(
+              controller: _controller,
+            ),
+            const Text('Press back button to save and return'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+<TabItem value="main" label="MainScreen">
+
+```dart title="main_screen.dart"
+import 'package:flutter/material.dart';
+import 'input_screen.dart';
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  String _receivedText = 'No text received yet';
+
+  // highlight-start
+  void _navigateToInput() async {
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (context) => const InputScreen()),
+    );
+    
+    if (result != null) {
+      setState(() {
+        _receivedText = result;
+      });
+    }
+  }
+  // highlight-end
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Main Screen'),
+      ),
+      body: Column(
+        children: [
+          Text('Received: $_receivedText'),
+          ElevatedButton(
+            onPressed: _navigateToInput,
+            child: const Text('Go to Input Screen'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+### How It Works
+
+1. **PopScope Setup**: `canPop: false` prevents automatic back navigation
+2. **Save on Back**: `onPopInvoked` is called when back is pressed, saves the text
+3. **Return Value**: `Navigator.pop(_savedText)` returns the saved value
+4. **Receive Value**: The main screen awaits the result and updates its state
+
+This pattern is useful for forms, settings screens, or any situation where you need to save data before leaving a screen.
+
+## Tab Navigation with Bottom Navigation Bar
+
+Tab navigation allows users to quickly switch between different screens using tabs at the bottom of the screen. This is perfect for apps with multiple main sections like Home, Search, Profile, etc.
+
+Here's a simple example with two tabs:
+
+<Tabs>
+<TabItem value="main" label="TabsScreen" default>
+
+```dart title="tabs_screen.dart"
+import 'package:flutter/material.dart';
+
+class TabsScreen extends StatefulWidget {
+  const TabsScreen({super.key});
+
+  @override
+  State<TabsScreen> createState() => _TabsScreenState();
+}
+
+class _TabsScreenState extends State<TabsScreen> {
+  // highlight-next-line
+  int _currentIndex = 0;
+
+  // List of screens for each tab
+  final List<Widget> _screens = [
+    const HomeTabScreen(),
+    const FavoritesTabScreen(),
+  ];
+
+  // highlight-start
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+  // highlight-end
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Display the current screen based on selected tab
+      // highlight-next-line
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        // highlight-next-line
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+<TabItem value="home" label="HomeTabScreen">
+
+```dart title="home_tab_screen.dart"
+// First tab screen
+class HomeTabScreen extends StatelessWidget {
+  const HomeTabScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        backgroundColor: Colors.blue,
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.home, size: 80, color: Colors.blue),
+            SizedBox(height: 20),
+            Text(
+              'Home Screen',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('This is the home tab content'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+<TabItem value="favorites" label="FavoritesTabScreen">
+
+```dart title="favorites_tab_screen.dart"
+// Second tab screen
+class FavoritesTabScreen extends StatelessWidget {
+  const FavoritesTabScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorites'),
+        backgroundColor: Colors.red,
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.favorite, size: 80, color: Colors.red),
+            SizedBox(height: 20),
+            Text(
+              'Favorites Screen',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('This is the favorites tab content'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+</TabItem>
+<TabItem value="main-usage" label="Main">
+
+```dart title="main.dart"
+import 'package:flutter/material.dart';
+import 'package:myapp/screens/tabs_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.blue),
+      // highlight-next-line
+      home: const TabsScreen(),
+    );
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+### How It Works
+
+1. **State Management**: `_currentIndex` tracks which tab is currently selected (0 for Home, 1 for Favorites)
+
+2. **Screen List**: `_screens` contains the widgets for each tab content
+
+3. **Body**: Displays the current screen based on `_currentIndex`
+
+4. **BottomNavigationBar**: 
+   - `currentIndex` - Shows which tab is currently active
+   - `onTap` - Called when a tab is tapped, updates `_currentIndex`
+   - `items` - List of `BottomNavigationBarItem` widgets defining each tab
+
+This pattern is perfect for apps where users need quick access to multiple main sections without using complex navigation.
